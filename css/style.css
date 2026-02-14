@@ -1,0 +1,689 @@
+/* ==========================================================================
+   IMPORTS & VARIÁVEIS GLOBAIS
+   ========================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Inter:wght@300;400;500;600&display=swap');
+
+:root {
+  --bg-dark: #0a0e17;
+  --neon-green: #00ff41;
+  --neon-green-border: #3a7a4a;
+  --neon-green-light: #00ff9d;
+  --neon-green-dim: #00cc33;
+  --neon-green-back: #6e8d4a;
+  --card-bg: rgba(6, 26, 11, 0.88);
+  --glow-shadow: 0 0 20px rgba(0, 255, 65, 0.15);
+  --text-shadow-glow: 0 0 10px #00ff41;
+}
+
+/* ==========================================================================
+   BASE & BODY (inclui scanline e grid de terminal)
+   ========================================================================== */
+body {
+  font-family: 'Inter', 'JetBrains Mono', monospace;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  line-height: 1.7;
+  background: var(--bg-dark);
+  color: var(--neon-green);
+  background-image: 
+    linear-gradient(rgba(0, 255, 65, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 65, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0,0,0,0.3) 1px,
+    transparent 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+  mix-blend-mode: multiply;
+}
+
+/* ==========================================================================
+   TIPOGRAFIA & ELEMENTOS COMUNS
+   ========================================================================== */
+header {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+h1 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 3.2rem;
+  font-weight: 700;
+  color: var(--neon-green-light);
+  text-shadow: var(--text-shadow-glow), 0 0 20px var(--neon-green);
+  margin: 0;
+  letter-spacing: 2px;
+}
+
+h1::after {
+  content: "_";
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+h2 {
+  font-size: 2rem;
+  color: var(--neon-green-light);
+  text-shadow: 0 0 8px var(--neon-green);
+  margin-top: 0;
+}
+
+time {
+  color: var(--neon-green-dim);
+  font-size: 0.95rem;
+  display: block;
+  margin: 12px 0;
+}
+
+footer {
+  text-align: center;
+  margin-top: 80px;
+  color: var(--neon-green-dim);
+  font-size: 0.9rem;
+}
+
+.subtitle {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.1rem;
+  color: var(--neon-green-dim);
+  margin-top: 12px;
+  text-shadow: 0 0 6px rgba(0, 255, 65, 0.4);
+  letter-spacing: 0.5px;
+  opacity: 0.9;
+  text-align: center;
+}
+
+.subtitle:hover {
+  color: var(--neon-green-light);
+  text-shadow: 0 0 12px var(--neon-green);
+  transition: all 0.3s ease;
+}
+
+/* Controle por breakpoint */
+.desktop-only {
+  display: block;
+}
+
+.mobile-only {
+  display: none;
+}
+
+/* ==========================================================================
+   CARDS DE POSTAGENS (article)
+   ========================================================================== */
+article {
+  background: var(--card-bg);
+  padding: 32px;
+  margin-bottom: 48px;
+  border: 1px solid var(--neon-green-border);
+  border-radius: 8px;
+  box-shadow: var(--glow-shadow);
+  backdrop-filter: blur(4px);
+  transition: all 0.3s ease;
+
+  /* Textura radial holográfica */
+  background-image: 
+    radial-gradient(circle at 50% 50%, rgba(0, 255, 100, 0.15) 0%, rgba(0, 255, 65, 0.005) 30%, transparent 60%),
+    radial-gradient(circle at 50% 50%, transparent 10%, rgba(0, 255, 65, 0.04) 11%, transparent 12%, rgba(0, 255, 65, 0.03) 20%, transparent 21%, rgba(0, 255, 65, 0.02) 35%, transparent 36%),
+    radial-gradient(circle at 30% 70%, rgba(0, 255, 150, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 70% 30%, rgba(0, 255, 100, 0.07) 0%, transparent 45%);
+  background-size: 200% 200%, 180% 180%, 300% 300%, 250% 250%;
+  background-position: center;
+  background-blend-mode: screen, overlay, screen, screen;
+}
+
+article:hover {
+  border-color: var(--neon-green-light);
+  box-shadow: 0 0 40px rgba(0, 255, 65, 0.3);
+  transform: translateY(-4px);
+}
+
+/* Tags */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tags span {
+  background: rgba(0, 255, 65, 0.1);
+  color: var(--neon-green);
+  padding: 6px 14px;
+  border: 1px solid var(--neon-green);
+  border-radius: 4px;
+  font-size: 0.85rem;
+  box-shadow: 0 0 8px rgba(0, 255, 65, 0.2);
+}
+
+/* Ler mais */
+.read-more {
+  margin-top: 20px;
+  padding: 10px 24px;
+  background: transparent;
+  color: var(--neon-green);
+  border: 2px solid var(--neon-green);
+  text-decoration: none;
+  border-radius: 4px;
+  font-weight: 500;
+  display: inline-block;
+  transition: all 0.3s;
+  text-shadow: 0 0 5px var(--neon-green);
+}
+
+.read-more:hover {
+  background: var(--neon-green);
+  color: var(--bg-dark);
+  box-shadow: 0 0 15px var(--neon-green);
+}
+
+/* ==========================================================================
+   SIDEBAR & HAMBURGER MENU
+   ========================================================================== */
+.container {
+  display: flex;
+  gap: 40px;
+  margin-top: 20px;
+}
+
+.content {
+  flex: 3;
+  min-width: 0;
+}
+
+.sidebar {
+  background: rgba(10, 20, 30, 0.95);
+  padding: 20px;
+  box-shadow: 5px 0 20px rgba(0, 255, 65, 0.2);
+  z-index: 1000;
+  overflow-y: auto;
+}
+
+.sidebar h3 {
+  color: var(--neon-green-light);
+  text-shadow: 0 0 8px var(--neon-green);
+  margin-top: 0;
+  border-bottom: 1px solid var(--neon-green);
+  padding-bottom: 10px;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar li {
+  margin: 12px 0;
+}
+
+.sidebar a {
+  color: var(--neon-green);
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.sidebar a:hover {
+  color: var(--neon-green-light);
+  text-shadow: 0 0 5px var(--neon-green);
+}
+
+/* Por padrão: esconde o botão de fechar */
+.close-btn-mobile {
+  display: none;
+}
+
+/* Hamburger (mobile only) */
+.mobile-menu-toggle {
+  display: none;
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  z-index: 1001;
+}
+
+#hamburger,
+#close-sidebar {
+  background: transparent;
+  border: none;
+  color: var(--neon-green);
+  font-size: 2rem;
+  cursor: pointer;
+  text-shadow: 0 0 5px var(--neon-green);
+}
+
+#hamburger:hover,
+#close-sidebar:hover {
+  color: var(--neon-green-light);
+}
+
+/* Off-canvas sidebar (mobile) */
+@media (max-width: 768px) {
+
+  .theme-switch-right {
+    justify-content: center;      /* centraliza no mobile para melhor UX */
+    margin: 20px 0 28px 0;        /* um pouco mais de espaço vertical */
+    padding: 0 20px;
+  }
+
+  .theme-label {
+    font-size: 0.95rem;
+  }
+  .desktop-only {
+    display: none;
+  }
+  
+  .mobile-only {
+    display: block;
+  }
+  
+  /* Opcional: ajuste fino pro mobile */
+  .subtitle {
+    font-size: 1rem;
+    margin-top: 8px;
+    line-height: 1.4;
+  }  
+
+  .close-btn-mobile {
+    display: block;
+  }
+
+  /* Opcional: melhora posicionamento no mobile */
+  .sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  #close-sidebar {
+    font-size: 2.2rem;
+    padding: 0 10px;
+  }
+
+  .sidebar {
+    position: fixed;
+    inset: 0  auto 0 0;
+    width: 280px;
+    transform: translateX(-100%);
+    transition: transform 0.4s ease;
+    border: none;
+  }
+
+  .sidebar.active {
+    transform: translateX(0);
+    border-right: 1px solid var(--neon-green);
+  }
+}
+
+/* Desktop sidebar */
+@media (min-width: 769px) {
+  .sidebar {
+    position: sticky;
+    top: 20px;
+
+    height: auto;
+    border: 1px solid var(--neon-green-border);
+    border-radius: 8px;
+
+    width: 280px;                /* largura fixa desejada - ajuste conforme seu gosto */
+    max-width: 320px;            /* ou use max-width se preferir flexibilidade */
+    min-width: 240px;            /* evita que fique muito estreito */
+    
+    /* Impede expansão infinita por conteúdo longo */
+    overflow-x: hidden;          /* esconde overflow horizontal */
+    
+    /* Quebra palavras longas (útil para títulos de notícias ou links) */
+    word-break: break-word;      /* ou hyphenate: auto; se quiser hifens */
+    hyphens: auto;               /* suporte melhor em português */
+    overflow-wrap: break-word;   /* fallback moderno */
+    
+    /* Opcional: permite scroll vertical se muitos posts */
+    overflow-y: auto;
+    max-height: 80vh;            /* limita altura se quiser, evita sidebar infinita verticalmente */
+    scrollbar-width: thin;                /* Firefox: fino e discreto */
+    
+    scrollbar-color: rgba(102, 190, 124, 0.25) transparent;  
+  }
+
+  /* Garante que os links/títulos dentro não quebrem o container */
+  .sidebar a,
+  .sidebar li,
+  .sidebar h3 {
+    white-space: normal;         /* permite quebra de linha */
+    word-wrap: break-word;
+  }
+
+  /* Se títulos ainda forem problema, force quebra */
+  .sidebar #recent-posts a {
+    display: block;              /* faz o link ocupar linha cheia */
+    line-height: 1.4;
+  }
+
+  :root {
+    --scrollbar-opacity: 0.75;          /* ajuste aqui: 0.1 = quase sumido, 0.4 = visível mas suave */
+    --scrollbar-opacity-hover: 0.65;
+  }
+
+  /* Regras específicas Chrome/Edge/Safari (sobrepõem onde suportado) */
+  @supports not (scrollbar-color: red transparent) {  /* truque pra atingir só WebKit */
+    .sidebar::-webkit-scrollbar {
+      width: 6px;
+    }
+    .sidebar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .sidebar::-webkit-scrollbar-thumb {
+      background: rgba(0, 255, 65, var(--scrollbar-opacity));
+      border-radius: 10px;
+      transition: all 0.3s ease;
+    }
+    .sidebar::-webkit-scrollbar-thumb:hover {
+      background: rgba(0, 255, 65, var(--scrollbar-opacity-hover));
+      box-shadow: 0 0 10px rgba(0, 255, 65, 0.45);
+    }
+  }
+
+  /* Opcional: esconde completamente quando não está em uso (mais clean) */
+  .sidebar::-webkit-scrollbar-thumb:vertical {
+    min-height: 40px;                     /* evita thumb muito pequeno */
+  }
+
+  /* Suporte Firefox extra (se quiser mais controle) */
+  @supports (scrollbar-width: thin) and (scrollbar-color: var(--neon-green-dim) transparent) {
+    /*.sidebar {
+      scrollbar-color: var(--neon-green-dim) transparent;
+    }*/
+  }
+}
+
+/* ==========================================================================
+   POST INDIVIDUAL (post.html)
+   ========================================================================== */
+.post-content {
+  background: rgba(10, 20, 30, 0.85);
+  padding: 32px;
+  border: 1px solid var(--neon-green-border);
+  border-radius: 8px;
+  box-shadow: 0 0 25px rgba(0, 255, 65, 0.2);
+}
+
+.back-link {
+  color: var(--neon-green-back);
+  text-shadow: 0 0 5px var(--neon-green);
+  text-decoration: none;
+}
+
+.back-link:hover {
+  color: var(--neon-green);
+  text-shadow: 0 0 10px var(--neon-green-light);
+}
+
+.post-content-font {
+  color: rgba(155, 65, 65, 0.85);
+  box-shadow: 0 0 25px rgba(0, 255, 65, 0.2);
+}
+
+/* ==========================================================================
+   MEDIA QUERIES (mobile adjustments)
+   ========================================================================== */
+@media (max-width: 768px) {
+  body {
+    padding: 20px 12px;
+  }
+
+  body.sidebar-open .mobile-menu-toggle {
+    display: none !important;
+  }  
+
+  header {
+    margin-bottom: 40px;
+  }
+
+  h1 {
+    font-size: 2.4rem;
+  }
+
+  h2 {
+    font-size: 1.7rem;
+  }
+
+  article {
+    padding: 24px 18px;
+    margin-bottom: 32px;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  .read-more {
+    width: 100%;
+    text-align: center;
+    box-sizing: border-box;
+  }
+
+  .post-content {
+    padding: 24px 18px;
+  }
+
+  article:hover,
+  .read-more:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .mobile-menu-toggle {
+    display: block;
+  }
+
+  .container {
+    flex-direction: column;
+    gap: 30px;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 15px 10px;
+  }
+
+  h1 {
+    font-size: 2rem;
+  }
+
+  article {
+    padding: 20px 15px;
+  }
+}
+
+/* Overlay para sidebar mobile */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s;
+}
+
+.overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+
+/* ==========================================================================
+   THEME SWITCHER
+   ========================================================================== */
+
+.theme-switch-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.theme-label {
+  font-size: 0.95rem;
+  color: var(--neon-green-dim);
+  min-width: 110px;
+  text-align: left;
+}
+
+/* Toggle switch */
+.theme-switch {
+  position: relative;
+  display: inline-block;
+  width: 54px;
+  height: 28px;
+}
+
+.theme-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #3a7a4a;
+  transition: .4s;
+  border-radius: 28px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 22px;
+  width: 22px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background: linear-gradient(90deg, #00d4ff, #7c3aed);
+}
+
+input:checked + .slider:before {
+  transform: translateX(26px);
+}
+
+/* Tema Modern Tech */
+[data-theme="modern"] {
+  --bg-dark: #0f1117;
+  --neon-green: #a5b4fc;            /* índigo claro */
+  --neon-green-light: #c7d2fe;
+  --neon-green-dim: #818cf8;
+  --neon-green-border: #6366f1;
+  --neon-green-back: #667892;
+  --card-bg: rgba(15, 23, 42, 0.92);
+  --glow-shadow: 0 0 20px rgba(99, 102, 241, 0.18);
+  --text-shadow-glow: 0 0 10px #a5b4fc;
+}
+
+[data-theme="modern"] body {
+  background: var(--bg-dark);
+  color: #e0e7ff;
+}
+
+[data-theme="modern"] h1,
+[data-theme="modern"] h2 {
+  color: #c7d2fe;
+  text-shadow: 0 0 12px rgba(165, 180, 252, 0.5);
+}
+
+[data-theme="modern"] article {
+  border-color: #6366f1;
+  background: var(--card-bg);
+}
+
+[data-theme="modern"] .read-more {
+  border-color: #818cf8;
+  color: #a5b4fc;
+}
+
+[data-theme="modern"] .read-more:hover {
+  background: #6366f1;
+  color: white;
+}
+
+/* (opcional) Tema Light — descomente se quiser adicionar */
+[data-theme="light"] {
+  --bg-dark: #f8fafc;
+  --neon-green: #1e293b;
+  --neon-green-light: #334155;
+  --neon-green-dim: #475569;
+  --neon-green-border: #64748b;
+  --neon-green-back: #334155;
+  --card-bg: #ffffff;
+  --glow-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  --text-shadow-glow: 0 0 10px #f8fafc; 
+}
+
+[data-theme="light"] body {
+  background: var(--bg-dark);
+  color: #0f172a;
+}
+
+[data-theme="light"] h1, [data-theme="light"] h2 {
+  color: #1e293b;
+  text-shadow: none;
+}
+
+[data-theme="light"] article {
+  border-color: #cbd5e1;
+  box-shadow: var(--glow-shadow);
+  background: white;
+}
+
+
+/* ==========================================================================
+   Ajustes no tema switcher dentro da sidebar
+   ========================================================================== */
+
+.sidebar .theme-switch-wrapper {
+  margin: 16px 0 24px 0;          /* espaço acima e (principalmente) abaixo */
+  padding: 0 16px;                /* respeta o padding lateral da sidebar */
+}
+
+/* Alinha o switch + label à direita (desktop) */
+.theme-switch-right {
+  display: flex;
+  justify-content: flex-end;      /* joga tudo para a direita */
+  align-items: center;
+  gap: 10px;                      /* espaço entre switch e texto "Neon Dark" */
+}
+
+/* Opcional: deixa o texto "Neon Dark / Modern Tech" um pouco mais discreto */
+.sidebar .theme-label {
+  color: var(--neon-green-dim);
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+/* Hover sutil no wrapper (melhora interatividade) */
+.theme-switch-wrapper:hover .theme-label {
+  color: var(--neon-green-light);
+  text-shadow: 0 0 6px var(--neon-green);
+  transition: all 0.2s ease;
+}

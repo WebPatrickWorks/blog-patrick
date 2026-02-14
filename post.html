@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Carregando post...</title>
+  <link rel="stylesheet" href="css/style.css">
+
+</head>
+<body>
+  <header>
+    <h1>Blog do Patrick</h1>
+    
+    <!-- Botão de tema -->
+    <div class="theme-switch-wrapper">
+      <label class="theme-switch">
+        <input type="checkbox" id="theme-toggle">
+        <span class="slider round"></span>
+      </label>
+      <span class="theme-label">Neon Dark</span>
+    </div>
+
+    <a href="index.html" class="back-link">← Voltar para a lista de posts</a>
+  </header>
+
+  <main id="post-container">
+    <p>Carregando post...</p>
+  </main>
+
+  <footer>
+    <p>Feito com ❤️ e JSON | <a href="https://github.com/SEU-USUARIO/SEU-REPO">Código-fonte</a></p>
+  </footer>
+
+  <script>
+    // Theme switcher (copiado/adaptado do main.js)
+    document.addEventListener('DOMContentLoaded', () => {
+      const toggle = document.getElementById('theme-toggle');
+      const label = document.querySelector('.theme-label');
+      
+      if (!toggle || !label) return; // segurança caso não encontre os elementos
+
+      // Carrega tema salvo (ou usa neon como default)
+      const currentTheme = localStorage.getItem('theme') || 'neon';
+      document.documentElement.setAttribute('data-theme', currentTheme);
+      
+      if (currentTheme === 'modern') {
+        toggle.checked = true;
+        label.textContent = 'Modern Tech';
+      } else if (currentTheme === 'light') {
+        toggle.checked = true;
+        label.textContent = 'Light Mode';
+      } else {
+        toggle.checked = false;
+        label.textContent = 'Neon Dark';
+      }
+
+      toggle.addEventListener('change', () => {
+        let theme;
+        if (toggle.checked) {
+          // Alterna: modern → light → neon (ou só modern ↔ neon se preferir)
+          if (document.documentElement.getAttribute('data-theme') === 'modern') {
+            theme = 'light';
+            label.textContent = 'Light Mode';
+          } else {
+            theme = 'modern';
+            label.textContent = 'Modern Tech';
+          }
+        } else {
+          theme = 'neon';
+          label.textContent = 'Neon Dark';
+        }
+        
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+      });
+    });
+  </script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const container = document.getElementById('post-container');
+      const urlParams = new URLSearchParams(window.location.search);
+      const postId = urlParams.get('id');
+
+      if (!postId) {
+        container.innerHTML = '<p>Post não encontrado. Volte para a <a href="index.html">página inicial</a>.</p>';
+        document.title = 'Post não encontrado';
+        return;
+      }
+
+      fetch('data/posts.json')
+        .then(response => {
+          if (!response.ok) throw new Error('Erro ao carregar os posts');
+          return response.json();
+        })
+        .then(posts => {
+          const post = posts.find(p => p.id == postId); // == para comparar string/number
+
+          if (!post) {
+            container.innerHTML = '<p>Post não encontrado. Volte para a <a href="index.html">página inicial</a>.</p>';
+            document.title = 'Post não encontrado';
+            return;
+          }
+
+          // Atualiza título da página
+          document.title = post.title + ' | Blog do Patrick';
+
+          container.innerHTML = `
+            <article class="post-content">
+              <h2>${post.title}</h2>   <!-- Mude de h1 para h2 aqui -->
+              <time datetime="${post.date}">${new Date(post.date).toLocaleDateString('pt-BR', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              })}</time>
+              <div class="tags">
+                ${post.tags.map(tag => `<span>#${tag}</span>`).join(' ')}
+              </div>
+              <div class="content">
+                ${post.content}
+              </div>
+            </article>
+            <a href="index.html" class="back-link">← Voltar para a lista de posts</a>
+          `;
+        })
+        .catch(error => {
+          console.error(error);
+          container.innerHTML = '<p>Ops... não consegui carregar o post. Verifique o console ou tente novamente.</p>';
+        });
+    });
+  </script>
+</body>
+</html>

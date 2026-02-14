@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Blog do Patrick</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <h1>Blog do Patrick</h1>
+    
+    <!-- Versão desktop (completa) -->
+    <p class="subtitle desktop-only">
+      Observando a singularidade de camarote — IA, startups, vida e deploy baratinho
+    </p>
+    
+    <!-- Versão mobile (curta) -->
+    <p class="subtitle mobile-only">
+      Singularidade de camarote — IA • startups • vida • deploy baratinho
+    </p> 
+  </header>
+
+  <!-- Logo após o <header> ou no topo do body -->
+  <div class="mobile-menu-toggle">
+    <button id="hamburger" aria-label="Abrir menu">☰</button>
+  </div>
+
+  <div class="container">
+    <main id="posts-container" class="content">
+      <!-- posts via JS -->
+    </main>
+
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h3>Menu</h3>
+        <button id="close-sidebar" class="close-btn-mobile" aria-label="Fechar menu">×</button>
+      </div>
+
+      <!-- Botão de tema com classe para alinhamento -->
+      <div class="theme-switch-wrapper theme-switch-right">
+        <label class="theme-switch">
+          <input type="checkbox" id="theme-toggle">
+          <span class="slider round"></span>
+        </label>
+        <span class="theme-label">Neon Dark</span>
+      </div>
+
+      <h3>Últimos Posts</h3>
+      <ul id="recent-posts"></ul>
+
+      <h3>Artigos</h3>
+      <ul id="recent-artigos"></ul>      
+
+      <h3>Sobre</h3>
+      <p>Dev old-school, nostálgico de Clipper...</p>
+    </aside>
+  </div>
+
+  <footer>
+    <p>Feito com ❤️ e JSON | <a href="https://github.com/seu-usuario/seu-repo">Código-fonte</a></p>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
