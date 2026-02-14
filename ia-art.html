@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>IA Arts | Blog do Patrick</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <!-- Cloudflare Web Analytics -->
+  <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "7839603b0b7341f6be8508063bbb734a"}'></script>
+</head>
+<body>
+  <header>
+    <h1>Blog do Patrick</h1>
+    
+    <div class="theme-switch-wrapper">
+      <label class="theme-switch">
+        <input type="checkbox" id="theme-toggle">
+        <span class="slider"></span>
+      </label>
+      <span class="theme-label">Neon Dark</span>
+    </div>
+
+    <a href="index.html" class="back-link">← Voltar para a página inicial</a>
+  </header>
+
+  <div class="mobile-menu-toggle">
+    <button id="hamburger" aria-label="Abrir menu">☰</button>
+  </div>
+
+  <div class="container">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h3>Temas IA Arts</h3>
+        <button id="close-sidebar" class="close-btn-mobile" aria-label="Fechar menu">×</button>
+      </div>
+
+      <ul id="temas-list"></ul>
+    </aside>
+
+    <main class="content">
+      <div id="obras-grid" class="grid-obras"></div>
+      <button id="carregar-mais" class="read-more" style="display: none; margin: 40px auto;">Carregar mais</button>
+    </main>
+  </div>
+
+  <!-- Modal para vídeo -->
+  <div id="modal-overlay" class="overlay">
+    <div class="modal-content">
+      <!-- Botão fechar no canto superior esquerdo -->
+      
+      <!-- Player sem bordas extras ou título -->
+      <div class="player-wrapper">
+        <iframe id="youtube-player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        
+        <!-- Só o botão fechar permanece -->
+        <button class="close-modal">×</button>
+      </div>
+      
+    </div>
+  </div>
+
+  <footer>
+    <p>Feito com ❤️ e JSON | <a href="https://webpatrickworks.github.io/blog-patrick">Código-fonte</a></p>
+  </footer>
+
+  <script>
+    // Theme switcher (reutilize o mesmo código do main.js ou post.html)
+    // ... cole aqui o código do theme toggle (pode usar o mesmo id ou duplicar para sidebar se quiser)
+
+    // Lógica principal da galeria
+    document.addEventListener('DOMContentLoaded', async () => {
+      const temasList = document.getElementById('temas-list');
+      const grid = document.getElementById('obras-grid');
+      const btnMais = document.getElementById('carregar-mais');
+      const modal = document.getElementById('modal-overlay');
+      const closeModal = document.querySelector('.close-modal');
+      const player = document.getElementById('youtube-player');
+
+      let todasObras = [];
+      let temas = [];
+      let currentThemeId = 0;
+      let pagina = 0;
+      const POR_PAGINA = 10;
+
+      try {
+        const res = await fetch('data/ia-arts.json');
+        if (!res.ok) throw new Error('Não encontrou ia-arts.json');
+        const data = await res.json();
+
+        temas = data.temas || [];
+        todasObras = (data.obras || []).sort((a, b) => new Date(b.date) - new Date(a.date));
+      } catch (err) {
+        console.error(err);
+        grid.innerHTML = '<p style="text-align:center; color:var(--neon-green-dim);">Ops... não consegui carregar as obras. Verifique o console.</p>';
+        return;
+      }
+
+      function renderTemas() {
+        temasList.innerHTML = '';
+
+        // Item "Todos" fixo no topo
+        const todosLi = document.createElement('li');
+        todosLi.dataset.themeId = '0';
+        todosLi.className = currentThemeId === 0 ? 'active' : '';
+        todosLi.innerHTML = `<span class="checkmark">✓</span> Todos`;
+        temasList.appendChild(todosLi);
+
+        // Temas reais, ordenados alfabeticamente
+        const sorted = [...temas].filter(t => t.id !== 0).sort((a, b) => a.name.localeCompare(b.name));
+        sorted.forEach(t => {
+          const li = document.createElement('li');
+          li.dataset.themeId = t.id;
+          li.className = currentThemeId === t.id ? 'active' : '';
+          li.innerHTML = `<span class="checkmark">✓</span> ${t.name}`;
+          // Tooltip com description (opcional)
+          if (t.description) li.title = t.description;
+          temasList.appendChild(li);
+        });
+
+        // Clique nos temas
+        temasList.querySelectorAll('li').forEach(li => {
+          li.addEventListener('click', () => {
+            currentThemeId = parseInt(li.dataset.themeId);
+            pagina = 0;
+            renderObras();
+            temasList.querySelectorAll('li').forEach(l => l.classList.remove('active'));
+            li.classList.add('active');
+          });
+        });
+      }
+
+      function renderObras() {
+        grid.innerHTML = '';
+
+        let filtradas = currentThemeId === 0 
+          ? todasObras 
+          : todasObras.filter(o => o.theme_id === currentThemeId);
+
+        const inicio = pagina * POR_PAGINA;
+        const itens = filtradas.slice(inicio, inicio + POR_PAGINA);
+
+        itens.forEach(obra => {
+          const videoId = obra.youtube_url.match(/(?:v=|youtu\.be\/)([0-9A-Za-z_-]{11})/)?.[1] || '';
+          if (!videoId) return;
+
+          const thumb = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+          const fallback = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+
+          const card = document.createElement('div');
+          card.className = 'obra-card';
+          card.innerHTML = `
+            <img src="${thumb}" onerror="this.src='${fallback}'" loading="lazy" alt="${obra.title}">
+            <p class="obra-title">${obra.title}</p>
+            <p class="obra-desc">${obra.description}</p>
+          `;
+          card.addEventListener('click', () => abrirModal(obra));
+          grid.appendChild(card);
+        });
+
+        btnMais.style.display = (inicio + POR_PAGINA < filtradas.length) ? 'block' : 'none';
+      }
+
+      function abrirModal(obra) {
+        document.body.style.overflow = 'hidden';
+        const match = obra.youtube_url.match(/(?:v=|youtu\.be\/)([0-9A-Za-z_-]{11})/);
+        const videoId = match ? match[1] : null;
+        if (!videoId) {
+          console.error("ID do vídeo não encontrado:", obra.youtube_url);
+          return;
+        }
+
+        console.log("Abrindo vídeo:", videoId); // ← adicione isso para debug
+
+        document.getElementById('youtube-player').src = 
+          `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&rel=0&modestbranding=1&controls=1`;
+
+        document.getElementById('modal-overlay').classList.add('active');
+        modal.focus();
+      }
+
+      // Eventos do modal
+      closeModal.addEventListener('click', fecharModal);
+      modal.addEventListener('click', e => { if (e.target === modal) fecharModal(); });
+
+      function fecharModal() {
+        document.body.style.overflow = '';
+        const modal = document.getElementById('modal-overlay');
+        const player = document.getElementById('youtube-player');
+        
+        modal.classList.remove('active');
+        player.src = '';  // para parar o vídeo imediatamente
+      }
+
+      // Carregar mais
+      btnMais.addEventListener('click', () => {
+        pagina++;
+        renderObras();
+      });
+
+      // Início
+      renderTemas();
+      renderObras();
+
+      // Fechar modal com tecla ESC
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' || event.key === 'Esc') {  // 'Esc' para compatibilidade antiga
+          const modal = document.getElementById('modal-overlay');
+          if (modal.classList.contains('active')) {
+            fecharModal();
+          }
+        }
+      });      
+    });
+  </script>
+
+  <script>
+    // Theme switcher - copiado e adaptado para consistência
+    document.addEventListener('DOMContentLoaded', () => {
+      const toggle = document.getElementById('theme-toggle');
+      const label = document.querySelector('.theme-label');
+      
+      if (!toggle || !label) {
+        console.warn('Theme toggle ou label não encontrado nesta página');
+        return;
+      }
+
+      // Carrega tema salvo (default: 'neon')
+      const currentTheme = localStorage.getItem('theme') || 'neon';
+      document.documentElement.setAttribute('data-theme', currentTheme);
+      
+      // Atualiza checkbox e texto do label
+      if (currentTheme === 'modern') {
+        toggle.checked = true;
+        label.textContent = 'Modern Tech';
+      } else if (currentTheme === 'light') {
+        toggle.checked = true;
+        label.textContent = 'Light Mode';
+      } else {
+        toggle.checked = false;
+        label.textContent = 'Neon Dark';
+      }
+
+      // Evento de mudança
+      toggle.addEventListener('change', () => {
+        let theme;
+        if (toggle.checked) {
+          if (document.documentElement.getAttribute('data-theme') === 'modern') {
+            theme = 'light';
+            label.textContent = 'Light Mode';
+          } else {
+            theme = 'modern';
+            label.textContent = 'Modern Tech';
+          }
+        } else {
+          theme = 'neon';
+          label.textContent = 'Neon Dark';
+        }
+        
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+      });
+    });
+  </script>
+</body>
+</html>

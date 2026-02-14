@@ -1,0 +1,36 @@
+{
+  "temas": [
+    {
+      "id": 0,
+      "name": "Todos",
+      "description": "Todas as obras"
+    },
+    {
+      "id": 1,
+      "name": "Filmes",
+      "description": "Tentativa de criar animações/filmes com consistência..."
+    }
+  ],
+  "obras": [
+    {
+      "id": 2,
+      "youtube_url": "https://youtu.be/K8y5EwmTV1w",
+      "title": "[Título do YouTube]",
+      "description": "Após um tiroteio no Memorial Lincoln, o agente Alexei Ivanov precisa escoltar Elena para fora da capital.",
+      "full_description": "Mas há algo errado: o pulso dela nunca muda. Em uma caçada eletrizante que nos leva das ruas de DC até as águas profundas da Ilha de Chesapeake, a verdade pode ser mais perigosa que a própria missão.",
+      "date": "2016-02-09",
+      "theme_id": 1,
+      "ferramenta_ia": "Grok"
+    },
+    {
+      "id": 1,
+      "youtube_url": "https://youtu.be/0onQd89wfLA",
+      "title": "[Título do YouTube]",
+      "description": "O que você faria se descobrisse que seu maior aliado esconde um segredo impossível? Assista ao trailer de Pulso Silencioso, a nova série original do canal Visões de Íris.",
+      "full_description": "Washington D.C. está em chamas. Após um tiroteio no Memorial Lincoln, o agente Alexei Ivanov precisa escoltar Elena para fora da capital. Mas há algo errado: o pulso dela nunca muda. Em uma caçada eletrizante que nos leva das ruas de DC até as águas profundas da Ilha de Chesapeake, a verdade pode ser mais perigosa que a própria missão.",
+      "date": "2016-02-08",
+      "theme_id": 1,
+      "ferramenta_ia": "Grok"
+    }
+  ]
+}
