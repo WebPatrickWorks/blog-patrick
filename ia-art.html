@@ -215,8 +215,40 @@
   </script>
 
   <script>
-    // Theme switcher - copiado e adaptado para consistência
     document.addEventListener('DOMContentLoaded', () => {
+      const hamburger = document.getElementById('hamburger');
+      const closeBtn = document.getElementById('close-sidebar');
+      const sidebar = document.getElementById('sidebar');
+
+      // Sempre cria um novo overlay dedicado para o sidebar
+      const sidebarOverlay = document.createElement('div');
+      sidebarOverlay.classList.add('sidebar-overlay');
+      document.body.appendChild(sidebarOverlay);
+
+      if (hamburger) {
+        hamburger.addEventListener('click', (event) => {
+          event.stopPropagation();
+          event.preventDefault();
+          sidebar.classList.add('active');
+          sidebarOverlay.classList.add('active');
+          document.body.classList.add('sidebar-open');
+        });
+      }
+
+      if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+          sidebar.classList.remove('active');
+          sidebarOverlay.classList.remove('active');
+          document.body.classList.remove('sidebar-open');
+        });
+      }
+
+      sidebarOverlay.addEventListener('click', () => {
+        sidebar.classList.remove('active');
+        sidebarOverlay.classList.remove('active');
+        document.body.classList.remove('sidebar-open');
+      });
+
       const toggle = document.getElementById('theme-toggle');
       const label = document.querySelector('.theme-label');
       
@@ -259,7 +291,7 @@
         
         document.documentElement.setAttribute('data-theme', theme);
         localStorage.setItem('theme', theme);
-      });
+      });      
     });
   </script>
 </body>

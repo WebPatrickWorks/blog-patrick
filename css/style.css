@@ -207,7 +207,7 @@ article:hover {
   background: rgba(10, 20, 30, 0.95);
   padding: 20px;
   box-shadow: 5px 0 20px rgba(0, 255, 65, 0.2);
-  z-index: 1000;
+  z-index: 1100;
   overflow-y: auto;
 }
 
@@ -251,6 +251,24 @@ article:hover {
   top: 15px;
   left: 15px;
   z-index: 1001;
+}
+
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6); /* Escuro semi-transparente */
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease;
+  z-index: 1000; /* Abaixo da sidebar (z-index: 1100) */
+}
+
+.sidebar-overlay.active {
+  opacity: 1;
+  visibility: visible;
 }
 
 #hamburger,
@@ -319,11 +337,13 @@ article:hover {
     transform: translateX(-100%);
     transition: transform 0.4s ease;
     border: none;
+    z-index: 1000;
   }
 
   .sidebar.active {
     transform: translateX(0);
     border-right: 1px solid var(--neon-green);
+    z-index: 1300;
   }
 }
 
@@ -511,7 +531,7 @@ article:hover {
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.75);   /* mais escuro para destacar */
-  z-index: 2000;                  /* maior que sidebar (que deve estar ~1000) */
+  z-index: 1200;                  /* maior que sidebar (que deve estar ~1000) */
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s ease;
@@ -597,6 +617,15 @@ article:hover {
   background: var(--neon-green);
   color: var(--bg-dark);
   border-color: var(--neon-green-light);
+}
+
+/* Modal / Player (o mais alto de tudo quando ativo) */
+#modal-overlay {
+  z-index: 2000;          /* sempre o mais alto possível */
+}
+
+#modal-overlay .modal-content {
+  z-index: 2001;          /* só por segurança */
 }
 
 /* ==========================================================================
