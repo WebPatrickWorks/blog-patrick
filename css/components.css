@@ -76,3 +76,50 @@ article:hover {
   color: var(--neon-green-light);
   text-shadow: 0 0 8px var(--neon-green);
 }
+
+
+/* ==========================================================================
+   LEGALTECH MODE - Banner old-school
+   ========================================================================== */
+
+.legaltech-mode-banner {
+  text-align: center;
+  margin: 40px 0 60px;
+  padding: 28px 20px;
+  border: 2px dashed var(--neon-green-dim);
+  background: rgba(0, 255, 65, 0.05);
+  backdrop-filter: blur(4px);
+  font-family: 'JetBrains Mono', monospace;
+  box-shadow: var(--glow-shadow);
+}
+
+.legaltech-mode-banner h2 {
+  font-size: 2.2rem;
+  color: var(--neon-green-light);
+  text-shadow: 0 0 12px var(--neon-green);
+  margin: 0 0 16px;
+  letter-spacing: 1px;
+}
+
+.legaltech-mode-banner h2::after {
+  content: " _";
+  animation: blink 1s step-end infinite;
+}
+
+.legaltech-mode-banner p {
+  color: var(--neon-green-dim);
+  font-size: 1rem;
+  margin: 0;
+  opacity: 0.9;
+  line-height: 1.6;
+}
+
+@keyframes blink {
+  50% { opacity: 0; }
+}
+
+/* Pequeno ajuste visual nos articles quando em modo filtrado (opcional, mas fica legal) */
+body.legaltech-mode article {
+  border-left: 4px solid var(--neon-green-light);
+  padding-left: 36px;
+}

@@ -9,15 +9,47 @@ document.addEventListener('DOMContentLoaded', () => {
       return response.json();
     })
     .then(posts => {
-      // Ordena por data mais recente primeiro (opcional)
+      // Ordena por data mais recente primeiro
       posts.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-      if (posts.length === 0) {
-        container.innerHTML = '<p>Ainda não tem postagens... 😅</p>';
+      // === DETECTA FILTRO POR TAG ===
+      const urlParams = new URLSearchParams(window.location.search);
+      const filterTag = urlParams.get('tag');
+
+      let postsToRender = posts;
+
+      if (filterTag) {
+        // Filtra posts que tenham a tag (case-insensitive)
+        postsToRender = posts.filter(post =>
+          post.tags.some(t => t.toLowerCase() === filterTag.toLowerCase())
+        );
+
+        // Adiciona classe no body para estilos condicionais
+        document.body.classList.add('legaltech-mode');
+
+        // Atualiza título da página
+        document.title = `${filterTag}: IA no Direito | Blog do Patrick`;
+
+        // Banner old-school
+        if (postsToRender.length > 0) {
+          const banner = document.createElement('div');
+          banner.className = 'legaltech-mode-banner';
+          banner.innerHTML = `
+            <h2>⚖️ MODO ${filterTag.toUpperCase()} ATIVADO</h2>
+            <p>IA invadindo tribunais, contratos inteligentes, responsabilidade civil de modelos...<br>
+            Tudo que importa quando código encontra lei.</p>
+          `;
+          container.appendChild(banner);
+        }
+      }
+
+      // Renderiza posts (filtrados ou todos)
+      if (postsToRender.length === 0) {
+        container.innerHTML += '<p>Nenhuma postagem com essa tag ainda... 🔍</p>';
         return;
       }
 
-      posts.forEach(post => {
+      postsToRender.forEach(post => {
         const article = document.createElement('article');
         article.innerHTML = `
           <h2>${post.title}</h2>
@@ -31,47 +63,45 @@ document.addEventListener('DOMContentLoaded', () => {
         container.appendChild(article);
       });
 
-      // Popula sidebar com últimos 5 posts
+      // Popula sidebar com últimos 5 posts (sempre os mais recentes, independente de filtro)
       const recentList = document.getElementById('recent-posts');
       if (recentList) {
-        const recent = posts.slice(0, 5); // Pega os 5 mais recentes (já ordenados)
+        const recent = posts.slice(0, 5);
         recent.forEach(post => {
           const li = document.createElement('li');
           li.innerHTML = `<a href="post.html?id=${post.id}">${post.title}</a>`;
           recentList.appendChild(li);
         });
-      }      
+      }
     })
     .catch(error => {
       console.error(error);
       container.innerHTML = '<p>Ops... não consegui carregar as postagens. Verifique o console.</p>';
     });
 
-  // fim do fetch de posts...
-
-  // Fetch e popula artigos
+  // Fetch e popula artigos (mantido como estava)
   fetch('data/artigos.json')
     .then(response => {
       if (!response.ok) throw new Error('Erro ao carregar artigos');
       return response.json();
     })
     .then(artigos => {
-      artigos.sort((a, b) => new Date(b.date) - new Date(a.date)); // Mais recentes primeiro
+      artigos.sort((a, b) => new Date(b.date) - new Date(a.date));
 
       const recentArtigosList = document.getElementById('recent-artigos');
       if (recentArtigosList) {
-        const recent = artigos.slice(0, 5); // Últimos 5
+        const recent = artigos.slice(0, 5);
         recent.forEach(artigo => {
           const li = document.createElement('li');
-          li.innerHTML = `<a href="artigo.html?id=${artigo.id}">${artigo.title}</a>`; // Nota: crie artigo.html se necessário
+          li.innerHTML = `<a href="artigo.html?id=${artigo.id}">${artigo.title}</a>`;
           recentArtigosList.appendChild(li);
         });
       }
     })
-    .catch(error => console.error('Erro nos artigos:', error));    
+    .catch(error => console.error('Erro nos artigos:', error));
 });
 
-
+// Hamburger menu (mantido)
 document.addEventListener('DOMContentLoaded', () => {
   const hamburger = document.getElementById('hamburger');
   const closeBtn = document.getElementById('close-sidebar');
@@ -84,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
     hamburger.addEventListener('click', () => {
       sidebar.classList.add('active');
       overlay.classList.add('active');
-      document.body.classList.add('sidebar-open');  // ← Nova classe no body
+      document.body.classList.add('sidebar-open');
     });
   }
 
@@ -103,15 +133,11 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-
-
-
-// Theme switcher
+// Theme switcher (mantido)
 document.addEventListener('DOMContentLoaded', () => {
   const toggle = document.getElementById('theme-toggle');
   const label = document.querySelector('.theme-label');
   
-  // Carrega tema salvo (ou usa neon como default)
   const currentTheme = localStorage.getItem('theme') || 'neon';
   document.documentElement.setAttribute('data-theme', currentTheme);
   
@@ -129,7 +155,6 @@ document.addEventListener('DOMContentLoaded', () => {
   toggle.addEventListener('change', () => {
     let theme;
     if (toggle.checked) {
-      // Aqui você decide a ordem: modern → light → neon
       if (document.documentElement.getAttribute('data-theme') === 'modern') {
         theme = 'light';
         label.textContent = 'Light Mode';
