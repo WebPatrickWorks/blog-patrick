@@ -123,3 +123,58 @@ body.legaltech-mode article {
   border-left: 4px solid var(--neon-green-light);
   padding-left: 36px;
 }
+
+
+/* ==================== POST HEADER ==================== */
+.post-header {
+  margin-bottom: 32px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--neon-green-border);
+}
+
+.post-header h1 {
+  font-size: 2.4rem;
+  line-height: 1.15;
+  margin: 0 0 12px 0;
+}
+
+.post-header time {
+  display: block;
+  color: var(--neon-green-dim);
+  font-size: 0.95rem;
+  margin-bottom: 16px;
+}
+
+/* Botão Compartilhar */
+.share-btn {
+  background: transparent;
+  color: var(--neon-green);
+  border: 2px solid var(--neon-green);
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.share-btn:hover {
+  background: var(--neon-green);
+  color: #000;
+  box-shadow: 0 0 15px var(--neon-green);
+}
+
+/* Responsivo */
+@media (max-width: 720px) {
+  .post-header h1 {
+    font-size: 2.05rem;
+  }
+  
+  .share-btn {
+    padding: 9px 18px;
+    font-size: 0.9rem;
+  }
+}
