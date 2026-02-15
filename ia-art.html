@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>IA Arts | Blog do Patrick</title>
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/main.css">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <!-- Cloudflare Web Analytics -->
   <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "7839603b0b7341f6be8508063bbb734a"}'></script>
@@ -12,6 +12,16 @@
 <body>
   <header>
     <h1>Blog do Patrick</h1>
+
+    <!-- Versão desktop (completa) -->
+    <p class="subtitle desktop-only">
+      Observando a singularidade de camarote — IA, startups, vida e deploy baratinho
+    </p>
+    
+    <!-- Versão mobile (curta) -->
+    <p class="subtitle mobile-only">
+      Singularidade de camarote — IA • startups • vida • deploy baratinho
+    </p>     
     
     <div class="theme-switch-wrapper">
       <label class="theme-switch">
@@ -32,7 +42,7 @@
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <h3>Temas IA Arts</h3>
-        <button id="close-sidebar" class="close-btn-mobile" aria-label="Fechar menu">×</button>
+        <button id="close-sidebar" class="close-btn-mobile" aria-label="Fechar menu lateral">×</button>
       </div>
 
       <ul id="temas-list"></ul>
@@ -47,16 +57,11 @@
   <!-- Modal para vídeo -->
   <div id="modal-overlay" class="overlay">
     <div class="modal-content">
-      <!-- Botão fechar no canto superior esquerdo -->
+      <button class="close-modal" aria-label="Fechar vídeo">×</button>
       
-      <!-- Player sem bordas extras ou título -->
       <div class="player-wrapper">
         <iframe id="youtube-player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-        
-        <!-- Só o botão fechar permanece -->
-        <button class="close-modal">×</button>
       </div>
-      
     </div>
   </div>
 

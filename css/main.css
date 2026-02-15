@@ -1,0 +1,10 @@
+/* ==========================================================================
+   MAIN CSS - Importa todos os módulos
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Inter:wght@300;400;500;600&display=swap');
+
+@import "base.css";
+@import "layout.css";
+@import "components.css";
+@import "ia-art.css";
