@@ -8,16 +8,41 @@
     {
       "id": 1,
       "name": "Filmes",
-      "description": "Tentativa de criar animações/filmes com consistência..."
+      "description": "Tentativa de criar filmes com consistência..."
+    },
+    {
+      "id": 2,
+      "name": "Animações",
+      "description": "Tentativa de criar animações com consistência..."
     }
   ],
   "obras": [
     {
+      "id": 4,
+      "youtube_url": "https://youtube.com/shorts/LTivIC53ijw",
+      "title": "CBR 1000",
+      "description": "Usando ferramentas como Kling AI 2.6, Imagine ou Runway Gen-4.5 / Gen-3 Alpha Turbo (com physics engine avançado).",
+      "full_description": "",
+      "date": "2026-01-31",
+      "theme_id": 2,
+      "ferramenta_ia": "Grok"
+    },
+    {
+      "id": 3,
+      "youtube_url": "https://youtube.com/shorts/8-stL82i9qI",
+      "title": "John & Gemy",
+      "description": "Uma peça curta de humor criada em fevereiro de 2026 com expressões em inglês casual, como experimento de colaboração humano-IA.",
+      "full_description": "",
+      "date": "2026-02-14",
+      "theme_id": 2,
+      "ferramenta_ia": "Grok"
+    },
+    {
       "id": 2,
       "youtube_url": "https://youtu.be/K8y5EwmTV1w",
-      "title": "[Título do YouTube]",
+      "title": "Pulso Silencioso (Trailer)",
       "description": "Após um tiroteio no Memorial Lincoln, o agente Alexei Ivanov precisa escoltar Elena para fora da capital.",
-      "full_description": "Mas há algo errado: o pulso dela nunca muda. Em uma caçada eletrizante que nos leva das ruas de DC até as águas profundas da Ilha de Chesapeake, a verdade pode ser mais perigosa que a própria missão.",
+      "full_description": "",
       "date": "2016-02-09",
       "theme_id": 1,
       "ferramenta_ia": "Grok"
@@ -25,9 +50,9 @@
     {
       "id": 1,
       "youtube_url": "https://youtu.be/0onQd89wfLA",
-      "title": "[Título do YouTube]",
-      "description": "O que você faria se descobrisse que seu maior aliado esconde um segredo impossível? Assista ao trailer de Pulso Silencioso, a nova série original do canal Visões de Íris.",
-      "full_description": "Washington D.C. está em chamas. Após um tiroteio no Memorial Lincoln, o agente Alexei Ivanov precisa escoltar Elena para fora da capital. Mas há algo errado: o pulso dela nunca muda. Em uma caçada eletrizante que nos leva das ruas de DC até as águas profundas da Ilha de Chesapeake, a verdade pode ser mais perigosa que a própria missão.",
+      "title": "Pulso Silencioso",
+      "description": "Washington D.C. está em chamas. Após um tiroteio no Memorial Lincoln, o agente Alexei Ivanov precisa escoltar Elena para fora da capital. Mas há algo errado: o pulso dela nunca muda. Em uma caçada eletrizante que nos leva das ruas de DC até as águas profundas da Ilha de Chesapeake, a verdade pode ser mais perigosa que a própria missão.",
+      "full_description": "",
       "date": "2016-02-08",
       "theme_id": 1,
       "ferramenta_ia": "Grok"

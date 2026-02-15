@@ -102,8 +102,8 @@
         // Item "Todos" fixo no topo
         const todosLi = document.createElement('li');
         todosLi.dataset.themeId = '0';
-        todosLi.className = currentThemeId === 0 ? 'active' : '';
         todosLi.innerHTML = `<span class="checkmark">✓</span> Todos`;
+        if (currentThemeId === 0) todosLi.classList.add('active');
         temasList.appendChild(todosLi);
 
         // Temas reais, ordenados alfabeticamente
@@ -111,21 +111,28 @@
         sorted.forEach(t => {
           const li = document.createElement('li');
           li.dataset.themeId = t.id;
-          li.className = currentThemeId === t.id ? 'active' : '';
           li.innerHTML = `<span class="checkmark">✓</span> ${t.name}`;
-          // Tooltip com description (opcional)
+          if (currentThemeId === t.id) li.classList.add('active');
           if (t.description) li.title = t.description;
           temasList.appendChild(li);
         });
 
-        // Clique nos temas
+        // Adiciona os listeners APENAS UMA VEZ, depois de criar todos os <li>
         temasList.querySelectorAll('li').forEach(li => {
           li.addEventListener('click', () => {
             currentThemeId = parseInt(li.dataset.themeId);
             pagina = 0;
-            renderObras();
-            temasList.querySelectorAll('li').forEach(l => l.classList.remove('active'));
+
+            // Limpa TODOS os active ANTES de adicionar o novo
+            temasList.querySelectorAll('li').forEach(item => {
+              item.classList.remove('active');
+            });
+
+            // Adiciona active só no clicado
             li.classList.add('active');
+
+            // Atualiza a grid
+            renderObras();
           });
         });
       }
@@ -141,19 +148,45 @@
         const itens = filtradas.slice(inicio, inicio + POR_PAGINA);
 
         itens.forEach(obra => {
-          const videoId = obra.youtube_url.match(/(?:v=|youtu\.be\/)([0-9A-Za-z_-]{11})/)?.[1] || '';
-          if (!videoId) return;
+          // Regex robusto para vários formatos de URL do YouTube
+          const match = obra.youtube_url.match(/(?:v=|\/shorts\/|youtu\.be\/|embed\/|watch\?v=)([0-9A-Za-z_-]{11})/);
+          const videoId = match ? match[1] : '';
+          
+          if (!videoId) {
+            console.warn(`ID não encontrado na URL: ${obra.youtube_url}`);
+            return; // Pula se não tiver ID válido
+          }
 
-          const thumb = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
-          const fallback = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+          // Lista de thumbnails em ordem de preferência (sddefault costuma ser rei nos Shorts)
+          const thumbCandidates = [
+            `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`,
+            `https://img.youtube.com/vi/${videoId}/sddefault.jpg`,     // ← Adicionei isso! Muito mais estável em Shorts
+            `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
+            `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`
+          ];
 
           const card = document.createElement('div');
           card.className = 'obra-card';
+          
+          // Detecta se é Short (para CSS futuro, ex: aspect-ratio vertical)
+          const isShort = obra.youtube_url.includes('/shorts/');
+          if (isShort) card.classList.add('short');
+
+          // Cria a img com chain de onerror
+          const imgSrc = thumbCandidates[0];
           card.innerHTML = `
-            <img src="${thumb}" onerror="this.src='${fallback}'" loading="lazy" alt="${obra.title}">
+            <img 
+              src="${imgSrc}" 
+              onerror="let idx = ${JSON.stringify(thumbCandidates)}.indexOf(this.src) + 1; 
+                      if (idx < ${thumbCandidates.length}) { this.src = ${JSON.stringify(thumbCandidates)}[idx]; } 
+                      else { this.src = 'data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 16 9\"><rect width=\"16\" height=\"9\" fill=\"%23333\"/><text x=\"50%\" y=\"50%\" font-size=\"1\" text-anchor=\"middle\" dy=\".3em\" fill=\"%23666\">Sem thumbnail</text></svg>'; this.style.background='#111'; this.style.objectFit='contain'; }"
+              loading="lazy" 
+              alt="${obra.title}"
+            >
             <p class="obra-title">${obra.title}</p>
             <p class="obra-desc">${obra.description}</p>
           `;
+
           card.addEventListener('click', () => abrirModal(obra));
           grid.appendChild(card);
         });
@@ -163,8 +196,8 @@
 
       function abrirModal(obra) {
         document.body.style.overflow = 'hidden';
-        const match = obra.youtube_url.match(/(?:v=|youtu\.be\/)([0-9A-Za-z_-]{11})/);
-        const videoId = match ? match[1] : null;
+        const match = obra.youtube_url.match(/(?:v=|\/shorts\/|youtu\.be\/|embed\/|watch\?v=)([0-9A-Za-z_-]{11})/);
+        const videoId = match ? match[1] : '';
         if (!videoId) {
           console.error("ID do vídeo não encontrado:", obra.youtube_url);
           return;

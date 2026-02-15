@@ -877,3 +877,28 @@ input:checked + .slider:before {
   height: 100%;
   border: none;
 }
+
+#temas-list li {
+  margin: 4px 0;
+  cursor: pointer;
+  padding: 5px 12px;
+  transition: all 0.2s;
+}
+
+#temas-list li.active {
+  background: rgba(0, 255, 65, 0.15);
+  border-left: 4px solid var(--neon-green-light);
+  font-weight: 500;
+}
+
+#temas-list li .checkmark {
+  display: inline-block;
+  width: 1.2em;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+#temas-list li.active .checkmark {
+  opacity: 1;
+}
