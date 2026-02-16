@@ -195,3 +195,40 @@ footer {
   box-shadow: var(--glow-shadow);
   background: white;
 }
+
+
+/* ==========================================================================
+   VIDEO BACKGROUND
+   ========================================================================== */
+
+.video-background {
+  position: fixed;  /* Fixo na tela, não rola com o conteúdo */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: -1;  /* Atrás de tudo */
+  background: var(--bg-dark);  /* Fallback se o vídeo não carregar */
+}
+
+.video-background video {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  min-width: 100%;  /* Garante que cubra a tela toda */
+  min-height: 100%;
+  width: auto;
+  height: auto;
+  transform: translate(-50%, -50%);  /* Centraliza perfeitamente */
+  object-fit: cover;  /* Cobre sem distorcer */
+  opacity: 0.4;  /* Ajuste a opacidade para não ofuscar o texto (ex: 0.3 a 0.6) */
+  filter: brightness(0.8) contrast(1.2);  /* Ajustes visuais opcionais para combinar com o tema neon */
+}
+
+/* Ajuste para mobile: reduz opacidade ou tamanho se necessário */
+@media (max-width: 768px) {
+  .video-background video {
+    opacity: 0.3;  /* Menos intenso em telas pequenas */
+  }
+}
