@@ -77,6 +77,21 @@ article:hover {
   text-shadow: 0 0 8px var(--neon-green);
 }
 
+/* Botão voltar da página de Posts */
+.back-link-post {
+  background: none;
+  border: none;
+  color: var(--neon-green-dim);
+  cursor: pointer;
+  font-size: inherit;
+  text-decoration: none;
+  padding: 0;
+}
+
+.back-link-post:hover {
+  color: var(--neon-green-light);
+  text-shadow: 0 0 8px var(--neon-green);
+}
 
 /* ==========================================================================
    LEGALTECH MODE - Banner old-school
