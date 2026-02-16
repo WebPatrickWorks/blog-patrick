@@ -195,8 +195,30 @@
   box-shadow: 0 0 0 3px rgba(0, 255, 65, 0.4);
 }
 
+/* ==========================================================================
+   Emojis
+   ========================================================================== */
+
 /* Coração Footer */
 .heart-svg {
   fill: var(--neon-green); /* Herda a cor do tema automaticamente! */
   vertical-align: middle; /* Alinha com o texto */
+}
+
+/* Caretinha do final do "Carregar mais" */
+.wink-svg {
+  display: inline-block;
+  vertical-align: middle;
+  color: var(--neon-green);           /* herda a cor do tema */
+  width: 2.2em;                        /* um pouquinho maior que o emoji normal */
+  height: 2.2em;
+  margin: 0 2px;
+}
+
+.wink-svg svg {
+  transition: transform 0.3s ease;
+}
+
+.wink-svg:hover svg {
+  transform: scale(1.2) rotate(5deg);  /* efeito divertido ao passar o mouse */
 }
