@@ -193,3 +193,33 @@ body.legaltech-mode article {
     font-size: 0.9rem;
   }
 }
+
+
+/* ==========================================================================
+   Botão "Carregar mais"
+   ========================================================================== */
+
+/* Garantir que o container dos posts permita centralização do botão */
+.content #posts-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;          /* centraliza filhos horizontalmente se quiser */
+  width: 100%;
+}
+
+/* Estilo reforçado pro botão carregar mais */
+.read-more.load-more {          /* opcional: adicione essa classe no JS se quiser especificidade */
+  display: block !important;
+  margin: 48px auto 80px !important;
+  width: fit-content;
+  min-width: 180px;
+  text-align: center;
+}
+
+/* Se o botão ainda desalinhar em mobile, força */
+@media (max-width: 768px) {
+  .read-more {
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+}
