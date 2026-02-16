@@ -79,79 +79,83 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-    const container = document.getElementById('post-container');
-    const urlParams = new URLSearchParams(window.location.search);
-    const postId = urlParams.get('id');
+      const container = document.getElementById('post-container');
+      const urlParams = new URLSearchParams(window.location.search);
+      const postId = urlParams.get('id');
 
-    if (!postId) {
-      container.innerHTML = '<p>Post não encontrado. Volte para a <a href="index.html">página inicial</a>.</p>';
-      document.title = 'Post não encontrado';
-      return;
-    }
-
-    fetch('data/posts.json')
-      .then(response => {
-        if (!response.ok) throw new Error('Erro ao carregar os posts');
-        return response.json();
-      })
-      .then(posts => {
-        const post = posts.find(p => p.id == postId); // == para comparar string/number
-
-        if (!post) {
-          container.innerHTML = '<p>Post não encontrado. Volte para a <a href="index.html">página inicial</a>.</p>';
-          document.title = 'Post não encontrado';
-          return;
-        }
-
-        // Atualiza título da página
-        document.title = post.title + ' | Blog do Patrick';
-
-        // Insere o HTML base, mas esconde o conteúdo inicialmente
-        container.innerHTML = `
-          <article class="post-content">
-            <h2>${post.title}</h2>
-            <time datetime="${post.date}">${new Date(post.date).toLocaleDateString('pt-BR', {
-              weekday: 'long',
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric'
-            })}</time>
-            <div class="tags">
-              ${post.tags.map(tag => `<span>#${tag}</span>`).join(' ')}
-            </div>
-            <div class="content content-typing" id="typing-content"></div> <!-- Aqui vai o texto digitado -->
-          </article>
-          <a href="index.html" class="back-link">← Voltar para a lista de posts</a>
-        `;
-
-        // Agora aplica o efeito de digitação
-        typeWriter(post.content, document.getElementById('typing-content'));
-      })
-      .catch(error => {
-        console.error(error);
-        container.innerHTML = '<p>Ops... não consegui carregar o post. Verifique o console ou tente novamente.</p>';
-      });
-  });
-
-  // Função para simular digitação
-  function typeWriter(fullHtml, targetElement) {
-    let i = 0;
-    const speed = 0.5; // Velocidade em ms por caractere (ajuste para mais rápido/lento)
-
-    // Como o conteúdo é HTML, vamos "digitar" o texto puro, mas preservar as tags
-    // Para simplicidade, vamos tratar como texto e inserir como innerHTML no final de cada passo
-    function type() {
-      if (i < fullHtml.length) {
-        targetElement.innerHTML = fullHtml.substring(0, i + 1); // Insere progressivamente
-        i++;
-        setTimeout(type, speed);
-      } else {
-        // Remove o cursor piscando ao finalizar
-        targetElement.classList.remove('content-typing');
+      if (!postId) {
+        container.innerHTML = '<p>Post não encontrado.</p>';
+        return;
       }
-    }
-    type();
-  }
+
+      fetch('data/posts.json')
+        .then(response => response.json())
+        .then(posts => {
+          const post = posts.find(p => p.id == postId);
+          if (!post) {
+            container.innerHTML = '<p>Post não encontrado.</p>';
+            return;
+          }
+
+          document.title = post.title + ' | Blog do Patrick';
+
+          // Remove o <h1> duplicado do content (o título gigante)
+          let cleanContent = post.content.replace(/^<h1>.*?<\/h1>\s*/i, '').trim();
+
+          container.innerHTML = `
+            <article class="post-content">
+              <!-- Cabeçalho limpo -->
+              <div class="post-header">
+                <h1>${post.title}</h1>
+                <time datetime="${post.date}">
+                  ${new Date(post.date).toLocaleDateString('pt-BR', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
+                </time>
+                
+                <!-- Botão Compartilhar -->
+                <button id="share-btn" class="share-btn">
+                  🔗 Compartilhar
+                </button>
+              </div>
+
+              <!-- Conteúdo limpo (sem título repetido) -->
+              <div class="content">
+                ${cleanContent}
+              </div>
+            </article>
+
+            <a href="index.html" class="back-link">← Voltar para a lista de posts</a>
+          `;
+
+          // === Funcionalidade do botão Compartilhar ===
+          const shareBtn = document.getElementById('share-btn');
+          shareBtn.addEventListener('click', () => {
+            const url = window.location.href;
+            
+            navigator.clipboard.writeText(url).then(() => {
+              const original = shareBtn.innerHTML;
+              shareBtn.innerHTML = '✅ Link copiado!';
+              shareBtn.style.background = 'var(--neon-green)';
+              shareBtn.style.color = '#000';
+              
+              setTimeout(() => {
+                shareBtn.innerHTML = original;
+                shareBtn.style.background = '';
+                shareBtn.style.color = '';
+              }, 2200);
+            }).catch(() => {
+              alert('Erro ao copiar o link. Tente novamente.');
+            });
+          });
+        })
+        .catch(() => {
+          container.innerHTML = '<p>Erro ao carregar o post.</p>';
+        });
+    });
   </script>
 </body>
 </html>
