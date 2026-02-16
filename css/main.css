@@ -8,3 +8,15 @@
 @import "layout.css";
 @import "components.css";
 @import "ia-art.css";
+
+/* No main.css ou em <style> no head do post.html */
+.content-typing {
+  white-space: pre-wrap; /* Preserva quebras de linha e espaços */
+  overflow: hidden; /* Esconde texto extra */
+  border-right: 0px solid var(--neon-green); /* Cursor piscando opcional */
+  animation: blink-cursor 0.75s step-end infinite; /* Efeito de cursor piscando */
+}
+
+@keyframes blink-cursor {
+  50% { border-color: transparent; }
+}
