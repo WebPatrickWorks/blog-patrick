@@ -4,14 +4,14 @@
 
 :root {
   --bg-dark: #0a0e17;
-  --neon-green: #00ff41;
+  --neon-green: #7AA174;
   --neon-green-border: #3a7a4a;
-  --neon-green-light: #00ff9d;
-  --neon-green-dim: #00cc33;
+  --neon-green-light: #74af6b;
+  --neon-green-dim: #619259;
   --neon-green-back: #6e8d4a;
-  --card-bg: rgba(6, 26, 11, 0.88);
+  --card-bg: rgba(6, 26, 11, 0);
   --glow-shadow: 0 0 20px rgba(0, 255, 65, 0.15);
-  --text-shadow-glow: 0 0 10px #00ff41;
+  --text-shadow-glow: 0 0 10px #336b41;
 }
 
 body {
@@ -136,7 +136,7 @@ footer {
   --neon-green-dim: #818cf8;
   --neon-green-border: #6366f1;
   --neon-green-back: #667892;
-  --card-bg: rgba(15, 23, 42, 0.92);
+  --card-bg: rgba(15, 23, 42, 0.322);
   --glow-shadow: 0 0 20px rgba(99, 102, 241, 0.18);
   --text-shadow-glow: 0 0 10px #a5b4fc;
 }
