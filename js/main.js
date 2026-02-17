@@ -35,10 +35,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const slice = allPosts.slice(start, end);
 
     slice.forEach(post => {
+      const [year, month, day] = post.date.split('-');  // Divide "2026-02-17" em [2026, 02, 17]
+      const postDate = new Date(Number(year), Number(month) - 1, Number(day));  // Cria data local sem offset
+      
       const article = document.createElement('article');
       article.innerHTML = `
         <h2>${post.title}</h2>
-        <time datetime="${post.date}">${new Date(post.date).toLocaleDateString('pt-BR')}</time>
+        <time datetime="${post.date}">${postDate.toLocaleDateString('pt-BR')}</time>
         <p>${post.excerpt}</p>
         <div class="tags">
           ${post.tags.map(tag => `<span>#${tag}</span>`).join(' ')}
@@ -85,7 +88,11 @@ document.addEventListener('DOMContentLoaded', () => {
       return response.json();
     })
     .then(posts => {
-      allPosts = posts.sort((a, b) => new Date(b.date) - new Date(a.date));
+      allPosts = posts.sort((a, b) => {
+        const [ay, am, ad] = a.date.split('-');
+        const [by, bm, bd] = b.date.split('-');
+        return new Date(by, bm-1, bd) - new Date(ay, am-1, ad);
+      });
 
       const urlParams = new URLSearchParams(window.location.search);
       const filterTag = urlParams.get('tag');

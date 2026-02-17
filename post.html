@@ -100,6 +100,8 @@
 
           // Remove o <h1> duplicado do content (o título gigante)
           let cleanContent = post.content.replace(/^<h1>.*?<\/h1>\s*/i, '').trim();
+          const [year, month, day] = post.date.split('-');
+          const postDate = new Date(Number(year), Number(month) - 1, Number(day));            
 
           container.innerHTML = `
             <article class="post-content">
@@ -107,14 +109,13 @@
               <div class="post-header">
                 <h1>${post.title}</h1>
                 <time datetime="${post.date}">
-                  ${new Date(post.date).toLocaleDateString('pt-BR', {
+                  ${postDate.toLocaleDateString('pt-BR', {
                     weekday: 'long',
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric'
-                  })}
+                    })}
                 </time>
-                
                 <!-- Botão Compartilhar -->
                 <button id="share-btn" class="share-btn">
                   🔗 Compartilhar
