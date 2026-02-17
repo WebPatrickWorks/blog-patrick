@@ -95,7 +95,7 @@
           return response.json();
         })
         .then(artigos => {
-          const artigo = artigos.find(p => p.id == artigoId); // == para comparar string/number
+          const artigo = artigos.find(p => p.id == artigoId);
 
           if (!artigo) {
             container.innerHTML = '<p>Artigo não encontrado. Volte para a <a href="index.html">página inicial</a>.</p>';
@@ -106,24 +106,69 @@
           // Atualiza título da página
           document.title = artigo.title + ' | Blog do Patrick';
 
+          // Limpa o conteúdo: remove <h1> inicial e as tags no final
+          let cleanContent = artigo.content
+            // Remove o <h1> inicial (geralmente o título duplicado)
+            .replace(/^<h1>.*?<\/h1>\s*/i, '')
+            // Remove o bloco de tags no final (div.tags)
+            // .replace(/<div class=["']tags["'].*?<\/div>\s*$/i, '')
+            .trim();
+
+          // Se o conteúdo terminar com o div.tags, insere espaçamento antes dele
+          cleanContent = cleanContent.replace(
+            /(<div class=["']tags["'].*?<\/div>\s*$)/i,
+            '<div style="height: 48px;"></div>$1'   // ou margin-top via inline, ou <br><br>
+          );            
+
           container.innerHTML = `
             <article class="post-content">
-              <h2>${artigo.title}</h2>   <!-- Mude de h1 para h2 aqui -->
-              <time datetime="${artigo.date}">${new Date(artigo.date).toLocaleDateString('pt-BR', {
-                weekday: 'long',
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-              })}</time>
-              <div class="tags">
-                ${artigo.tags.map(tag => `<span>#${tag}</span>`).join(' ')}
+              <!-- Cabeçalho limpo -->
+              <div class="post-header">
+                <h1>${artigo.title}</h1>
+                <time datetime="${artigo.date}">
+                  ${new Date(artigo.date).toLocaleDateString('pt-BR', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
+                </time>
+                
+                <!-- Botão Compartilhar -->
+                <button id="share-btn" class="share-btn">
+                  🔗 Compartilhar
+                </button>
               </div>
+
+              <!-- Conteúdo limpo -->
               <div class="content">
-                ${artigo.content}
+                ${cleanContent}
               </div>
             </article>
+
             <a href="index.html" class="back-link">← Voltar para a página inicial</a>
           `;
+
+          // Funcionalidade do botão Compartilhar
+          const shareBtn = document.getElementById('share-btn');
+          shareBtn.addEventListener('click', () => {
+            const url = window.location.href;
+            
+            navigator.clipboard.writeText(url).then(() => {
+              const original = shareBtn.innerHTML;
+              shareBtn.innerHTML = '✅ Link copiado!';
+              shareBtn.style.background = 'var(--neon-green)';
+              shareBtn.style.color = '#000';
+              
+              setTimeout(() => {
+                shareBtn.innerHTML = original;
+                shareBtn.style.background = '';
+                shareBtn.style.color = '';
+              }, 2200);
+            }).catch(() => {
+              alert('Erro ao copiar o link. Tente novamente.');
+            });
+          });
         })
         .catch(error => {
           console.error(error);
@@ -131,5 +176,6 @@
         });
     });
   </script>
+
 </body>
 </html>

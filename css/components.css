@@ -223,3 +223,34 @@ body.legaltech-mode article {
     margin-right: auto !important;
   }
 }
+
+
+/* ==========================================================================
+   Icone do Instagram
+   ========================================================================== */
+.social-link {
+  margin-right: 12px;               /* espaço entre o ícone e o texto */
+  display: inline-flex;
+  align-items: center;
+  color: var(--neon-green-dim);     /* cor inicial mais suave */
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.social-link:hover,
+.social-link:focus {
+  color: var(--neon-green-light);
+  text-shadow: 0 0 8px var(--neon-green);
+  transform: scale(1.15);           /* leve zoom ao passar o mouse */
+}
+
+.instagram-svg {
+  vertical-align: middle;
+  margin-right: 4px;                /* pequeno espaço extra se quiser */
+}
+
+/* Opcional: se quiser o ícone um pouco maior que o coração */
+.instagram-svg {
+  width: 1.2em;
+  height: 1.2em;
+}

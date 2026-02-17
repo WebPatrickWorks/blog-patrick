@@ -141,7 +141,33 @@ document.addEventListener('DOMContentLoaded', () => {
       container.innerHTML = '<p>Ops... não consegui carregar as postagens. Verifique o console.</p>';
     });
 
-  // ... resto do código (artigos.json, hamburger, theme switcher) permanece igual
+  // Fetch para artigos (adicione isso após o fetch de posts.json)
+  fetch('data/artigos.json')
+    .then(response => {
+      if (!response.ok) throw new Error('Erro ao carregar artigos: ' + response.status);
+      return response.json();
+    })
+    .then(artigos => {
+      artigos = artigos.sort((a, b) => new Date(b.date) - new Date(a.date)); // Ordena por data descendente
+
+      const artigosList = document.getElementById('recent-artigos');
+      if (artigosList) {
+        const recentArtigos = artigos.slice(0, 5); // Mostra os últimos 5 artigos
+        recentArtigos.forEach(artigo => {
+          const li = document.createElement('li');
+          li.innerHTML = `<a href="artigo.html?id=${artigo.id}">${artigo.title}</a>`;
+          artigosList.appendChild(li);
+        });
+      }
+    })
+    .catch(error => {
+      console.error(error);
+      // Opcional: Mostrar uma mensagem na sidebar se der erro
+      const artigosList = document.getElementById('recent-artigos');
+      if (artigosList) {
+        artigosList.innerHTML = '<li>Ops... erro ao carregar artigos.</li>';
+      }
+    });
 });
 
 // Hamburger menu (mantido)
