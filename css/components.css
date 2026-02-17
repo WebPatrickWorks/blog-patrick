@@ -278,3 +278,18 @@ body.legaltech-mode article {
   color: #ff9800;
   text-shadow: 0 0 6px rgba(255, 152, 0, 0.5);
 }
+
+/* ==========================================================================
+   Config icons sidebar
+   ========================================================================== */
+.icon-svg {
+  display: inline-block;
+  vertical-align: middle;  /* Alinha com o texto */
+  margin-right: 8px;       /* Espaço entre ícone e texto */
+  transition: all 0.3s ease;
+}
+
+a:hover .icon-svg {
+  stroke: var(--neon-green-icon);  /* Muda cor no hover */
+  filter: drop-shadow(0 0 6px var(--neon-green));  /* Glow neon */
+}
