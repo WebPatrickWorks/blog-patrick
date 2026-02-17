@@ -254,3 +254,27 @@ body.legaltech-mode article {
   width: 1.2em;
   height: 1.2em;
 }
+
+
+/* ==========================================================================
+   Disclaimer posts "antigos"
+   ========================================================================== */
+
+.outdated-banner {
+  background: rgba(255, 193, 7, 0.15);       /* amarelo suave de alerta */
+  border: 1px solid #ffc107;
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin: 24px 0 32px;
+  color: var(--neon-green-light);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  text-align: center;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 0 15px rgba(255, 193, 7, 0.2);
+}
+
+.outdated-banner strong {
+  color: #ff9800;
+  text-shadow: 0 0 6px rgba(255, 152, 0, 0.5);
+}

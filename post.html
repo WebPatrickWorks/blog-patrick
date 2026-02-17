@@ -91,57 +91,103 @@
         .then(response => response.json())
         .then(posts => {
           const post = posts.find(p => p.id == postId);
+          console.log('Post encontrado:', post);
           if (!post) {
             container.innerHTML = '<p>Post não encontrado.</p>';
             return;
           }
-
+          
+          container.innerHTML = '';
           document.title = post.title + ' | Blog do Patrick';
 
-          // Remove o <h1> duplicado do content (o título gigante)
+          // PRIMEIRO: limpa o content (não depende de data)
           let cleanContent = post.content.replace(/^<h1>.*?<\/h1>\s*/i, '').trim();
+          console.log('cleanContent length:', cleanContent.length);
+          console.log('cleanContent starts with:', cleanContent.substring(0, 200));
+
+          // SEGUNDO: calcula data e disclaimer (agora post existe)
+          let disclaimerHTML = '';
+          const postDateObj = new Date(post.date);
+
+          if (isNaN(postDateObj.getTime())) {
+            console.warn('Data inválida no post:', post.date);
+            disclaimerHTML = '<div class="outdated-banner">Data de publicação inválida.</div>';
+          } else {
+            const now = new Date();
+            const daysOld = Math.floor((now - postDateObj) / (1000 * 60 * 60 * 24));
+            const isOutdated = daysOld >= 7;  // ou FRESH_DAYS se você definir como const global
+
+            if (isOutdated) {
+              const formattedDate = postDateObj.toLocaleDateString('pt-BR', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              });
+
+              disclaimerHTML = `
+                <div class="outdated-banner">
+                  <strong>Aviso importante:</strong><br>
+                  Esta notícia foi publicada em ${formattedDate} (${daysOld} dias atrás) e <strong>pode estar desatualizada</strong>.<br>
+                  Verifique as fontes originais (linkadas no artigo) ou busque notícias recentes para o status atual.<br>
+                  O Blog do Patrick não se responsabiliza por decisões baseadas em informações obsoletas.
+                </div>
+              `;
+            }
+          }
+
+          // TERCEIRO: cria postDate para o <time> (versão sem timezone issues)
           const [year, month, day] = post.date.split('-');
-          const postDate = new Date(Number(year), Number(month) - 1, Number(day));            
+          const postDate = new Date(Number(year), Number(month) - 1, Number(day));
+          console.log('postDate criado:', postDate.toISOString());
 
-          container.innerHTML = `
-            <article class="post-content">
-              <!-- Cabeçalho limpo -->
-              <div class="post-header">
-                <h1>${post.title}</h1>
-                <time datetime="${post.date}">
-                  ${postDate.toLocaleDateString('pt-BR', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                    })}
-                </time>
-                <!-- Botão Compartilhar -->
-                <button id="share-btn" class="share-btn">
-                  🔗 Compartilhar
-                </button>
-              </div>
+          // Monte o DOM
+          const article = document.createElement('article');
+          article.className = 'post-content';
 
-              <!-- Conteúdo limpo (sem título repetido) -->
-              <div class="content">
-                ${cleanContent}
-              </div>
-            </article>
-
-            <button class="back-link-post" onclick="history.back()">← Voltar para a lista de posts</button>
+          // Header
+          const header = document.createElement('div');
+          header.className = 'post-header';
+          header.innerHTML = `
+            <h1>${post.title}</h1>
+            <time datetime="${post.date}">
+              ${postDate.toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+            </time>
+            <button id="share-btn" class="share-btn">🔗 Compartilhar</button>
           `;
+          article.appendChild(header);
 
-          // === Funcionalidade do botão Compartilhar ===
+          // Disclaimer
+          if (disclaimerHTML) {
+            const bannerDiv = document.createElement('div');
+            bannerDiv.innerHTML = disclaimerHTML;
+            article.appendChild(bannerDiv.firstElementChild || bannerDiv);  // mais seguro
+          }
+
+          // Content
+          const contentDiv = document.createElement('div');
+          contentDiv.className = 'content';
+          contentDiv.innerHTML = cleanContent;
+          article.appendChild(contentDiv);
+
+          container.appendChild(article);
+
+          // Botão voltar
+          const backBtn = document.createElement('button');
+          backBtn.className = 'back-link-post';
+          backBtn.textContent = '← Voltar para a lista de posts';
+          backBtn.onclick = () => history.back();
+          container.appendChild(backBtn);
+
+          // Share
           const shareBtn = document.getElementById('share-btn');
           shareBtn.addEventListener('click', () => {
             const url = window.location.href;
-            
             navigator.clipboard.writeText(url).then(() => {
               const original = shareBtn.innerHTML;
               shareBtn.innerHTML = '✅ Link copiado!';
               shareBtn.style.background = 'var(--neon-green)';
               shareBtn.style.color = '#000';
-              
               setTimeout(() => {
                 shareBtn.innerHTML = original;
                 shareBtn.style.background = '';
@@ -151,11 +197,15 @@
               alert('Erro ao copiar o link. Tente novamente.');
             });
           });
+
+          console.log('Montagem do DOM concluída sem erro');
         })
-        .catch(() => {
-          container.innerHTML = '<p>Erro ao carregar o post.</p>';
+        .catch(error => {
+          console.error('Catch acionado com erro:', error);
+          container.innerHTML = '<p>Erro ao carregar o post: ' + (error.message || 'desconhecido') + '</p>';
         });
     });
   </script>
+
 </body>
 </html>

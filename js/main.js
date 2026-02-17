@@ -3,6 +3,7 @@
 document.addEventListener('DOMContentLoaded', () => {
   const container = document.getElementById('posts-container');
   const POSTS_PER_LOAD = 10;
+  const FRESH_DAYS = 7;  // Ajustar a data de expiração.
   let allPosts = [];
   let displayedCount = 0;
   let loadMoreBtn = null;
@@ -88,24 +89,29 @@ document.addEventListener('DOMContentLoaded', () => {
       return response.json();
     })
     .then(posts => {
-      allPosts = posts.sort((a, b) => {
-        const [ay, am, ad] = a.date.split('-');
-        const [by, bm, bd] = b.date.split('-');
-        return new Date(by, bm-1, bd) - new Date(ay, am-1, ad);
+      allPosts = posts.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      const freshPosts = allPosts.filter(post => {
+        const postDate = new Date(post.date);
+        const daysOld = (new Date() - postDate) / (1000 * 60 * 60 * 24);
+        return daysOld <= FRESH_DAYS;
       });
 
       const urlParams = new URLSearchParams(window.location.search);
       const filterTag = urlParams.get('tag');
 
+      let postsToRender = freshPosts;  // padrão: só frescos na home
+
       if (filterTag) {
-        allPosts = allPosts.filter(post =>
+        // No modo tag, mostramos TODOS que têm a tag (mesmo antigos)
+        postsToRender = allPosts.filter(post =>
           post.tags.some(t => t.toLowerCase() === filterTag.toLowerCase())
         );
 
         document.body.classList.add('legaltech-mode');
         document.title = `${filterTag}: IA no Direito | Blog do Patrick`;
 
-        if (allPosts.length > 0) {
+        if (postsToRender.length > 0) {
           const banner = document.createElement('div');
           banner.className = 'legaltech-mode-banner';
           banner.innerHTML = `
@@ -117,12 +123,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
+      // Atualiza a lista global que renderNextPosts usa
+      allPosts = postsToRender;   // ← aqui é o truque: reatribui para o render usar a lista filtrada
+
       if (allPosts.length === 0) {
         container.innerHTML = '<p>Nenhuma postagem com essa tag ainda... 🔍</p>';
         return;
       }
 
-      // Primeira leva de posts
+      // Primeira leva de posts (agora usa a lista filtrada)
       renderNextPosts();
 
       // Popula sidebar (mantido)
@@ -134,12 +143,12 @@ document.addEventListener('DOMContentLoaded', () => {
           li.innerHTML = `<a href="post.html?id=${post.id}">${post.title}</a>`;
           recentList.appendChild(li);
         });
-      }
+      }      
     })
     .catch(error => {
       console.error(error);
       container.innerHTML = '<p>Ops... não consegui carregar as postagens. Verifique o console.</p>';
-    });
+    });  
 
   // Fetch para artigos (adicione isso após o fetch de posts.json)
   fetch('data/artigos.json')
