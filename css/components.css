@@ -293,3 +293,37 @@ a:hover .icon-svg {
   stroke: var(--neon-green-icon);  /* Muda cor no hover */
   filter: drop-shadow(0 0 6px var(--neon-green));  /* Glow neon */
 }
+
+/* ==========================================================================
+   Social Media - footer
+   ========================================================================== */
+
+.social-links {
+  margin: 0 0 12px;                /* espaço abaixo da linha de redes */
+  text-align: center;              /* centraliza tudo */
+  font-size: 1rem;
+}
+
+.social-link {
+  color: var(--neon-green-dim);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;                        /* espaço entre ícone e texto */
+}
+
+.social-link:hover {
+  color: var(--neon-green-light);
+  text-shadow: 0 0 8px var(--neon-green);
+}
+
+.social-link svg {
+  vertical-align: middle;
+}
+
+/* Ajuste ícones um pouquinho maiores se quiser */
+.x-svg, .instagram-svg {
+  width: 1.2em;
+  height: 1.2em;
+}
