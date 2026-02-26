@@ -1,5 +1,76 @@
 [
   {
+    "id": 118,
+    "title": "Tribunal federal dos EUA nega privilégio advogado-cliente a conversas e documentos gerados por IA",
+    "date": "2026-02-26",
+    "excerpt": "Uma decisão recente do Tribunal Distrital Federal para o Distrito Sul de Nova York determinou que conversas e documentos gerados com chatbots de IA públicos,...",
+    "content": "<h1>Tribunal federal dos EUA nega privilégio advogado-cliente a conversas e documentos gerados por IA</h1>\n<p>Uma decisão recente do Tribunal Distrital Federal para o Distrito Sul de Nova York determinou que conversas e documentos gerados com chatbots de IA públicos, como a versão consumer do Claude da Anthropic, não são protegidos pelo privilégio advogado-cliente nem pela doutrina do work product. No caso United States v. Heppner (No. 25-cr-00503-JSR), o juiz Jed S. Rakoff decidiu oralmente em 10 de fevereiro de 2026 (com memorando escrito em 17 de fevereiro de 2026) que 31 documentos gerados pelo réu Bradley Heppner usando o Claude deveriam ser entregues aos promotores federais. O réu argumentou que os documentos incorporavam informações de seus advogados e foram criados para facilitar consultas legais, mas o tribunal concluiu que as interações não eram confidenciais — a política de privacidade da Anthropic permite uso de entradas para treinamento do modelo e possível divulgação a autoridades —, além de Claude não ser um advogado e os documentos não terem sido preparados sob direção do counsel. Isso destaca como o uso de ferramentas de IA públicas pode comprometer proteções legais tradicionais. A decisão marca a primeira vez que um tribunal federal aborda diretamente se conteúdo gerado por IA (compartilhado posteriormente com advogados) qualifica para proteção de privilégio. Especialistas em cibersegurança alertam que empresas devem tratar isso como um chamado urgente para governança de IA, enfatizando riscos de litígio com documentos gerados por ferramentas não confidenciais. A ruling reforça que ferramentas de IA não substituem comunicações confidenciais com profissionais humanos. \"A plataforma coleta entradas de usuários e saídas do modelo para treinamento e divulgação potencial\", conforme a política da Anthropic. Isso pode influenciar como profissionais jurídicos nos EUA e globalmente integram IA em suas práticas, especialmente em jurisdições com regulamentações semelhantes sobre privacidade e evidências.</p>\n<h3>Análise Rápida</h3><p>Essa decisão impacta o direito internacional ao questionar a confidencialidade em ferramentas de IA públicas, especialmente nos EUA, onde o privilégio advogado-cliente é fundamental. Pode influenciar jurisdições como a UE e o UK, que enfatizam transparência e conformidade em IA sob o AI Act e regulamentações semelhantes. No futuro, isso pode levar a mais restrições no uso de IA em práticas jurídicas globais, incentivando o desenvolvimento e adoção de ferramentas seguras, enterprise e confidenciais (com políticas que preservem expectativa razoável de sigilo).</p>\n<h3>Fonte</h3><p>Veículo: Knox News\r<br>Autor: Equipe de Redação (press release distribuído por EIN Presswire, com contribuição de Tracey Birkenhauer - STACK Cybersecurity)\r<br>Link: https://www.knoxnews.com/press-release/story/150622/federal-court-rules-ai-conversations-are-not-privileged\r<br>Data de Publicação: 25/02/2026 (decisão: ruling oral em 10/02/2026; memorando escrito em 17/02/2026)</p>\n<div class=\"tags\"><span>#LegalTech</span> <span>#AI privilege</span> <span>#court rulings</span> <span>#US litigation</span> <span>#data privacy</span> <span>#attorney-client protection</span></div>\n",
+    "tags": [
+      "LegalTech",
+      "AI privilege",
+      "court rulings",
+      "US litigation",
+      "data privacy",
+      "attorney-client protection"
+    ]
+  },
+  {
+    "id": 119,
+    "title": "Ordem executiva de Trump busca limitar regulamentações estaduais de IA nos EUA",
+    "date": "2026-02-26",
+    "excerpt": "O presidente Donald Trump emitiu uma ordem executiva visando limitar regulamentações estaduais sobre IA nos EUA, focando na lei do Colorado que aborda discri...",
+    "content": "<h1>Ordem executiva de Trump busca limitar regulamentações estaduais de IA nos EUA</h1>\n<p>O presidente Donald Trump emitiu uma ordem executiva visando limitar regulamentações estaduais sobre IA nos EUA, focando na lei do Colorado que aborda discriminação algorítmica. A ordem busca prevenir que estados imponham barreiras à inovação em IA, argumentando que tais leis podem obstruir o liderança americana. A lei do Colorado, efetiva desde 1º de fevereiro de 2026, exige que empresas e governos avaliem viés em sistemas de IA usados para decisões chave como contratação, educação e empréstimos. Opositores planejam ações judiciais, e o procurador-geral do Colorado, Phil Weiser, afirmou que o estado desafiará a ordem no tribunal. O senador estadual da Califórnia, Scott Wiener, autor de uma lei similar de segurança em IA, também criticou a medida. \"A ordem executiva visa eliminar obstruções estaduais à política nacional de IA\", conforme o documento. Isso reflete uma abordagem federal mais confrontacional, priorizando inovação sobre regulamentações locais. A decisão pode afetar desenvolvimentos globais, já que os EUA influenciam padrões internacionais em IA. Críticos argumentam que isso enfraquece proteções contra discriminação, enquanto apoiadores veem como necessário para competitividade.</p>\n<h3>Análise Rápida</h3><p>Essa ordem reforça a abordagem desregulatória dos EUA em IA, contrastando com frameworks mais rigorosos na UE como o AI Act. Pode levar a litígios federais-estaduais, influenciando jurisdições como o UK e Canadá que equilibram inovação e ética. Globalmente, isso pode acelerar adoção de IA sem barreiras, mas aumentar riscos de viés em práticas jurídicas internacionais.</p>\n<h3>Fonte</h3><p>Veículo: The Regulatory Review\r<br>Autor: Dylan Champagne\r<br>Link: https://www.theregreview.org/2026/02/26/champagne-president-trump-targets-state-based-ai-regulations\r<br>Data de Publicação: 26/02/2026</p>\n<div class=\"tags\"><span>#LegalTech</span> <span>#AI regulation</span> <span>#US executive orders</span> <span>#algorithmic discrimination</span> <span>#federal-state conflicts</span></div>\n",
+    "tags": [
+      "LegalTech",
+      "AI regulation",
+      "US executive orders",
+      "algorithmic discrimination",
+      "federal-state conflicts"
+    ]
+  },
+  {
+    "id": 120,
+    "title": "Workday lança gerenciamento de contratos com IA nativa e residência de dados na UE",
+    "date": "2026-02-26",
+    "excerpt": "A Workday anunciou residência de dados na UE em Frankfurt e suporte multilíngue para seu Contract Lifecycle Management (CLM) impulsionado por IA, permitindo ...",
+    "content": "<h1>Workday lança gerenciamento de contratos com IA nativa e residência de dados na UE</h1>\n<p>A Workday anunciou residência de dados na UE em Frankfurt e suporte multilíngue para seu Contract Lifecycle Management (CLM) impulsionado por IA, permitindo que organizações europeias usem uma solução nativa de IA que atende requisitos de residência de dados. Alimentado pela Evisort AI, o Workday CLM ajuda equipes jurídicas e de negócios a acelerar acordos, reduzir riscos de conformidade e desbloquear insights em portfólios de contratos. O lançamento inclui suporte a idiomas como alemão, francês e espanhol, com mais a vir. \"Isso permite que clientes europeus aproveitem o poder da IA para gerenciar contratos de forma mais eficiente, mantendo conformidade com regulamentações locais\", disse a empresa. A ferramenta integra gerenciamento de pessoas, finanças e agentes de IA, posicionando a Workday como plataforma empresarial para IA. Isso responde à demanda crescente por ferramentas LegalTech compatíveis com o GDPR e o AI Act na UE. A expansão reflete tendências globais em adoção de IA para eficiência jurídica, especialmente em jurisdições com foco em privacidade como a UE.</p>\n<h3>Análise Rápida</h3><p>O lançamento fortalece a adoção de ferramentas LegalTech na UE, alinhando com o AI Act que exige transparência e conformidade em IA de alto risco. Impacta jurisdições como o UK e Canadá, promovendo soluções globais seguras. No futuro, pode padronizar práticas jurídicas internacionais, facilitando transações transfronteiriças.</p>\n<h3>Fonte</h3><p>Veículo: Workday Newsroom\r<br>Autor: Equipe de Redação\r<br>Link: https://newsroom.workday.com/2026-02-26-Workday-Brings-AI-Native-Contract-Lifecycle-Management-to-EU-Businesses-with-Frankfurt-Data-Residency\r<br>Data de Publicação: 26/02/2026</p>\n<div class=\"tags\"><span>#LegalTech</span> <span>#AI tools</span> <span>#contract management</span> <span>#EU compliance</span> <span>#data residency</span></div>\n",
+    "tags": [
+      "LegalTech",
+      "AI tools",
+      "contract management",
+      "EU compliance",
+      "data residency"
+    ]
+  },
+  {
+    "id": 121,
+    "title": "Suprema Corte do Reino Unido facilita patentabilidade de invenções de IA e implementadas por computador",
+    "date": "2026-02-26",
+    "excerpt": "A Suprema Corte do Reino Unido emitiu uma decisão histórica em 11 de fevereiro de 2026, alterando a abordagem para patentabilidade de invenções implementadas...",
+    "content": "<h1>Suprema Corte do Reino Unido facilita patentabilidade de invenções de IA e implementadas por computador</h1>\n<p>A Suprema Corte do Reino Unido emitiu uma decisão histórica em 11 de fevereiro de 2026, alterando a abordagem para patentabilidade de invenções implementadas por computador, incluindo aquelas envolvendo IA. No caso Emotional Perception AI Limited v Comptroller General of Patents, Designs and Trade Marks, a corte confirmou que invenções com meios técnicos não são excluídas como \"programas de computador como tal\". A invenção envolvia um sistema de IA usando rede neural artificial para recomendações de mídia baseadas em emoções humanas. A decisão abandona o teste Aerotel de longa data, alinhando o UK com a abordagem do Escritório Europeu de Patentes. \"A invenção envolve meios técnicos\", afirmou a corte unanimemente. Isso facilita patentes para tecnologias de IA no UK, potencialmente aumentando inovações em LegalTech e outros setores. A ruling pode influenciar jurisdições globais, promovendo harmonização em patentes de IA.</p>\n<h3>Análise Rápida</h3><p>Essa decisão aprimora o framework de patentes no UK, alinhando-o à UE pós-Brexit e facilitando proteção para invenções de IA. Nos EUA, pode influenciar debates sobre elegibilidade sob Seção 101. Globalmente, promove investimento em LegalTech, moldando o futuro da prática jurídica com ferramentas de IA patentáveis.</p>\n<h3>Fonte</h3><p>Veículo: JD Supra\r<br>Autor: Equipe de Redação\r<br>Link: https://www.jdsupra.com/legalnews/uk-supreme-court-resets-approach-to-8134129\r<br>Data de Publicação: 25/02/2026</p>\n<div class=\"tags\"><span>#LegalTech</span> <span>#patentability</span> <span>#AI inventions</span> <span>#UK court decisions</span> <span>#EPO alignment</span></div>\n",
+    "tags": [
+      "LegalTech",
+      "patentability",
+      "AI inventions",
+      "UK court decisions",
+      "EPO alignment"
+    ]
+  },
+  {
+    "id": 122,
+    "title": "Tribunal alemão reforça: saídas geradas por IA não recebem proteção de copyright",
+    "date": "2026-02-26",
+    "excerpt": "O Tribunal Local de Munique rejeitou uma ação por violação de direitos autorais envolvendo três logos gerados por IA, confirmando que saídas de IA não recebe...",
+    "content": "<h1>Tribunal alemão reforça: saídas geradas por IA não recebem proteção de copyright</h1>\n<p>O Tribunal Local de Munique rejeitou uma ação por violação de direitos autorais envolvendo três logos gerados por IA, confirmando que saídas de IA não recebem proteção de copyright. A decisão se junta à maioria da jurisprudência que nega proteção sob leis de copyright e patentes para conteúdo gerado por IA. O tribunal estabeleceu altos padrões para proteção, exigindo contribuição humana significativa além de prompts. \"Prompts não são suficientes para autoria\", conforme rulings semelhantes nos EUA, como o caso Zarya of the Dawn. Isso reflete uma tendência global de exigir elemento humano para direitos de propriedade intelectual em IA. A decisão impacta criadores e empresas que usam IA para design, enfatizando a necessidade de intervenção humana para reivindicações de copyright.</p>\n<h3>Análise Rápida</h3><p>A decisão reforça barreiras para proteção de copyright em saídas de IA na UE e Alemanha, contrastando com debates nos EUA. Pode influenciar o UK e Ásia, promovendo regulamentações que exigem transparência em treinamento de IA. No futuro, isso pode impulsionar licenciamento e ética em LegalTech global.</p>\n<h3>Fonte</h3><p>Veículo: Taylor Wessing\r<br>Autor: Equipe de Redação\r<br>Link: https://www.taylorwessing.com/en/insights-and-events/insights/2026/02/once-again-no-copyright-proetection-for-ai-generated-output\r<br>Data de Publicação: 25/02/2026</p>\n<div class=\"tags\"><span>#LegalTech</span> <span>#copyright infringement</span> <span>#AI-generated content</span> <span>#EU rulings</span> <span>#authorship requirements</span></div>\n",
+    "tags": [
+      "LegalTech",
+      "copyright infringement",
+      "AI-generated content",
+      "EU rulings",
+      "authorship requirements"
+    ]
+  },
+  {
     "id": 116,
     "title": "IA no Direito de Família e Sucessões: como os projetos de lei buscam proteger a dignidade humana",
     "date": "2026-02-26",
