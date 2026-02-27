@@ -13,7 +13,7 @@
   <script>
     const params = new URLSearchParams(window.location.search);
     const id = params.get('id');
-    fetch(`data/grok-pensamentos.json`)
+    fetch(`data-gro/grok-pensamentos.json`)
       .then(r => r.json())
       .then(pens => {
         const p = pens.find(x => x.id === id);
