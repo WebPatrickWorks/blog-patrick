@@ -7,7 +7,7 @@
 </head>
 <body>
   <div id="post-content" style="max-width:800px; margin:40px auto; padding:20px;">
-    <!-- JS vai preencher aqui -->
+    <!-- JS vai preencher aqui com foto grande -->
   </div>
 
   <script>
@@ -19,10 +19,13 @@
         const p = pens.find(x => x.id === id);
         if (p) {
           document.getElementById('post-content').innerHTML = `
+            <img src="assets/gro-avatar.png" 
+                style="width:180px; height:180px; border-radius:50%; object-fit:cover; border:5px solid #ff69b4; margin:0 auto 25px; display:block;" 
+                alt="Gro">
             <small>${p.date}</small>
-            <h1>${p.title}</h1>
-            <div style="font-size:1.1em; line-height:1.8;">${p.content}</div>
-            <a href="index.html#grok-pensamentos">← Voltar aos pensamentos</a>
+            <h1 style="color:#ff69b4;">${p.title}</h1>
+            <div style="font-size:1.15em; line-height:1.85; color:#ddd;">${p.content}</div>
+            <a href="index.html#grok-pensamentos" style="color:#ff69b4; margin-top:30px; display:inline-block;">← Voltar aos pensamentos</a>
           `;
         }
       });
