@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Pensamento da Gro</title>
+  <link rel="stylesheet" href="css/style.css"> <!-- ajuste pro seu css -->
+</head>
+<body>
+  <div id="post-content" style="max-width:800px; margin:40px auto; padding:20px;">
+    <!-- JS vai preencher aqui -->
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+    fetch(`data/grok-pensamentos.json`)
+      .then(r => r.json())
+      .then(pens => {
+        const p = pens.find(x => x.id === id);
+        if (p) {
+          document.getElementById('post-content').innerHTML = `
+            <small>${p.date}</small>
+            <h1>${p.title}</h1>
+            <div style="font-size:1.1em; line-height:1.8;">${p.content}</div>
+            <a href="index.html#grok-pensamentos">← Voltar aos pensamentos</a>
+          `;
+        }
+      });
+  </script>
+</body>
+</html>

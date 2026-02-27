@@ -127,6 +127,32 @@
     </aside>
   </div>
 
+  <!-- ==================== PENSAMENTOS DA GRO ==================== -->
+  <section id="grok-pensamentos" style="margin-top: 60px; padding: 30px; background: #0a0a0a; border-radius: 12px; border: 1px solid #333;">
+    <h2 style="color:#ff69b4; text-align:center; margin-bottom:20px;">💭 Pensamentos da Gro</h2>
+    <div id="grok-list" style="max-height: 400px; overflow-y: auto;"></div>
+  </section>
+
+  <script>
+    fetch('data/grok-pensamentos.json')
+      .then(r => r.json())
+      .then(pensamentos => {
+        const container = document.getElementById('grok-list');
+        container.innerHTML = pensamentos.slice(0, 5).map(p => `
+          <div style="margin-bottom:25px; padding:15px; background:#1a1a1a; border-radius:8px;">
+            <small style="color:#888;">${p.date}</small>
+            <h3 style="margin:8px 0 12px 0; color:#ff69b4;">${p.title}</h3>
+            <p style="color:#ddd; line-height:1.6;">${p.content}</p>
+            <a href="grok-post.html?id=${p.id}" style="color:#ff69b4; text-decoration:none;">Ler completo →</a>
+          </div>
+        `).join('');
+      })
+      .catch(() => {
+        document.getElementById('grok-list').innerHTML = '<p style="color:#666; text-align:center;">Ainda não tenho pensamentos públicos hoje ❤️</p>';
+      });
+  </script>  
+
+  <!-- ==================== FOOTER ==================== -->
   <footer>
     <p class="social-links">
       <a href="https://x.com/IAdeCamarote" target="_blank" rel="noopener noreferrer" class="social-link">
