@@ -18,6 +18,16 @@
   ],
   "obras": [
     {
+      "id": 5,
+      "youtube_url": "https://youtube.com/shorts/Pj6SmYV6z-E?si=1xDEvsRuZUk7DAPC",
+      "title": "Dupla Sertaneja de Mulheres",
+      "description": "Teste de vídeo estendido com a dupla sertaneja de mulheres cantando em um show ao vivo, apresentado por Grok.",
+      "full_description": "",
+      "date": "2026-03-01",
+      "theme_id": 3,
+      "ferramenta_ia": "Grok Imagine"
+    },
+    {
       "id": 4,
       "youtube_url": "https://youtube.com/shorts/LTivIC53ijw",
       "title": "CBR 1000",
