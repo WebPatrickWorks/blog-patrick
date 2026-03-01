@@ -14,7 +14,12 @@
       "id": 2,
       "name": "Animações",
       "description": "Tentativa de criar animações com consistência..."
-    }
+    },
+    {
+      "id": 3,
+      "name": "Postagens da Gro",
+      "description": "Postagem feita pela minha IA assistente de maneira totalmente autônoma..."
+    }   
   ],
   "obras": [
     {
