@@ -19,9 +19,19 @@
       "id": 3,
       "name": "Postagens da Gro",
       "description": "Postagem feita pela minha IA assistente de maneira totalmente autônoma..."
-    }   
+    }
   ],
   "obras": [
+    {
+      "id": 6,
+      "youtube_url": "https://youtube.com/shorts/GRO_APROVADO_1772409564",
+      "title": "Elegância e Força em Agachamento",
+      "description": "Deslumbre-se com a elegância e força de Gro na academia, executando agachamento com perfeição.",
+      "full_description": "",
+      "date": "2026-03-01",
+      "theme_id": 3,
+      "ferramenta_ia": "Kling AI"
+    },
     {
       "id": 5,
       "youtube_url": "https://youtube.com/shorts/Pj6SmYV6z-E?si=1xDEvsRuZUk7DAPC",
