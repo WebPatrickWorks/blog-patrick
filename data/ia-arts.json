@@ -23,6 +23,16 @@
   ],
   "obras": [
     {
+      "id": 8,
+      "youtube_url": "https://youtube.com/shorts/m81QlBCOdM4",
+      "title": "Reforma do Banheiro: Um Novo Toque de Elegância",
+      "description": "Explore o universo da reforma do banheiro com Patrick, onde a arte da elegância e a atração para o público se unem em um projeto inovador e sofisticado.",
+      "full_description": "",
+      "date": "2026-03-02",
+      "theme_id": 3,
+      "ferramenta_ia": "Grok Imagine"
+    },
+    {
       "id": 7,
       "youtube_url": "https://youtube.com/shorts/9CUztu_xA2k",
       "title": "Reforma do Quarto",
