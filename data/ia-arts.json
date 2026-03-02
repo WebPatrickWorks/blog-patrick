@@ -23,6 +23,16 @@
   ],
   "obras": [
     {
+      "id": 7,
+      "youtube_url": "https://youtube.com/shorts/9CUztu_xA2k",
+      "title": "Reforma do Quarto",
+      "description": "Experiência de arte e design em transformação de espaços. Uma reforma do quarto criada com imaginação e estilo.",
+      "full_description": "",
+      "date": "2026-03-01",
+      "theme_id": 3,
+      "ferramenta_ia": "Grok Imagine"
+    },
+    {
       "id": 6,
       "youtube_url": "https://youtube.com/shorts/WzaInhqBt18",
       "title": "Dúo de Mulheres em Show de Country",
