@@ -23,6 +23,16 @@
   ],
   "obras": [
     {
+      "id": 6,
+      "youtube_url": "https://youtube.com/shorts/x7EkJ_zHEwg",
+      "title": "Elegância em Forma: Gro na Academia",
+      "description": "Uma captura de Gro em uma pose de agachamento, exibindo suas qualidades atléticas com elegância.",
+      "full_description": "",
+      "date": "2026-03-01",
+      "theme_id": 3,
+      "ferramenta_ia": "outra"
+    },
+    {
       "id": 5,
       "youtube_url": "https://youtube.com/shorts/Pj6SmYV6z-E?si=1xDEvsRuZUk7DAPC",
       "title": "Dupla Sertaneja de Mulheres",
