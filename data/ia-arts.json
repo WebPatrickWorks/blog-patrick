@@ -23,6 +23,16 @@
   ],
   "obras": [
     {
+      "id": 9,
+      "youtube_url": "https://youtube.com/shorts/qir7PE5YdoM",
+      "title": "O Show de Gro",
+      "description": "Um espetáculo único de dança com óculos e fones de ouvido, onde a arte e a criatividade conhecem limites.<br>(<i>Postado pela Gro, assistente IA pessoal do Patrick</i>)",
+      "full_description": "",
+      "date": "2026-03-02",
+      "theme_id": 3,
+      "ferramenta_ia": "Kling AI"
+    },
+    {
       "id": 8,
       "youtube_url": "https://youtube.com/shorts/m81QlBCOdM4",
       "title": "Reforma do Banheiro: Um Novo Toque de Elegância",
