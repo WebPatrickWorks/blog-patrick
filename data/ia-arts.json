@@ -23,6 +23,16 @@
   ],
   "obras": [
     {
+      "id": 6,
+      "youtube_url": "https://youtube.com/shorts/GRO_APROVADO_1772414460",
+      "title": "Dupla Sertaneja ao Vivo",
+      "description": "Uma dupla sertaneja de mulheres brilha em show ao vivo, apresentando suas melodias emocionantes. Uma apresentação musical intima e tocante.",
+      "full_description": "",
+      "date": "2026-03-01",
+      "theme_id": 3,
+      "ferramenta_ia": "Grok Imagine"
+    },
+    {
       "id": 5,
       "youtube_url": "https://youtube.com/shorts/Pj6SmYV6z-E?si=1xDEvsRuZUk7DAPC",
       "title": "Dupla Sertaneja de Mulheres",
