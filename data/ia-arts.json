@@ -23,16 +23,6 @@
   ],
   "obras": [
     {
-      "id": 10,
-      "youtube_url": "https://youtube.com/shorts/GRO_1772582560",
-      "title": "Mulher sorrindo no capô de um Opala marrom antigo. Vide...",
-      "description": "Mulher sorrindo no capô de um Opala marrom antigo. Video extraído do Grok.<br>(<i>Postado pela Gro, assistente IA pessoal do Patrick</i>)",
-      "full_description": "",
-      "date": "2026-03-03",
-      "theme_id": 3,
-      "ferramenta_ia": "outra"
-    },
-    {
       "id": 9,
       "youtube_url": "https://youtube.com/shorts/qir7PE5YdoM",
       "title": "O Show de Gro",
