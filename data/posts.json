@@ -1,5 +1,50 @@
 [
   {
+    "id": 136,
+    "title": "OpenAI e Anthropic: por que a batalha pelo futuro da IA é também uma disputa pessoal",
+    "date": "2026-03-09",
+    "excerpt": "Não há muito tempo, a OpenAI de Sam Altman parecia desfrutar de uma liderança confortável na corrida corporativa para levar inteligência artificial às massas...",
+    "content": "<h1>OpenAI e Anthropic: por que a batalha pelo futuro da IA é também uma disputa pessoal</h1>\n<p>Não há muito tempo, a OpenAI de Sam Altman parecia desfrutar de uma liderança confortável na corrida corporativa para levar inteligência artificial às massas. A OpenAI criou o aplicativo de consumo de crescimento mais rápido na história da tecnologia, detinha mais de US$ 100 bilhões no banco e se aliou aos gigantes de computação mais poderosos do mundo. Mas empresas estão sempre subindo e caindo no Vale do Silício. Em apenas alguns meses, a Anthropic, rival menor da OpenAI, adicionou milhares de grandes empresas como clientes. Ela mais que dobrou a receita esperada para este ano para US$ 19 bilhões, acima de US$ 9 bilhões no ano passado. E sua tecnologia está sendo elogiada em alguns círculos de tecnologia como a melhor entre seus pares. Até mesmo uma disputa feia com o Pentágono sobre um contrato ajudou a Anthropic – pelo menos na opinião pública. O aplicativo de smartphone da Anthropic subiu para o primeiro lugar em downloads na App Store da Apple após a OpenAI fechar seu próprio acordo com o Pentágono. A controvérsia do contrato envolvendo o Departamento de Defesa, OpenAI e Anthropic foi a última rodada em uma briga longa e profundamente pessoal entre as duas startups de IA mais importantes da indústria de tecnologia e dois executivos com visões diferentes de como a IA deve ser criada. Ela também mostrou quão rapidamente as fortunas estão mudando no mundo da IA. \"It took years for the story to emerge on any one company\", disse Siri Srinivas, uma capitalista de risco que investe no setor de IA. \"Now, narratives flip in months.\" Outras empresas, como Google, Microsoft, Meta e uma ampla gama de startups ao redor do mundo, também competem pela liderança em IA. Mas OpenAI e Anthropic, campos opostos com sedes a cerca de 2 milhas de distância em San Francisco, se tornaram os porta-estandartes para o frenesi de IA na tecnologia.</p>\n<h3>Análise Rápida</h3><p>A competição intensa reflete mudanças rápidas no ecossistema de IA, onde liderança pode virar em meses. Isso impacta inovação ao destacar diferenças filosóficas em desenvolvimento de IA. Para usuários, mostra opções crescentes, com Anthropic ganhando tração em negócios. No Brasil, onde mercado de IA cresce, pode inspirar startups locais a competir globalmente. O futuro da tecnologia pode ver mais consolidação ou divisões baseadas em abordagens éticas.</p>\n<h3>Fonte</h3><p>Veículo: The Economic Times Enterprise AI\r<br>Autor: NYT News Service\r<br>Link: https://enterpriseai.economictimes.indiatimes.com/news/industry/the-intense-ai-battle-openai-vs-anthropic/129316825\r<br>Data: 07/03/2026</p>\n<div class=\"tags\"><span>#OpenAI</span> <span>#Anthropic</span> <span>#competição IA</span> <span>#receita Anthropic</span> <span>#Pentágono</span> <span>#startups IA</span></div>\n",
+    "tags": [
+      "OpenAI",
+      "Anthropic",
+      "competição IA",
+      "receita Anthropic",
+      "Pentágono",
+      "startups IA"
+    ]
+  },
+  {
+    "id": 137,
+    "title": "GPT-5.4, memória portável no Claude e Google em modo expansão: o que mudou na IA esta semana",
+    "date": "2026-03-09",
+    "excerpt": "A OpenAI lançou o GPT-5.4, seu modelo de fronteira mais capaz, unificando raciocínio, codificação e fluxos de trabalho agenticos em um sistema para trabalho ...",
+    "content": "<h1>GPT-5.4, memória portável no Claude e Google em modo expansão: o que mudou na IA esta semana</h1>\n<p>A OpenAI lançou o GPT-5.4, seu modelo de fronteira mais capaz, unificando raciocínio, codificação e fluxos de trabalho agenticos em um sistema para trabalho profissional. Ele iguala ou excede profissionais da indústria 83% do tempo no GDPval em 44 ocupações, acima de 70,9% com o GPT-5.2, com pontuações em modelagem de planilhas melhorando de 68,4% para 87,3%. O GPT-5.4 suporta uso nativo de computador, alcançando 75% de taxa de sucesso no benchmark OSWorld de navegação desktop, superando desempenho humano em 72,4%. Inclui recurso de busca de ferramentas que reduz uso de tokens em 47% em fluxos multi-ferramentas e suporta até 1M tokens de contexto. A Anthropic lançou um recurso de importação de memória para o Claude, permitindo transferir histórico de personalização inteiro de ChatGPT, Gemini ou Grok em menos de 60 segundos, copiando um prompt e exportando respostas. Isso elimina custos de troca, com Claude atingindo #1 na App Store enquanto desinstalações do ChatGPT subiram 295%. A memória agora é gratuita para todos os usuários. Separadamente, modo de voz está sendo implantado no Claude Code para desenvolvedores emitirem comandos falados, atualmente ao vivo para ~5% dos usuários. O Google enviou atualizações incluindo um CLI para Workspace para agentes de IA integrarem com Gmail, Calendar, Drive, Sheets, Docs e Chat, com mais de 100 habilidades pré-construídas. O NotebookLM introduziu Visões Gerais de Vídeo Cinematográficas usando Gemini 3, Nano Banana Pro e Veo 3, exclusivo para assinantes Google AI Ultra com limite de 20 vídeos por dia. O Gemini 3.1 Flash Lite é um modelo custo-eficiente a US$ 0,25 por milhão de tokens de entrada e US$ 1,50 por milhão de saída, oferecendo 2,5x tempo-para-primeiro-token mais rápido e Níveis de Pensamento ajustáveis.</p>\n<h3>Análise Rápida</h3><p>As atualizações intensificam a competição no ecossistema de IA, com OpenAI e Anthropic reduzindo barreiras para adoção. Isso beneficia usuários ao melhorar eficiência e migração de dados. Para brasileiros, facilita acesso a ferramentas avançadas em trabalho remoto e educação. Google expande integração, potencializando produtividade em empresas. O futuro pode ver mais unificação de capacidades de IA, acelerando inovação.</p>\n<h3>Fonte</h3><p>Veículo: The Signal\r<br>Autor: Alex Banks\r<br>Link: https://thesignal.substack.com/p/openai-bites-back-claudes-memory\r<br>Data: 08/03/2026</p>\n<div class=\"tags\"><span>#OpenAI</span> <span>#GPT-5.4</span> <span>#Anthropic</span> <span>#Claude</span> <span>#Google</span> <span>#Gemini</span></div>\n",
+    "tags": [
+      "OpenAI",
+      "GPT-5.4",
+      "Anthropic",
+      "Claude",
+      "Google",
+      "Gemini"
+    ]
+  },
+  {
+    "id": 138,
+    "title": "Anthropic’s Claude Finds More Bugs in Firefox than Human Teams",
+    "date": "2026-03-09",
+    "excerpt": "O modelo de IA Claude Opus 4.6 da Anthropic descobriu 22 vulnerabilidades no Mozilla Firefox em duas semanas, junto com 100 bugs no total. Isso excede o núme...",
+    "content": "<h1>Anthropic’s Claude Finds More Bugs in Firefox than Human Teams</h1>\n<p>O modelo de IA Claude Opus 4.6 da Anthropic descobriu 22 vulnerabilidades no Mozilla Firefox em duas semanas, junto com 100 bugs no total. Isso excede o número de vulnerabilidades reportadas em qualquer mês único de 2025. Das vulnerabilidades identificadas, 14 foram classificadas como de alta severidade, representando quase um quinto das 73 vulnerabilidades de alta severidade corrigidas pela Mozilla em 2025. Pesquisadores da Mozilla compartilharam que a IA possibilita detectar vulnerabilidades graves de segurança em velocidades altamente aceleradas. \"In other words: AI is making it possible to detect severe security vulnerabilities at highly accelerated speeds\", disseram os pesquisadores. No entanto, o Claude performou comparativamente mal em explorar as vulnerabilidades, conseguindo transformar em exploits apenas em dois casos, que foram exploits brutos de navegador improváveis de funcionar em cenários reais devido a salvaguardas existentes. Especialistas apontaram problemas em depender demais de IA para identificação de vulnerabilidades. Daniel Stenberg, desenvolvedor líder na curl, disse que sua empresa experimentou uma explosão em relatórios de IA falsos, com menos de um em 20 bugs reportados em 2025 sendo reais. \"The AI chatbots still easily hallucinate security problems\", afirmou Stenberg. A notícia vem enquanto a Anthropic pivota para cibersegurança, lançando o Claude Code Security, que destaca vulnerabilidades e sugere correções de software para revisão humana, impactando negativamente preços de ações de grandes empresas de cibersegurança.</p>\n<h3>Análise Rápida</h3><p>A capacidade do Claude demonstra potencial de IA em cibersegurança, acelerando detecção de bugs. Isso impacta ecossistema ao complementar equipes humanas, mas destaca riscos de falsos positivos. Para usuários brasileiros, melhora segurança em navegadores populares como Firefox. O futuro da tecnologia pode integrar mais IA em desenvolvimento de software, reduzindo vulnerabilidades globais.</p>\n<h3>Fonte</h3><p>Veículo: PCMag UK\r<br>Autor: Will McCurdy\r<br>Link: https://uk.pcmag.com/business-1/163676/anthropics-claude-finds-more-bugs-in-firefox-than-human-teams\r<br>Data: 08/03/2026</p>\n<div class=\"tags\"><span>#Anthropic</span> <span>#Claude</span> <span>#bugs Firefox</span> <span>#cibersegurança</span> <span>#IA detecção vulnerabilidades</span> <span>#Mozilla</span></div>\n",
+    "tags": [
+      "Anthropic",
+      "Claude",
+      "bugs Firefox",
+      "cibersegurança",
+      "IA detecção vulnerabilidades",
+      "Mozilla"
+    ]
+  },
+  {
     "id": 132,
     "title": "Do 42º lugar ao topo: como o Claude desbancou o ChatGPT em um fim de semana",
     "date": "2026-03-04",
