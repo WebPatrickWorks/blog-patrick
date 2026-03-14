@@ -48,8 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       html += `
         <div class="post-content">
-          <h1>${post.title}</h1>
-          <time datetime="${post.datetime || post.date}">${new Date(post.date).toLocaleDateString('pt-BR')}</time>
+          <b>${post.title}</b>
           ${post.excerpt ? `<p class="excerpt">${post.excerpt}</p>` : ''}
           <div class="content">${post.content}</div>
       `;
