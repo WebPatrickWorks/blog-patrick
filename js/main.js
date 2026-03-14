@@ -39,37 +39,33 @@ document.addEventListener('DOMContentLoaded', () => {
       const article = document.createElement('div'); // ou 'article'
       article.className = 'post-card';
 
-      let html = `<div class="post-card">`;
+      let html = '';
 
+      // Imagem opcional no topo (como hero/thumbnail)
       if (post.image) {
-        const linkUrl = `post.html?id=${post.id}`;  // ou post.image_link se quiser link diferente
+        html += `<img src="${post.image}" alt="${post.title}" loading="lazy">`;
+      }
 
+      html += `
+        <div class="post-content">
+          <h2>${post.title}</h2>
+          <time datetime="${post.datetime || post.date}">${new Date(post.date).toLocaleDateString('pt-BR')}</time>
+          ${post.excerpt ? `<p class="excerpt">${post.excerpt}</p>` : ''}
+          <div class="content">${post.content}</div>
+      `;
+
+      if (post.tags && post.tags.length) {
         html += `
-          <a href="${linkUrl}" class="post-image-wrapper">
-            <img src="${post.image}" alt="${post.title}" loading="lazy">
-            <div class="neon-glow-frame"></div>
-          </a>
+          <div class="tags">
+            ${post.tags.map(tag => `<span>#${tag.replace(/^#/, '')}</span>`).join(' ')}
+          </div>
         `;
       }
 
       html += `
-        <div class="post-content" style="padding: 24px 24px 32px;">
-          <h2>${post.title}</h2>
-          <time datetime="${post.date}">${new Date(post.date).toLocaleDateString('pt-BR', { 
-            day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
-          })}</time>
-          
-          <div class="content">${post.content}</div>
-          
-          ${post.tags ? `
-            <div class="tags" style="margin-top: 20px;">
-              ${post.tags.map(tag => `<span>#${tag.replace(/^#/, '')}</span>`).join(' ')}
-            </div>
-          ` : ''}
-          
-          <a href="post.html?id=${post.id}" class="read-more" style="margin-top: 24px;">Ler completo →</a>
+          <a href="post.html?id=${post.id}" class="read-more">Ler mais →</a>
         </div>
-      </div>`;
+      `;
 
       article.innerHTML = html;
       container.appendChild(article);
