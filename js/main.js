@@ -47,6 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       let cleanedContent = post.content;      // conteúdo que vamos usar no final
+      let displayTitle = post.title;
 
       // =============================================
       // 1. Extrai título do primeiro <h2> (se existir)
