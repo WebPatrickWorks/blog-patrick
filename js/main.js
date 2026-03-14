@@ -46,11 +46,10 @@ document.addEventListener('DOMContentLoaded', () => {
         html += `<img src="${post.image}" alt="${post.title}" loading="lazy">`;
       }
 
-      let cleanedContent = post.content;      // conteúdo que vamos usar no final
       let displayTitle = post.title;
 
       // =============================================
-      // 1. Extrai título do primeiro <h2> (se existir)
+      // 1. Extrai título
       // =============================================
       if (post.content) {
         const parser = new DOMParser();
@@ -62,6 +61,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }      
 
+      // =============================================
+      // 2. Extrai excerpt
+      // =============================================
       let excerptHtml = '';
 
       if (post.excerpt) {
