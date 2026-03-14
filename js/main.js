@@ -59,15 +59,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const firstH2 = doc.querySelector('h2');
         if (firstH2 && firstH2.textContent.trim()) {
           displayTitle = firstH2.textContent.trim();
-          
-          // Remove o <h2> inteiro do documento
-          firstH2.remove();
-          
-          // Atualiza o cleanedContent com o HTML sem o h2
-          cleanedContent = doc.body.innerHTML.trim();
-          
-          // Opcional: remove <br><br> ou espaços iniciais que sobram após remoção
-          cleanedContent = cleanedContent.replace(/^(\s*<br\s*\/?>\s*)+/, '').trim();
         }
       }      
 
@@ -92,8 +83,8 @@ document.addEventListener('DOMContentLoaded', () => {
       html += `
         <div class="post-content">
           <b>${post.title}</b>
+          <h2>${displayTitle}</h2>
           ${excerptHtml}
-          ${displayTitle}
       `;
 
       if (post.tags && post.tags.length) {
