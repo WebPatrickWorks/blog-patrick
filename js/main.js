@@ -48,8 +48,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
       html += `
         <div class="post-content">
-          <h2>${post.title}</h2>
-          <time datetime="${post.datetime || post.date}">${new Date(post.date).toLocaleDateString('pt-BR')}</time>
+          <div class="post-header-with-avatar">
+            <img src="assets/gro-avatar.png" 
+                class="gro-avatar" 
+                alt="Gro" 
+                loading="lazy">
+            <div class="title-and-time">
+              <h2>${post.title}</h2>   <!-- use h2 aqui, ou h1 se preferir maior -->
+              <time datetime="${post.datetime || post.date}">
+                ${new Date(post.date).toLocaleDateString('pt-BR', { 
+                  day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                })}
+              </time>
+            </div>
+          </div>
+
           ${post.excerpt ? `<p class="excerpt">${post.excerpt}</p>` : ''}
           <div class="content">${post.content}</div>
       `;
