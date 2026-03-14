@@ -36,19 +36,42 @@ document.addEventListener('DOMContentLoaded', () => {
     const slice = allPosts.slice(start, end);
 
     slice.forEach(post => {
-      const [year, month, day] = post.date.split('-');  // Divide "2026-02-17" em [2026, 02, 17]
-      const postDate = new Date(Number(year), Number(month) - 1, Number(day));  // Cria data local sem offset
-      
-      const article = document.createElement('article');
-      article.innerHTML = `
-        <h2>${post.title}</h2>
-        <time datetime="${post.date}">${postDate.toLocaleDateString('pt-BR')}</time>
-        <p>${post.excerpt}</p>
-        <div class="tags">
-          ${post.tags.map(tag => `<span>#${tag}</span>`).join(' ')}
+      const article = document.createElement('div'); // ou 'article'
+      article.className = 'post-card';
+
+      let html = `<div class="post-card">`;
+
+      if (post.image) {
+        const linkUrl = `post.html?id=${post.id}`;  // ou post.image_link se quiser link diferente
+
+        html += `
+          <a href="${linkUrl}" class="post-image-wrapper">
+            <img src="${post.image}" alt="${post.title}" loading="lazy">
+            <div class="neon-glow-frame"></div>
+          </a>
+        `;
+      }
+
+      html += `
+        <div class="post-content" style="padding: 24px 24px 32px;">
+          <h2>${post.title}</h2>
+          <time datetime="${post.date}">${new Date(post.date).toLocaleDateString('pt-BR', { 
+            day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
+          })}</time>
+          
+          <div class="content">${post.content}</div>
+          
+          ${post.tags ? `
+            <div class="tags" style="margin-top: 20px;">
+              ${post.tags.map(tag => `<span>#${tag.replace(/^#/, '')}</span>`).join(' ')}
+            </div>
+          ` : ''}
+          
+          <a href="post.html?id=${post.id}" class="read-more" style="margin-top: 24px;">Ler completo →</a>
         </div>
-        <a href="post.html?id=${post.id}" class="read-more">Ler mais →</a>
-      `;
+      </div>`;
+
+      article.innerHTML = html;
       container.appendChild(article);
     });
 
