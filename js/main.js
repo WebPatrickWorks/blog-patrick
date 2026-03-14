@@ -48,22 +48,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
       let excerptHtml = '';
 
-      // 1. Prioriza excerpt explícito no JSON (se existir)
       if (post.excerpt) {
         excerptHtml = `<p class="excerpt">${post.excerpt}</p>`;
-      } 
-      // 2. Se não tiver excerpt, tenta pegar o primeiro <p> do content
-      else if (post.content) {
-        // Extrai o primeiro <p>...</p> usando regex simples
-        const firstPMatch = post.content.match(/<p[^>]*>(.*?)<\/p>/is);
-        if (firstPMatch && firstPMatch[1]) {
-          // Limpa tags internas se quiser (opcional), ou deixa como está
-          let firstPara = firstPMatch[1].trim();
-          // Opcional: corta em ~150-200 caracteres pra não ficar muito longo
-          if (firstPara.length > 220) {
-            firstPara = firstPara.substring(0, 220) + '...';
+      } else if (post.content) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(post.content, 'text/html');
+        const firstP = doc.querySelector('p');
+        
+        if (firstP && firstP.textContent.trim()) {
+          let text = firstP.textContent.trim();
+          if (text.length > 220) {
+            text = text.substring(0, 220) + '...';
           }
-          excerptHtml = `<p class="excerpt">${firstPara}</p>`;
+          excerptHtml = `<p class="excerpt">${text}</p>`;
         }
       }
 
