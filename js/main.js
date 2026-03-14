@@ -46,9 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
         html += `<img src="${post.image}" alt="${post.title}" loading="lazy">`;
       }
 
-      let displayTitle = post.title;          // fallback: título do JSON
       let cleanedContent = post.content;      // conteúdo que vamos usar no final
-      let excerptHtml = '';
 
       // =============================================
       // 1. Extrai título do primeiro <h2> (se existir)
@@ -70,16 +68,16 @@ document.addEventListener('DOMContentLoaded', () => {
           // Opcional: remove <br><br> ou espaços iniciais que sobram após remoção
           cleanedContent = cleanedContent.replace(/^(\s*<br\s*\/?>\s*)+/, '').trim();
         }
-      }
+      }      
 
-      // =============================================
-      // 2. Excerpt (mantém exatamente como estava)
-      // =============================================
+      let excerptHtml = '';
+
       if (post.excerpt) {
         excerptHtml = `<p class="excerpt">${post.excerpt}</p>`;
-      } else if (cleanedContent) {
-        const docExcerpt = parser.parseFromString(cleanedContent, 'text/html'); // re-parseia o limpo
-        const firstP = docExcerpt.querySelector('p');
+      } else if (post.content) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(post.content, 'text/html');
+        const firstP = doc.querySelector('p');
         
         if (firstP && firstP.textContent.trim()) {
           let text = firstP.textContent.trim();
@@ -90,15 +88,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      // =============================================
-      // 3. Monta o HTML
-      // =============================================
       html += `
         <div class="post-content">
-          <b>${displayTitle}</b>
+          <b>${post.title}</b>
           ${excerptHtml}
-          <div class="content">${cleanedContent}</div>
-          <!-- aqui continuam tags, read-more, etc. -->
+          ${cleanedContent}
       `;
 
       if (post.tags && post.tags.length) {
