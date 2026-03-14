@@ -233,17 +233,77 @@
 .post-card {
   background: var(--card-bg);
   border: 1px solid var(--neon-green-border);
-  border-radius: 12px;
+  border-radius: 10px;
   overflow: hidden;
   box-shadow: var(--glow-shadow);
-  transition: all 0.3s ease;
-  margin-bottom: 48px;
+  margin-bottom: 48px;          /* espaço entre cards */
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .post-card:hover {
   transform: translateY(-6px);
   box-shadow: 0 0 40px rgba(0, 255, 65, 0.35);
   border-color: var(--neon-green-light);
+}
+
+.post-card img {
+  width: 100%;
+  height: auto;
+  display: block;
+  max-height: 280px;            /* evita imagens gigantes em mobile */
+  object-fit: cover;            /* corta proporcionalmente sem distorcer */
+}
+
+/* Área de conteúdo - aqui entra o espaçamento */
+.post-content {
+  padding: 24px 20px 32px;      /* top / left-right / bottom — mais respiro em baixo */
+}
+
+/* Ajustes mobile (prioridade alta) */
+@media (max-width: 768px) {
+  .post-content {
+    padding: 20px 16px 28px;    /* um pouco menos em mobile, mas ainda confortável */
+  }
+  
+  .post-card img {
+    max-height: 220px;          /* menor em telas pequenas pra não dominar */
+  }
+  
+  h2 {
+    font-size: 1.65rem;         /* título não fica gigante demais */
+    line-height: 1.3;
+  }
+  
+  .content {
+    font-size: 0.98rem;         /* legibilidade em mobile */
+    line-height: 1.75;          /* mais espaço entre linhas */
+  }
+  
+  .tags {
+    font-size: 0.85rem;
+    gap: 8px;
+  }
+  
+  .read-more {
+    padding: 10px 20px;
+    font-size: 0.95rem;
+  }
+}
+
+/* Garantir que listas e parágrafos tenham espaçamento interno bom */
+.content ul,
+.content ol {
+  margin: 16px 0;
+  padding-left: 24px;
+}
+
+.content p {
+  margin: 14px 0;
+}
+
+.content h3 {
+  margin: 28px 0 12px;
+  font-size: 1.3rem;
 }
 
 .post-image-wrapper {
