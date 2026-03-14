@@ -46,28 +46,44 @@ document.addEventListener('DOMContentLoaded', () => {
         html += `<img src="${post.image}" alt="${post.title}" loading="lazy">`;
       }
 
+      let displayTitle = post.title;          // fallback: usa o title do JSON
+      let cleanedContent = post.content;      // vamos limpar o h2 se encontrar
+
+      // Tenta extrair o primeiro <h2>...</h2> do content
+      const h2Match = post.content.match(/<h2[^>]*>(.*?)<\/h2>/is);
+      if (h2Match && h2Match[1]) {
+        displayTitle = h2Match[1].trim();     // pega o texto interno do h2
+        
+        // Remove o h2 inteiro do content para não duplicar no corpo
+        cleanedContent = post.content.replace(h2Match[0], '').trim();
+        
+        // Opcional: remove <br><br> iniciais que sobram depois da remoção
+        cleanedContent = cleanedContent.replace(/^(\s*<br\s*\/?>\s*)+/, '');
+      }
+
+      // Agora monta o HTML
       let excerptHtml = '';
 
+      // Prioriza excerpt explícito, senão tenta pegar primeiro <p> (como falamos antes)
       if (post.excerpt) {
         excerptHtml = `<p class="excerpt">${post.excerpt}</p>`;
-      } else if (post.content) {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(post.content, 'text/html');
-        const firstP = doc.querySelector('p');
-        
-        if (firstP && firstP.textContent.trim()) {
-          let text = firstP.textContent.trim();
-          if (text.length > 220) {
-            text = text.substring(0, 220) + '...';
+      } else if (cleanedContent) {
+        const firstPMatch = cleanedContent.match(/<p[^>]*>(.*?)<\/p>/is);
+        if (firstPMatch && firstPMatch[1]) {
+          let firstPara = firstPMatch[1].trim();
+          if (firstPara.length > 220) {
+            firstPara = firstPara.substring(0, 220) + '...';
           }
-          excerptHtml = `<p class="excerpt">${text}</p>`;
+          excerptHtml = `<p class="excerpt">${firstPara}</p>`;
         }
       }
 
       html += `
         <div class="post-content">
-          <b>${post.title}</b>
+          <b>${displayTitle}</b>               <!-- aqui usa o título extraído ou o do JSON -->
           ${excerptHtml}
+          <div class="content">${cleanedContent}</div>
+          <!-- tags, read-more etc. continuam aqui -->
       `;
 
       if (post.tags && post.tags.length) {
