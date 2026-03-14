@@ -10,7 +10,7 @@
   --neon-green-icon: #c7d2fe;
   --neon-green-dim: #619259;
   --neon-green-back: #6e8d4a;
-  --card-bg: rgba(6, 26, 11, 0);
+  --card-bg: rgba(0, 0, 0, 0.644);
   --glow-shadow: 0 0 20px rgba(0, 255, 65, 0.15);
   --text-shadow-glow: 0 0 10px #336b41;
 }
