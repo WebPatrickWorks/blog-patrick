@@ -46,44 +46,59 @@ document.addEventListener('DOMContentLoaded', () => {
         html += `<img src="${post.image}" alt="${post.title}" loading="lazy">`;
       }
 
-      let displayTitle = post.title;          // fallback: usa o title do JSON
-      let cleanedContent = post.content;      // vamos limpar o h2 se encontrar
-
-      // Tenta extrair o primeiro <h2>...</h2> do content
-      const h2Match = post.content.match(/<h2[^>]*>(.*?)<\/h2>/is);
-      if (h2Match && h2Match[1]) {
-        displayTitle = h2Match[1].trim();     // pega o texto interno do h2
-        
-        // Remove o h2 inteiro do content para não duplicar no corpo
-        cleanedContent = post.content.replace(h2Match[0], '').trim();
-        
-        // Opcional: remove <br><br> iniciais que sobram depois da remoção
-        cleanedContent = cleanedContent.replace(/^(\s*<br\s*\/?>\s*)+/, '');
-      }
-
-      // Agora monta o HTML
+      let displayTitle = post.title;          // fallback: título do JSON
+      let cleanedContent = post.content;      // conteúdo que vamos usar no final
       let excerptHtml = '';
 
-      // Prioriza excerpt explícito, senão tenta pegar primeiro <p> (como falamos antes)
-      if (post.excerpt) {
-        excerptHtml = `<p class="excerpt">${post.excerpt}</p>`;
-      } else if (cleanedContent) {
-        const firstPMatch = cleanedContent.match(/<p[^>]*>(.*?)<\/p>/is);
-        if (firstPMatch && firstPMatch[1]) {
-          let firstPara = firstPMatch[1].trim();
-          if (firstPara.length > 220) {
-            firstPara = firstPara.substring(0, 220) + '...';
-          }
-          excerptHtml = `<p class="excerpt">${firstPara}</p>`;
+      // =============================================
+      // 1. Extrai título do primeiro <h2> (se existir)
+      // =============================================
+      if (post.content) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(post.content, 'text/html');
+        
+        const firstH2 = doc.querySelector('h2');
+        if (firstH2 && firstH2.textContent.trim()) {
+          displayTitle = firstH2.textContent.trim();
+          
+          // Remove o <h2> inteiro do documento
+          firstH2.remove();
+          
+          // Atualiza o cleanedContent com o HTML sem o h2
+          cleanedContent = doc.body.innerHTML.trim();
+          
+          // Opcional: remove <br><br> ou espaços iniciais que sobram após remoção
+          cleanedContent = cleanedContent.replace(/^(\s*<br\s*\/?>\s*)+/, '').trim();
         }
       }
 
+      // =============================================
+      // 2. Excerpt (mantém exatamente como estava)
+      // =============================================
+      if (post.excerpt) {
+        excerptHtml = `<p class="excerpt">${post.excerpt}</p>`;
+      } else if (cleanedContent) {
+        const docExcerpt = parser.parseFromString(cleanedContent, 'text/html'); // re-parseia o limpo
+        const firstP = docExcerpt.querySelector('p');
+        
+        if (firstP && firstP.textContent.trim()) {
+          let text = firstP.textContent.trim();
+          if (text.length > 220) {
+            text = text.substring(0, 220) + '...';
+          }
+          excerptHtml = `<p class="excerpt">${text}</p>`;
+        }
+      }
+
+      // =============================================
+      // 3. Monta o HTML
+      // =============================================
       html += `
         <div class="post-content">
-          <b>${displayTitle}</b>               <!-- aqui usa o título extraído ou o do JSON -->
+          <b>${displayTitle}</b>
           ${excerptHtml}
           <div class="content">${cleanedContent}</div>
-          <!-- tags, read-more etc. continuam aqui -->
+          <!-- aqui continuam tags, read-more, etc. -->
       `;
 
       if (post.tags && post.tags.length) {
