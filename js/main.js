@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="post-content">
           <b>${post.title}</b>
           ${excerptHtml}
-          ${cleanedContent}
+          ${displayTitle}
       `;
 
       if (post.tags && post.tags.length) {
