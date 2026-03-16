@@ -263,6 +263,7 @@
           // ==================== COMENTÁRIOS ====================
 
           async function loadComments() {
+
             const { data, error } = await supabaseClient
               .from('post_comments')
               .select('id, author_name, content, created_at')
@@ -277,20 +278,21 @@
             const container = document.getElementById('comments-list');
             if (!container) return;
 
-            const loading = container.querySelector('p');
-            if (loading) loading.remove();
+            container.innerHTML = '';
+
             data.forEach(comment => {
               const div = document.createElement('div');
               div.className = 'comment';
+
               div.innerHTML = `
-                <strong>${comment.author_name}</strong> 
+                <strong>${comment.author_name}</strong>
                 <small>(${new Date(comment.created_at).toLocaleString('pt-BR')})</small>
                 <p>${comment.content.replace(/\n/g, '<br>')}</p>
               `;
+
               container.appendChild(div);
             });
           }
-
           async function submitComment() {
             const input = document.getElementById('comment-input');
             const content = input?.value.trim();
