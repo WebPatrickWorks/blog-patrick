@@ -112,6 +112,7 @@
           const post = posts.find(p => p.id == postId);
           console.log('Post encontrado:', post);
 
+          const container = document.getElementById('post-container');
           if (!post) {
             container.innerHTML = '<p>Post não encontrado.</p>';
             return;
@@ -198,8 +199,6 @@
           const SUPABASE_URL    = 'https://yegczfbshkctxedzkdpu.supabase.co';      // ← substitua
           const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InllZ2N6ZmJzaGtjdHhlZHprZHB1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYyMzc1OTUsImV4cCI6MjA4MTgxMzU5NX0.GU7KfJ4J1gAGK_q_uyYNPsPWqYbXjU2qdVhZq8SsIdM'; // ← substitua
 
-          const container = document.getElementById('post-container');
-          
           const supabaseClient = supabase.createClient(
             SUPABASE_URL,
             SUPABASE_ANON_KEY
