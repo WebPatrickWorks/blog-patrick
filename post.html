@@ -23,27 +23,25 @@
     <button class="back-link-post" onclick="history.back()">← Voltar para a lista de posts</button>
   </header>
 
-  <main>
-    <div id="post-container"></div>
-
+  <main id="post-container">
     <p>Carregando post...</p>
-
-    <div class="interactions" style="margin-top: 48px; padding: 24px; border-top: 1px solid var(--neon-green-border);">
-      <div class="likes-section" style="margin-bottom: 32px;">
-        <button id="like-btn" class="like-btn" style="font-size: 1.3rem; background: none; border: none; color: var(--neon-green); cursor: pointer;">
-          🤍 <span id="likes-count">0</span> likes
-        </button>
-      </div>
-
-      <h3 style="margin: 0 0 16px; color: var(--neon-green-light);">Comentários</h3>
-      <div id="comments-list" style="max-height: 400px; overflow-y: auto; margin-bottom: 24px;"></div>
-
-      <div style="display: flex; gap: 12px;">
-        <textarea id="comment-input" placeholder="Deixe seu comentário..." rows="3" style="flex:1; padding:12px; background:rgba(0,255,65,0.05); border:1px solid var(--neon-green-border); color:var(--neon-green); border-radius:6px;"></textarea>
-        <button onclick="submitComment()" style="padding:12px 24px; background:var(--neon-green); color:#000; border:none; border-radius:6px; cursor:pointer;">Enviar</button>
-      </div>
-    </div>    
   </main>
+
+  <div class="interactions" style="margin-top: 48px; padding: 24px; border-top: 1px solid var(--neon-green-border);">
+    <div class="likes-section" style="margin-bottom: 32px;">
+      <button id="like-btn" class="like-btn" style="font-size: 1.3rem; background: none; border: none; color: var(--neon-green); cursor: pointer;">
+        🤍 <span id="likes-count">0</span> likes
+      </button>
+    </div>
+
+    <h3 style="margin: 0 0 16px; color: var(--neon-green-light);">Comentários</h3>
+    <div id="comments-list" style="max-height: 400px; overflow-y: auto; margin-bottom: 24px;"></div>
+
+    <div style="display: flex; gap: 12px;">
+      <textarea id="comment-input" placeholder="Deixe seu comentário..." rows="3" style="flex:1; padding:12px; background:rgba(0,255,65,0.05); border:1px solid var(--neon-green-border); color:var(--neon-green); border-radius:6px;"></textarea>
+      <button onclick="submitComment()" style="padding:12px 24px; background:var(--neon-green); color:#000; border:none; border-radius:6px; cursor:pointer;">Enviar</button>
+    </div>
+  </div>
 
   <footer>
     <p>Feito com <svg class="heart-svg" width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg> e JSON | <a href="https://webpatrickworks.github.io/blog-patrick">Código-fonte</a></p>
@@ -192,8 +190,6 @@
           article.appendChild(contentDiv);
 
           container.appendChild(article);
-          const loading = document.querySelector('main > p');
-          if (loading) loading.remove();          
 
 
           // ==================== SUPABASE – Likes & Comentários ====================
@@ -209,7 +205,7 @@
           async function updateLikeCount() {
             const { count, error } = await supabaseClient
               .from('post_likes')
-              select('*', { count: 'exact', head: true })
+              .select('*', { count: 'exact', head: true })
               .eq('post_id', postId);
 
             if (error) {
