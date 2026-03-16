@@ -96,12 +96,11 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const container = document.getElementById('post-container');
       const urlParams = new URLSearchParams(window.location.search);
       const postId = urlParams.get('id');
 
       if (!postId) {
-        container.innerHTML = '<p>Post não encontrado.</p>';
+        document.getElementById('post-container').innerHTML = '<p>Post não encontrado (sem ID na URL).</p>';
         return;
       }
 
@@ -175,6 +174,10 @@
           `;
           article.appendChild(header);
 
+          const container = document.getElementById('post-container');
+
+          const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
           // Disclaimer
           if (disclaimerHTML) {
             const bannerDiv = document.createElement('div');
@@ -195,8 +198,6 @@
 
           const SUPABASE_URL    = 'https://yegczfbshkctxedzkdpu.supabase.co';      // ← substitua
           const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InllZ2N6ZmJzaGtjdHhlZHprZHB1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYyMzc1OTUsImV4cCI6MjA4MTgxMzU5NX0.GU7KfJ4J1gAGK_q_uyYNPsPWqYbXjU2qdVhZq8SsIdM'; // ← substitua
-
-          const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
           // Variável global pro id do post (já existe no seu código)
           const urlParams = new URLSearchParams(window.location.search);
@@ -362,7 +363,7 @@
               .subscribe();
           }
 
-          document.getElementById('like-btn').addEventListener('click', toggleLike);
+          document.getElementById('like-btn')?.addEventListener('click', toggleLike);
 
           // ==================== INICIALIZAÇÃO ====================
 
