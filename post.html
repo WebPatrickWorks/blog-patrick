@@ -112,7 +112,6 @@
           const post = posts.find(p => p.id == postId);
           console.log('Post encontrado:', post);
 
-          const container = document.getElementById('post-container');
           if (!post) {
             container.innerHTML = '<p>Post não encontrado.</p>';
             return;
@@ -199,11 +198,15 @@
           const SUPABASE_URL    = 'https://yegczfbshkctxedzkdpu.supabase.co';      // ← substitua
           const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InllZ2N6ZmJzaGtjdHhlZHprZHB1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYyMzc1OTUsImV4cCI6MjA4MTgxMzU5NX0.GU7KfJ4J1gAGK_q_uyYNPsPWqYbXjU2qdVhZq8SsIdM'; // ← substitua
 
-          const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
+          const container = document.getElementById('post-container');
+          
+          const supabaseClient = supabase.createClient(
+            SUPABASE_URL,
+            SUPABASE_ANON_KEY
+          );
           // Função auxiliar: contar likes
           async function updateLikeCount() {
-            const { count, error } = await supabase
+            const { count, error } = await supabaseClient
               .from('post_likes')
               .select('*', { count: 'exact', head: true })
               .eq('post_id', postId);
@@ -219,13 +222,13 @@
 
           // Verifica se o usuário já deu like (muda ícone/cor)
           async function checkUserLiked() {
-            const { data: { user } } = await supabase.auth.getUser();
+            const { data: { user } } = await supabaseClient.auth.getUser();
             if (!user) {
               // sem login → não marca como liked
               return;
             }
 
-            const { data } = await supabase
+            const { data } = await supabaseClient
               .from('post_likes')
               .select('id')
               .eq('post_id', postId)
@@ -246,7 +249,7 @@
 
           // Toggle like
           async function toggleLike() {
-            const { data: { user } } = await supabase.auth.getUser();
+            const { data: { user } } = await supabaseClient.auth.getUser();
 
             if (!user) {
               alert('Faça login para curtir (opcional no momento)');
@@ -254,7 +257,7 @@
               return;
             }
 
-            const { data: existing } = await supabase
+            const { data: existing } = await supabaseClient
               .from('post_likes')
               .select('id')
               .eq('post_id', postId)
@@ -263,10 +266,10 @@
 
             if (existing) {
               // Remove like
-              await supabase.from('post_likes').delete().eq('id', existing.id);
+              await supabaseClient.from('post_likes').delete().eq('id', existing.id);
             } else {
               // Adiciona like
-              await supabase.from('post_likes').insert({
+              await supabaseClient.from('post_likes').insert({
                 post_id: postId
               });
             }
@@ -314,7 +317,7 @@
 
             const name = prompt('Seu nome (ou deixe em branco para Anônimo):') || 'Anônimo';
 
-            const { error } = await supabase.from('post_comments').insert({
+            const { error } = await supabaseClient.from('post_comments').insert({
               post_id: postId,
               author_name: name,
               content
