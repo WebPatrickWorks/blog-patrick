@@ -309,11 +309,16 @@
                   const comment = payload.new;
                   const container = document.getElementById('comments-list');
                   const div = document.createElement('div');
-                  div.className = 'comment';
+                  div.className = 'comment-card';
+
                   div.innerHTML = `
-                    <strong>${comment.author_name}</strong> 
-                    <small>(${new Date(comment.created_at).toLocaleString('pt-BR')})</small>
-                    <p>${comment.content.replace(/\n/g, '<br>')}</p>
+                    <div class="comment-header">
+                      <strong>${comment.author_name || 'Anônimo'}</strong>
+                      <small>(${new Date(comment.created_at).toLocaleString('pt-BR', {
+                        dateStyle: 'short', timeStyle: 'short'
+                      })})</small>
+                    </div>
+                    <p class="comment-content">${comment.content.replace(/\n/g, '<br>')}</p>
                   `;
                   container.appendChild(div);
                 }
