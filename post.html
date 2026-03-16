@@ -192,6 +192,8 @@
           article.appendChild(contentDiv);
 
           container.appendChild(article);
+          const loading = document.querySelector('main > p');
+          if (loading) loading.remove();          
 
 
           // ==================== SUPABASE – Likes & Comentários ====================
@@ -207,7 +209,7 @@
           async function updateLikeCount() {
             const { count, error } = await supabaseClient
               .from('post_likes')
-              .select('*', { count: 'exact', head: true })
+              select('id', { count: 'exact', head: true })
               .eq('post_id', postId);
 
             if (error) {
