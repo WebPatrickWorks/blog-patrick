@@ -456,58 +456,6 @@ article:hover {
 }
 
 /* ==========================================================================
-   COMENTÁRIOS
-   ========================================================================== */
-
-/* Cards de comentários - compactos e com borda neon sutil */
-.comment-card {
-  background: rgba(0, 255, 65, 0.04);          /* fundo levemente neon */
-  border: 1px solid var(--neon-green-border);  /* borda fina neon */
-  border-radius: 6px;
-  padding: 12px 16px;                          /* padding interno menor */
-  margin-bottom: 12px;                         /* espaço entre cards (reduzido) */
-  box-shadow: 0 2px 8px rgba(0, 255, 65, 0.1);
-  transition: all 0.2s ease;
-}
-
-.comment-card:hover {
-  border-color: var(--neon-green-light);
-  box-shadow: 0 4px 16px rgba(0, 255, 65, 0.2);
-}
-
-.comment-header {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;                                    /* espaço pequeno entre nome e data */
-  margin-bottom: 4px;                          /* ← REDUZIDO! era mais antes */
-  flex-wrap: wrap;
-}
-
-.comment-header strong {
-  color: var(--neon-green-light);
-  font-weight: 600;
-}
-
-.comment-header small {
-  color: var(--neon-green-dim);
-  font-size: 0.85rem;
-  opacity: 0.9;
-}
-
-.comment-content {
-  margin: 0;                                   /* sem margem extra em cima/baixo */
-  line-height: 1.5;
-  color: var(--neon-green);
-}
-
-/* Ajuste no container geral de comentários (se quiser mais compacto) */
-#comments-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;                                    /* gap menor entre cards */
-}
-
-/* ==========================================================================
    MEDIA QUERIES (mobile adjustments)
    ========================================================================== */
 @media (max-width: 768px) {
