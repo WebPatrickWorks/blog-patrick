@@ -22,7 +22,7 @@
   display: flex;
   align-items: baseline;
   gap: 8px;                                    /* espaço pequeno entre nome e data */
-  margin-bottom: 4px;                          /* ← REDUZIDO! era mais antes */
+  margin-bottom: 2px;                          /* ← REDUZIDO! era mais antes */
   flex-wrap: wrap;
 }
 
