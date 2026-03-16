@@ -289,11 +289,11 @@
             }
 
             const container = document.getElementById('comments-list');
-            if (!container) return;
+
 
             const loading = container.querySelector('p');
             if (loading) loading.remove();
-            
+
             data.forEach(comment => {
               const div = document.createElement('div');
               div.className = 'comment';
