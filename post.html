@@ -190,14 +190,6 @@
 
           container.appendChild(article);
 
-          // ==================== INICIALIZAÇÃO ====================
-
-          // Coloque isso depois de montar o article
-          updateLikeCount();
-          checkUserLiked();
-          loadComments();
-          setupRealtime();
-
 
           // ==================== SUPABASE – Likes & Comentários ====================
 
@@ -229,19 +221,27 @@
           // Verifica se o usuário já deu like (muda ícone/cor)
           async function checkUserLiked() {
             const { data: { user } } = await supabase.auth.getUser();
-            if (!user) return false;
+            if (!user) {
+              // sem login → não marca como liked
+              return;
+            }
 
             const { data } = await supabase
               .from('post_likes')
               .select('id')
               .eq('post_id', postId)
               .eq('user_id', user.id)
-              .single();
+              .maybeSingle();  // .single() pode falhar se não existir
 
             const btn = document.getElementById('like-btn');
-            if (btn && data) {
-              btn.classList.add('liked');
-              btn.innerHTML = '❤️ Liked';
+            if (btn) {
+              if (data) {
+                btn.classList.add('liked');
+                btn.innerHTML = '❤️ Liked';
+              } else {
+                btn.classList.remove('liked');
+                btn.innerHTML = '🤍 Like';
+              }
             }
           }
 
@@ -362,6 +362,15 @@
               .subscribe();
           }
 
+          document.getElementById('like-btn').addEventListener('click', toggleLike);
+
+          // ==================== INICIALIZAÇÃO ====================
+
+          // Coloque isso depois de montar o article
+          updateLikeCount();
+          checkUserLiked();
+          loadComments();
+          setupRealtime();
 
           // Botão voltar
           const backBtn = document.createElement('button');
