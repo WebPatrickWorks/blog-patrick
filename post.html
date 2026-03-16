@@ -248,36 +248,16 @@
 
           // Toggle like
           async function toggleLike() {
-            const { data: { user } } = await supabaseClient.auth.getUser();
-
             const { error } = await supabaseClient
               .from('post_likes')
               .insert({ post_id: postId });
 
             if (error) {
-              console.error(error);
+              console.error('Erro ao registrar like:', error);
               return;
             }
 
-            const { data: existing } = await supabaseClient
-              .from('post_likes')
-              .select('id')
-              .eq('post_id', postId)
-              .eq('user_id', user.id)
-              .single();
-
-            if (existing) {
-              // Remove like
-              await supabaseClient.from('post_likes').delete().eq('id', existing.id);
-            } else {
-              // Adiciona like
-              await supabaseClient.from('post_likes').insert({
-                post_id: postId
-              });
-            }
-
             updateLikeCount();
-            checkUserLiked();
           }
 
           // ==================== COMENTÁRIOS ====================
