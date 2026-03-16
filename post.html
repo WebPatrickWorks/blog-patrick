@@ -25,6 +25,22 @@
 
   <main id="post-container">
     <p>Carregando post...</p>
+
+    <div class="interactions" style="margin-top: 48px; padding: 24px; border-top: 1px solid var(--neon-green-border);">
+      <div class="likes-section" style="margin-bottom: 32px;">
+        <button id="like-btn" class="like-btn" style="font-size: 1.3rem; background: none; border: none; color: var(--neon-green); cursor: pointer;">
+          🤍 <span id="likes-count">0</span> likes
+        </button>
+      </div>
+
+      <h3 style="margin: 0 0 16px; color: var(--neon-green-light);">Comentários</h3>
+      <div id="comments-list" style="max-height: 400px; overflow-y: auto; margin-bottom: 24px;"></div>
+
+      <div style="display: flex; gap: 12px;">
+        <textarea id="comment-input" placeholder="Deixe seu comentário..." rows="3" style="flex:1; padding:12px; background:rgba(0,255,65,0.05); border:1px solid var(--neon-green-border); color:var(--neon-green); border-radius:6px;"></textarea>
+        <button onclick="submitComment()" style="padding:12px 24px; background:var(--neon-green); color:#000; border:none; border-radius:6px; cursor:pointer;">Enviar</button>
+      </div>
+    </div>    
   </main>
 
   <footer>
@@ -171,6 +187,179 @@
           article.appendChild(contentDiv);
 
           container.appendChild(article);
+
+          // ==================== INICIALIZAÇÃO ====================
+
+          // Coloque isso depois de montar o article
+          updateLikeCount();
+          checkUserLiked();
+          loadComments();
+          setupRealtime();
+
+
+          // ==================== SUPABASE – Likes & Comentários ====================
+
+          const SUPABASE_URL    = 'https://yegczfbshkctxedzkdpu.supabase.co';      // ← substitua
+          const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InllZ2N6ZmJzaGtjdHhlZHprZHB1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYyMzc1OTUsImV4cCI6MjA4MTgxMzU5NX0.GU7KfJ4J1gAGK_q_uyYNPsPWqYbXjU2qdVhZq8SsIdM'; // ← substitua
+
+          const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+          // Variável global pro id do post (já existe no seu código)
+          const urlParams = new URLSearchParams(window.location.search);
+          const postId = urlParams.get('id');   // ex: "113", "6", etc.
+
+          // Função auxiliar: contar likes
+          async function updateLikeCount() {
+            const { count, error } = await supabase
+              .from('post_likes')
+              .select('*', { count: 'exact', head: true })
+              .eq('post_id', postId);
+
+            if (error) {
+              console.error('Erro ao contar likes:', error);
+              return;
+            }
+
+            const likesEl = document.getElementById('likes-count');
+            if (likesEl) likesEl.textContent = count || 0;
+          }
+
+          // Verifica se o usuário já deu like (muda ícone/cor)
+          async function checkUserLiked() {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) return false;
+
+            const { data } = await supabase
+              .from('post_likes')
+              .select('id')
+              .eq('post_id', postId)
+              .eq('user_id', user.id)
+              .single();
+
+            const btn = document.getElementById('like-btn');
+            if (btn && data) {
+              btn.classList.add('liked');
+              btn.innerHTML = '❤️ Liked';
+            }
+          }
+
+          // Toggle like
+          async function toggleLike() {
+            const { data: { user } } = await supabase.auth.getUser();
+
+            if (!user) {
+              alert('Faça login para curtir (opcional no momento)');
+              // ou redirecione para login: supabase.auth.signInWithOAuth({ provider: 'google' })
+              return;
+            }
+
+            const { data: existing } = await supabase
+              .from('post_likes')
+              .select('id')
+              .eq('post_id', postId)
+              .eq('user_id', user.id)
+              .single();
+
+            if (existing) {
+              // Remove like
+              await supabase.from('post_likes').delete().eq('id', existing.id);
+            } else {
+              // Adiciona like
+              await supabase.from('post_likes').insert({
+                post_id: postId,
+                user_id: user.id
+              });
+            }
+
+            updateLikeCount();
+            checkUserLiked();
+          }
+
+          // ==================== COMENTÁRIOS ====================
+
+          async function loadComments() {
+            const { data, error } = await supabase
+              .from('post_comments')
+              .select('id, author_name, content, created_at')
+              .eq('post_id', postId)
+              .order('created_at', { ascending: true });
+
+            if (error) {
+              console.error('Erro ao carregar comentários:', error);
+              return;
+            }
+
+            const container = document.getElementById('comments-list');
+            if (!container) return;
+
+            container.innerHTML = '';
+            data.forEach(comment => {
+              const div = document.createElement('div');
+              div.className = 'comment';
+              div.innerHTML = `
+                <strong>${comment.author_name}</strong> 
+                <small>(${new Date(comment.created_at).toLocaleString('pt-BR')})</small>
+                <p>${comment.content.replace(/\n/g, '<br>')}</p>
+              `;
+              container.appendChild(div);
+            });
+          }
+
+          async function submitComment() {
+            const input = document.getElementById('comment-input');
+            const content = input?.value.trim();
+
+            if (!content) return;
+
+            const name = prompt('Seu nome (ou deixe em branco para Anônimo):') || 'Anônimo';
+
+            const { error } = await supabase.from('post_comments').insert({
+              post_id: postId,
+              author_name: name,
+              content
+            });
+
+            if (error) {
+              alert('Erro ao enviar comentário: ' + error.message);
+            } else {
+              input.value = '';
+              // O realtime vai atualizar a lista
+            }
+          }
+
+          // ==================== REALTIME ====================
+
+          function setupRealtime() {
+            // Likes
+            supabase
+              .channel(`likes-changes:${postId}`)
+              .on('postgres_changes', 
+                { event: '*', schema: 'public', table: 'post_likes', filter: `post_id=eq.${postId}` },
+                () => updateLikeCount()
+              )
+              .subscribe();
+
+            // Comentários novos
+            supabase
+              .channel(`comments-changes:${postId}`)
+              .on('postgres_changes', 
+                { event: 'INSERT', schema: 'public', table: 'post_comments', filter: `post_id=eq.${postId}` },
+                (payload) => {
+                  const comment = payload.new;
+                  const container = document.getElementById('comments-list');
+                  const div = document.createElement('div');
+                  div.className = 'comment';
+                  div.innerHTML = `
+                    <strong>${comment.author_name}</strong> 
+                    <small>(${new Date(comment.created_at).toLocaleString('pt-BR')})</small>
+                    <p>${comment.content.replace(/\n/g, '<br>')}</p>
+                  `;
+                  container.appendChild(div);
+                }
+              )
+              .subscribe();
+          }
+
 
           // Botão voltar
           const backBtn = document.createElement('button');
