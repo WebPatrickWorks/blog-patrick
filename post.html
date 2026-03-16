@@ -250,9 +250,12 @@
           async function toggleLike() {
             const { data: { user } } = await supabaseClient.auth.getUser();
 
-            if (!user) {
-              alert('Faça login para curtir (opcional no momento)');
-              // ou redirecione para login: supabase.auth.signInWithOAuth({ provider: 'google' })
+            const { error } = await supabaseClient
+              .from('post_likes')
+              .insert({ post_id: postId });
+
+            if (error) {
+              console.error(error);
               return;
             }
 
@@ -280,7 +283,7 @@
           // ==================== COMENTÁRIOS ====================
 
           async function loadComments() {
-            const { data, error } = await supabase
+            const { data, error } = await supabaseClient
               .from('post_comments')
               .select('id, author_name, content, created_at')
               .eq('post_id', postId)
@@ -336,7 +339,7 @@
 
           function setupRealtime() {
             // Likes
-            supabase
+            supabaseClient
               .channel(`likes-changes:${postId}`)
               .on('postgres_changes', 
                 { event: '*', schema: 'public', table: 'post_likes', filter: `post_id=eq.${postId}` },
@@ -405,7 +408,8 @@
         })
         .catch(error => {
           console.error('Catch acionado com erro:', error);
-          container.innerHTML = '<p>Erro ao carregar o post: ' + (error.message || 'desconhecido') + '</p>';
+          document.getElementById('post-container').innerHTML =
+            '<p>Erro ao carregar o post.</p>';
         });
     });
   </script>
