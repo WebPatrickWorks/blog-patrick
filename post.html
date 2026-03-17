@@ -235,7 +235,6 @@
           // ==================== COMENTÁRIOS ====================
 
           async function loadComments() {
-
             const { data, error } = await supabaseClient
               .from('post_comments')
               .select('id, author_name, content, created_at')
@@ -248,23 +247,26 @@
             }
 
             const container = document.getElementById('comments-list');
-            if (!container) return;
-
-            container.innerHTML = '';
+            container.innerHTML = '';  // limpa antes
 
             data.forEach(comment => {
               const div = document.createElement('div');
-              div.className = 'comment';
+              div.className = 'comment-card';
 
               div.innerHTML = `
-                <strong>${comment.author_name}</strong>
-                <small>(${new Date(comment.created_at).toLocaleString('pt-BR')})</small>
-                <p>${comment.content.replace(/\n/g, '<br>')}</p>
+                <div class="comment-header">
+                  <strong>${comment.author_name || 'Anônimo'}</strong>
+                  <small>(${new Date(comment.created_at).toLocaleString('pt-BR', {
+                    dateStyle: 'short', timeStyle: 'short'
+                  })})</small>
+                </div>
+                <p class="comment-content">${comment.content.replace(/\n/g, '<br>')}</p>
               `;
 
               container.appendChild(div);
             });
           }
+          
           async function submitComment() {
             const input = document.getElementById('comment-input');
             const content = input?.value.trim();

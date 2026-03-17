@@ -21,7 +21,7 @@
 .comment-header {
   display: flex;
   align-items: baseline;
-  margin-bottom: 0;                          /* ← REDUZIDO! era mais antes */
+  gap: 8px;
   flex-wrap: wrap;
 }
 
