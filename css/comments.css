@@ -13,6 +13,16 @@
   transition: all 0.2s ease;
 }
 
+.comment-card-main {
+  background: rgba(0, 255, 65, 0.04);          /* fundo levemente neon */
+  border: 0px;  /* borda fina neon */
+  border-radius: 6px;
+  padding: 0;                          /* padding interno menor */
+  margin-bottom: 8px;                         /* espaço entre cards (reduzido) */
+  box-shadow: 0 2px 8px rgba(0, 255, 65, 0.1);
+  transition: all 0.2s ease;
+}
+
 .comment-card:hover {
   border-color: var(--neon-green-light);
   box-shadow: 0 4px 16px rgba(0, 255, 65, 0.2);
