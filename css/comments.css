@@ -22,7 +22,7 @@
   display: flex;
   align-items: baseline;
   gap: 8px;                                    /* espaço pequeno entre nome e data */
-  margin-bottom: 2px;                          /* ← REDUZIDO! era mais antes */
+  margin-bottom: 0px;                          /* ← REDUZIDO! era mais antes */
   flex-wrap: wrap;
 }
 
@@ -38,6 +38,8 @@
 }
 
 .comment-content {
+  padding-top: 0;
+  margin-top: -2px;  
   margin: 0;                                   /* sem margem extra em cima/baixo */
   line-height: 1.5;
   color: var(--neon-green);
