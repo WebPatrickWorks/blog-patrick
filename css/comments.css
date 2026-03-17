@@ -21,8 +21,7 @@
 .comment-header {
   display: flex;
   align-items: baseline;
-                                  /* espaço pequeno entre nome e data */
-  margin-bottom: 0px;                          /* ← REDUZIDO! era mais antes */
+  margin-bottom: 0;                          /* ← REDUZIDO! era mais antes */
   flex-wrap: wrap;
 }
 
@@ -41,7 +40,7 @@
   padding-top: 0;
   margin-top: -2px;  
   margin: 0;                                   /* sem margem extra em cima/baixo */
-  line-height: 1.5;
+  line-height: 1.1;
   color: var(--neon-green);
 }
 
