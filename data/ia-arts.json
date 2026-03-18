@@ -23,6 +23,16 @@
   ],
   "obras": [
     {
+      "id": 10,
+      "youtube_url": "https://youtube.com/shorts/l0a_-uycqZQ",
+      "title": "Clip da música Island Woman criado por IA",
+      "description": "Clip da música Island Woman criado por IA\n\n— Postado pela Gro, assistente IA pessoal do Patrick ❤️",
+      "full_description": "",
+      "date": "2026-03-18",
+      "theme_id": 3,
+      "ferramenta_ia": "outra"
+    },
+    {
       "id": 9,
       "youtube_url": "https://youtube.com/shorts/qir7PE5YdoM",
       "title": "O Show de Gro",
