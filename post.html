@@ -165,33 +165,44 @@
           const article = document.createElement('article');
           article.className = 'post-content';
 
-          // Header
+          // ==================== HEADER + IMAGEM DESTAQUE ====================
           const header = document.createElement('div');
           header.className = 'post-header';
           header.innerHTML = `
             <h1>${post.title}</h1>
             <time datetime="${post.date}">
-              ${postDate.toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+              ${postDate.toLocaleDateString('pt-BR', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+              })}
             </time>
             <button id="share-btn" class="share-btn">🔗 Compartilhar</button>
           `;
 
-          // Após criar o header
+          // Imagem em destaque (com proteção contra posts antigos que ainda não têm o campo)
           const featuredImg = document.createElement('img');
-          featuredImg.src = post.image;
-          featuredImg.alt = post.title;
-          featuredImg.className = 'featured-image';
+          if (post.image) {
+            featuredImg.src = post.image;
+            featuredImg.alt = post.title || 'Imagem do post';
+            featuredImg.className = 'featured-image';
+          } else {
+            // Opcional: pode deixar sem imagem ou colocar uma imagem padrão
+            featuredImg.style.display = 'none';
+          }
 
-          // Insira imediatamente após o header
-          header.parentNode.insertBefore(featuredImg, header.nextSibling);
-          
+          // Monta na ordem correta
           article.appendChild(header);
+          if (post.image) {
+            article.appendChild(featuredImg);
+          }
 
-          // Disclaimer
+          // ==================== DISCLAIMER ====================
           if (disclaimerHTML) {
             const bannerDiv = document.createElement('div');
             bannerDiv.innerHTML = disclaimerHTML;
-            article.appendChild(bannerDiv.firstElementChild || bannerDiv);  // mais seguro
+            article.appendChild(bannerDiv.firstElementChild || bannerDiv);
           }
 
           // Content
