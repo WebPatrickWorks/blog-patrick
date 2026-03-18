@@ -196,6 +196,24 @@ body.legaltech-mode article {
   }
 }
 
+/* Imagem em destaque na página individual (post.html) */
+.featured-image {
+  width: 100%;                 /* ocupa toda a largura disponível */
+  max-width: 100%;             /* respeita o container de 900 px */
+  height: auto;                /* mantém proporção original – sem cortes */
+  display: block;
+  margin: 0 auto 32px;         /* centraliza e dá respiro */
+  border-radius: 8px;
+  box-shadow: var(--glow-shadow);
+}
+
+/* Responsividade adicional (já coberta pelo max-width:100%) */
+@media (max-width: 720px) {
+  .featured-image {
+    margin: 0 auto 24px;
+  }
+}
+
 /* ==========================================================================
    Botão "Carregar mais"
    ========================================================================== */
