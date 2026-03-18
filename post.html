@@ -175,6 +175,16 @@
             </time>
             <button id="share-btn" class="share-btn">🔗 Compartilhar</button>
           `;
+
+          // Após criar o header
+          const featuredImg = document.createElement('img');
+          featuredImg.src = post.image;
+          featuredImg.alt = post.title;
+          featuredImg.className = 'featured-image';
+
+          // Insira imediatamente após o header
+          header.parentNode.insertBefore(featuredImg, header.nextSibling);
+          
           article.appendChild(header);
 
           // Disclaimer
