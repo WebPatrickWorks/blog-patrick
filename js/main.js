@@ -143,9 +143,10 @@ document.addEventListener('DOMContentLoaded', () => {
       return response.json();
     })
     .then(posts => {
-      allPosts = posts.sort((a, b) => new Date(b.date) - new Date(a.date));
+      // Lista completa e ordenada (usada pelas seções especiais)
+      const fullPosts = posts.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-      const freshPosts = allPosts.filter(post => {
+      const freshPosts = fullPosts.filter(post => {
         const postDate = new Date(post.date);
         const daysOld = (new Date() - postDate) / (1000 * 60 * 60 * 24);
         return daysOld <= FRESH_DAYS;
@@ -157,8 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
       let postsToRender = freshPosts;  // padrão: só frescos na home
 
       if (filterTag) {
-        // No modo tag, mostramos TODOS que têm a tag (mesmo antigos)
-        postsToRender = allPosts.filter(post =>
+        postsToRender = fullPosts.filter(post =>
           post.tags.some(t => t.toLowerCase() === filterTag.toLowerCase())
         );
 
@@ -178,57 +178,57 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       // Atualiza a lista global que renderNextPosts usa
-      allPosts = postsToRender;   // ← aqui é o truque: reatribui para o render usar a lista filtrada
+      allPosts = postsToRender;
 
       if (allPosts.length === 0) {
         container.innerHTML = '<p>Nenhuma postagem com essa tag ainda... 🔍</p>';
         return;
       }
 
-      // Primeira leva de posts (agora usa a lista filtrada)
+      // Primeira leva de posts
       renderNextPosts();
 
-      // Popula sidebar (mantido)
+      // Popula Últimos Posts (mantido)
       const recentList = document.getElementById('recent-posts');
       if (recentList) {
-        const recent = posts.slice(0, 5);
+        const recent = fullPosts.slice(0, 5);
         recent.forEach(post => {
           const li = document.createElement('li');
           li.innerHTML = `<a href="post.html?id=${post.id}">${post.title}</a>`;
           recentList.appendChild(li);
         });
-      }      
+      }
+
+      // =============================================
+      // SEÇÕES ESPECIAIS POR HASHTAG (única fonte: posts.json)
+      // =============================================
+      const sidebarSections = {
+        artigos: { title: "Artigos", tag: "#artigo", ulId: "recent-artigos" },
+        fitness: { title: "Vida Fitness", tag: "#fitness", ulId: "recent-fitness" }
+      };
+
+      Object.keys(sidebarSections).forEach(key => {
+        const sec = sidebarSections[key];
+        const filtered = fullPosts
+          .filter(post => 
+            post.tags && post.tags.some(t => t.toLowerCase() === sec.tag.toLowerCase())
+          )
+          .slice(0, 5);
+
+        const ul = document.getElementById(sec.ulId);
+        if (ul) {
+          ul.innerHTML = '';
+          filtered.forEach(post => {
+            const li = document.createElement('li');
+            li.innerHTML = `<a href="post.html?id=${post.id}">${post.title}</a>`;
+            ul.appendChild(li);
+          });
+        }
+      });
     })
     .catch(error => {
       console.error(error);
       container.innerHTML = '<p>Ops... não consegui carregar as postagens. Verifique o console.</p>';
-    });  
-
-    // =============================================
-    // SEÇÕES ESPECIAIS POR HASHTAG (única fonte: posts.json)
-    // =============================================
-    const sidebarSections = {
-      artigos: { title: "Artigos", tag: "#artigo", ulId: "recent-artigos" },
-      fitness: { title: "Vida Fitness", tag: "#fitness", ulId: "recent-fitness" }
-    };
-
-    Object.keys(sidebarSections).forEach(key => {
-      const sec = sidebarSections[key];
-      const filtered = allPosts
-        .filter(post => 
-          post.tags && post.tags.some(t => t.toLowerCase() === sec.tag.toLowerCase())
-        )
-        .slice(0, 5);                     // últimos 5 da seção
-
-      const ul = document.getElementById(sec.ulId);
-      if (ul) {
-        ul.innerHTML = '';
-        filtered.forEach(post => {
-          const li = document.createElement('li');
-          li.innerHTML = `<a href="post.html?id=${post.id}">${post.title}</a>`;
-          ul.appendChild(li);
-        });
-      }
     });
 });
 
