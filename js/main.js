@@ -135,6 +135,21 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // =============================================
+  // Função auxiliar: extrai título real do <h2> do content
+  // =============================================
+  function getDisplayTitle(post) {
+    if (post.content) {
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(post.content, 'text/html');
+      const firstH2 = doc.querySelector('h2');
+      if (firstH2 && firstH2.textContent.trim()) {
+        return firstH2.textContent.trim();
+      }
+    }
+    return post.title; // fallback seguro
+  }
+
+  // =============================================
   // Fetch principal dos posts
   // =============================================
   fetch('data/posts.json')
@@ -143,7 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return response.json();
     })
     .then(posts => {
-      // Lista completa e ordenada (usada pelas seções especiais)
+      // Lista completa e ordenada
       const fullPosts = posts.sort((a, b) => new Date(b.date) - new Date(a.date));
 
       const freshPosts = fullPosts.filter(post => {
@@ -155,7 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const urlParams = new URLSearchParams(window.location.search);
       const filterTag = urlParams.get('tag');
 
-      let postsToRender = freshPosts;  // padrão: só frescos na home
+      let postsToRender = freshPosts;
 
       if (filterTag) {
         postsToRender = fullPosts.filter(post =>
@@ -177,7 +192,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      // Atualiza a lista global que renderNextPosts usa
       allPosts = postsToRender;
 
       if (allPosts.length === 0) {
@@ -185,26 +199,25 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      // Primeira leva de posts
       renderNextPosts();
 
-      // Popula Últimos Posts (mantido)
+      // ====================== SIDEBAR ======================
+      // Últimos Posts
       const recentList = document.getElementById('recent-posts');
       if (recentList) {
+        recentList.innerHTML = '';
         const recent = fullPosts.slice(0, 5);
         recent.forEach(post => {
           const li = document.createElement('li');
-          li.innerHTML = `<a href="post.html?id=${post.id}">${post.title}</a>`;
+          li.innerHTML = `<a href="post.html?id=${post.id}">${getDisplayTitle(post)}</a>`;
           recentList.appendChild(li);
         });
       }
 
-      // =============================================
-      // SEÇÕES ESPECIAIS POR HASHTAG (única fonte: posts.json)
-      // =============================================
+      // Seções especiais por hashtag
       const sidebarSections = {
-        artigos: { title: "Artigos", tag: "#artigo", ulId: "recent-artigos" },
-        fitness: { title: "Vida Fitness", tag: "#fitness", ulId: "recent-fitness" }
+        artigos: { tag: "#artigo", ulId: "recent-artigos" },
+        fitness: { tag: "#fitness", ulId: "recent-fitness" }
       };
 
       Object.keys(sidebarSections).forEach(key => {
@@ -220,7 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
           ul.innerHTML = '';
           filtered.forEach(post => {
             const li = document.createElement('li');
-            li.innerHTML = `<a href="post.html?id=${post.id}">${post.title}</a>`;
+            li.innerHTML = `<a href="post.html?id=${post.id}">${getDisplayTitle(post)}</a>`;
             ul.appendChild(li);
           });
         }
