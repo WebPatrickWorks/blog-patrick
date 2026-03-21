@@ -204,31 +204,30 @@ document.addEventListener('DOMContentLoaded', () => {
       container.innerHTML = '<p>Ops... não consegui carregar as postagens. Verifique o console.</p>';
     });  
 
-  // Fetch para artigos (adicione isso após o fetch de posts.json)
-  fetch('data/artigos.json')
-    .then(response => {
-      if (!response.ok) throw new Error('Erro ao carregar artigos: ' + response.status);
-      return response.json();
-    })
-    .then(artigos => {
-      artigos = artigos.sort((a, b) => new Date(b.date) - new Date(a.date)); // Ordena por data descendente
+    // =============================================
+    // SEÇÕES ESPECIAIS POR HASHTAG (única fonte: posts.json)
+    // =============================================
+    const sidebarSections = {
+      artigos: { title: "Artigos", tag: "#artigo", ulId: "recent-artigos" },
+      fitness: { title: "Vida Fitness", tag: "#fitness", ulId: "recent-fitness" }
+    };
 
-      const artigosList = document.getElementById('recent-artigos');
-      if (artigosList) {
-        const recentArtigos = artigos.slice(0, 5); // Mostra os últimos 5 artigos
-        recentArtigos.forEach(artigo => {
+    Object.keys(sidebarSections).forEach(key => {
+      const sec = sidebarSections[key];
+      const filtered = allPosts
+        .filter(post => 
+          post.tags && post.tags.some(t => t.toLowerCase() === sec.tag.toLowerCase())
+        )
+        .slice(0, 5);                     // últimos 5 da seção
+
+      const ul = document.getElementById(sec.ulId);
+      if (ul) {
+        ul.innerHTML = '';
+        filtered.forEach(post => {
           const li = document.createElement('li');
-          li.innerHTML = `<a href="artigo.html?id=${artigo.id}">${artigo.title}</a>`;
-          artigosList.appendChild(li);
+          li.innerHTML = `<a href="post.html?id=${post.id}">${post.title}</a>`;
+          ul.appendChild(li);
         });
-      }
-    })
-    .catch(error => {
-      console.error(error);
-      // Opcional: Mostrar uma mensagem na sidebar se der erro
-      const artigosList = document.getElementById('recent-artigos');
-      if (artigosList) {
-        artigosList.innerHTML = '<li>Ops... erro ao carregar artigos.</li>';
       }
     });
 });
