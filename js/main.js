@@ -161,7 +161,12 @@ document.addEventListener('DOMContentLoaded', () => {
       // Lista completa e ordenada
       const fullPosts = posts.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-      const freshPosts = fullPosts.filter(post => {
+      // Lista VISÍVEL (exclui posts com #oculto)
+      const visiblePosts = fullPosts.filter(post => 
+        !post.tags || !post.tags.some(t => t.toLowerCase() === '#oculto')
+      );      
+
+      const freshPosts = visiblePosts.filter(post => {
         const postDate = new Date(post.date);
         const daysOld = (new Date() - postDate) / (1000 * 60 * 60 * 24);
         return daysOld <= FRESH_DAYS;
@@ -173,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
       let postsToRender = freshPosts;
 
       if (filterTag) {
-        postsToRender = fullPosts.filter(post =>
+        postsToRender = visiblePosts.filter(post =>
           post.tags.some(t => t.toLowerCase() === filterTag.toLowerCase())
         );
 
@@ -222,7 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       Object.keys(sidebarSections).forEach(key => {
         const sec = sidebarSections[key];
-        const filtered = fullPosts
+        const filtered = visiblePosts
           .filter(post => 
             post.tags && post.tags.some(t => t.toLowerCase() === sec.tag.toLowerCase())
           )
