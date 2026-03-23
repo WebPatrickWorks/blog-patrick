@@ -213,8 +213,8 @@ document.addEventListener('DOMContentLoaded', () => {
         recentList.innerHTML = '';
         const recent = visiblePosts.slice(0, 5);
         recent.forEach(post => {
-          const li = document.createElement('li');
-          li.innerHTML = `<a href="post.html?id=${post.id}">💭 ${getDisplayTitle(post)}</a>`;
+          const li = document.createElement('💭');
+          li.innerHTML = `<a href="post.html?id=${post.id}">${getDisplayTitle(post)}</a>`;
           recentList.appendChild(li);
         });
       }
