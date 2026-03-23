@@ -216,7 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
         recent.forEach(post => {
           const item = document.createElement('div'); // ← aqui substituímos o <li>
           item.className = 'recent-item';             // classe para estilização futura
-          item.innerHTML = `💭 <a href="post.html?id=${post.id}">${getDisplayTitle(post)}</a></br>`;
+          item.innerHTML = `💭 <a href="post.html?id=${post.id}">${getDisplayTitle(post)}</a><br>`;
           recentList.appendChild(item);
         });
       }
