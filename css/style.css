@@ -396,6 +396,22 @@ article:hover {
     --scrollbar-opacity-hover: 0.65;
   }
 
+  #recent-posts .recent-item {
+  margin: 12px 0;
+  padding-left: 4px;
+}
+
+#recent-posts .recent-item a {
+  text-decoration: none;
+  color: var(--neon-green);
+  transition: all 0.2s;
+}
+
+#recent-posts .recent-item a:hover {
+  color: var(--neon-green-light);
+  text-shadow: 0 0 8px var(--neon-green);
+}
+
   /* Regras específicas Chrome/Edge/Safari (sobrepõem onde suportado) */
   @supports not (scrollbar-color: red transparent) {  /* truque pra atingir só WebKit */
     .sidebar::-webkit-scrollbar {
