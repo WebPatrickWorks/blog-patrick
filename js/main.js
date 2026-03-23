@@ -207,14 +207,14 @@ document.addEventListener('DOMContentLoaded', () => {
       renderNextPosts();
 
       // ====================== SIDEBAR ======================
-      // Últimos Posts (apenas visíveis)
+      // Últimos Posts (apenas visíveis) – com ícone 💭
       const recentList = document.getElementById('recent-posts');
       if (recentList) {
         recentList.innerHTML = '';
         const recent = visiblePosts.slice(0, 5);
         recent.forEach(post => {
           const li = document.createElement('li');
-          li.innerHTML = `<a href="post.html?id=${post.id}">${getDisplayTitle(post)}</a>`;
+          li.innerHTML = `<a href="post.html?id=${post.id}">💭 ${getDisplayTitle(post)}</a>`;
           recentList.appendChild(li);
         });
       }
