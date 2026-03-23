@@ -207,15 +207,17 @@ document.addEventListener('DOMContentLoaded', () => {
       renderNextPosts();
 
       // ====================== SIDEBAR ======================
-      // Últimos Posts (apenas visíveis) – com ícone 💭
+      // Últimos Posts – SEM <li>, usando 💭 diretamente
       const recentList = document.getElementById('recent-posts');
       if (recentList) {
-        recentList.innerHTML = '';
+        recentList.innerHTML = '';                    // limpa tudo
         const recent = visiblePosts.slice(0, 5);
+        
         recent.forEach(post => {
-          const li = document.createElement('<span>💭</span>');
-          li.innerHTML = `<a href="post.html?id=${post.id}">${getDisplayTitle(post)}</a>`;
-          recentList.appendChild(li);
+          const item = document.createElement('div'); // ← aqui substituímos o <li>
+          item.className = 'recent-item';             // classe para estilização futura
+          item.innerHTML = `💭 <a href="post.html?id=${post.id}">${getDisplayTitle(post)}</a>`;
+          recentList.appendChild(item);
         });
       }
 
