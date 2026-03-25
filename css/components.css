@@ -97,7 +97,7 @@ article:hover {
    LEGALTECH MODE - Banner old-school
    ========================================================================== */
 
-.legaltech-mode-banner {
+.tag-mode-banner {
   text-align: center;
   margin: 40px 0 60px;
   padding: 28px 20px;
@@ -108,7 +108,7 @@ article:hover {
   box-shadow: var(--glow-shadow);
 }
 
-.legaltech-mode-banner h2 {
+.tag-mode-banner h2 {
   font-size: 2.2rem;
   color: var(--neon-green-light);
   text-shadow: 0 0 12px var(--neon-green);
@@ -116,17 +116,22 @@ article:hover {
   letter-spacing: 1px;
 }
 
-.legaltech-mode-banner h2::after {
+.tag-mode-banner h2::after {
   content: " _";
   animation: blink 1s step-end infinite;
 }
 
-.legaltech-mode-banner p {
+.tag-mode-banner p {
   color: var(--neon-green-dim);
   font-size: 1rem;
   margin: 0;
   opacity: 0.9;
   line-height: 1.6;
+}
+
+body.tag-mode article {
+  border-left: 4px solid var(--neon-green-light);
+  padding-left: 36px;
 }
 
 @keyframes blink {

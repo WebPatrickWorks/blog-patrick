@@ -179,19 +179,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (filterTag) {
         postsToRender = visiblePosts.filter(post =>
+          post.tags &&
           post.tags.some(t => t.toLowerCase() === filterTag.toLowerCase())
         );
 
-        document.body.classList.add('legaltech-mode');
-        document.title = `${filterTag}: IA no Direito | Blog do Patrick`;
+        const normalizedTag = filterTag.replace(/^#/, '');
+        document.body.classList.add('tag-mode');
+        document.body.classList.add(`tag-${normalizedTag.toLowerCase()}`);
+        document.title = `${normalizedTag} | Blog do Patrick`;
 
         if (postsToRender.length > 0) {
           const banner = document.createElement('div');
-          banner.className = 'legaltech-mode-banner';
+          banner.className = 'tag-mode-banner';
+
+          let bannerTitle = `MODO ${normalizedTag.toUpperCase()} ATIVADO`;
+          let bannerText = `Exibindo apenas os posts marcados com #${normalizedTag}.`;
+
+          if (normalizedTag.toLowerCase() === 'legaltech') {
+            bannerTitle = '⚖️ MODO LEGALTECH ATIVADO';
+            bannerText = 'IA no Direito, automação jurídica, responsabilidade civil algorítmica e tudo que importa quando código encontra lei.';
+          }
+
+          if (normalizedTag.toLowerCase() === 'lifestyle') {
+            bannerTitle = '💪 MODO LIFESTYLE ATIVADO';
+            bannerText = 'Disciplina, rotina, transformação, corpo, mentalidade e evolução real — sem teatro.';
+          }
+
           banner.innerHTML = `
-            <h2>⚖️ MODO ${filterTag.toUpperCase()} ATIVADO</h2>
-            <p>IA invadindo tribunais, contratos inteligentes, responsabilidade civil de modelos...<br>
-            Tudo que importa quando código encontra lei.</p>
+            <h2>${bannerTitle}</h2>
+            <p>${bannerText}</p>
           `;
           container.appendChild(banner);
         }
