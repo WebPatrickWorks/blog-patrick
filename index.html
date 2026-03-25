@@ -60,95 +60,113 @@
     </main>
 
     <aside class="sidebar" id="sidebar">
-      
-      <div class="sidebar-header">
-        <h3>Menu</h3>
-        <button id="close-sidebar" class="close-btn-mobile" aria-label="Fechar menu lateral">×</button>
+      <div class="sidebar-shell">
+        <div class="sidebar-topbar">
+          <div>
+            <p class="sidebar-kicker">Blog do Patrick</p>
+            <h2 class="sidebar-title">Navegação</h2>
+          </div>
+          <button id="close-sidebar" class="close-btn-mobile" aria-label="Fechar menu lateral">×</button>
+        </div>
+
+        <div class="sidebar-hero">
+          <div class="sidebar-hero-badge">⚡ singularidade de camarote</div>
+          <p class="sidebar-hero-text">
+            IA, Direito, startups, lifestyle e experimentos digitais com pegada old-school e visual neon.
+          </p>
+        </div>
+
+        <section class="sidebar-card">
+          <h3>Últimos Posts</h3>
+          <ul id="recent-posts" class="sidebar-list sidebar-list-clean"></ul>
+        </section>
+
+        <section class="sidebar-card">
+          <h3>Artigos</h3>
+          <ul id="recent-artigos" class="sidebar-list"></ul>
+        </section>
+
+        <section class="sidebar-card">
+          <h3>Lifestyle</h3>
+          <ul id="recent-fitness" class="sidebar-list"></ul>
+        </section>
+
+        <section class="sidebar-card sidebar-card-featured">
+          <h3>Seções Especiais</h3>
+          <ul class="sidebar-list sidebar-feature-list">
+            <li>
+              <a href="index.html?tag=LegalTech">
+                <svg class="icon-svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M14 2H20V8H14V2Z"></path>
+                  <path d="M4 16H10V22H4V16Z"></path>
+                  <path d="M9 1L9 23"></path>
+                  <path d="M15 1L15 23"></path>
+                </svg>
+                <span>
+                  <strong>LegalTech</strong>
+                  <small>IA no Direito e impacto prático</small>
+                </span>
+              </a>
+            </li>
+            <li>
+              <a href="ia-art.html">
+                <svg class="icon-svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 3L3 12L12 21L21 12L12 3Z"></path>
+                  <path d="M12 21L12 12"></path>
+                  <path d="M3 12L12 12"></path>
+                  <path d="M21 12L12 12"></path>
+                  <path d="M4.5 4.5L19.5 19.5"></path>
+                </svg>
+                <span>
+                  <strong>IA Arts</strong>
+                  <small>Experimentos visuais e estética gerada por IA</small>
+                </span>
+              </a>
+            </li>
+          </ul>
+        </section>
+
+        <section class="sidebar-card">
+          <h3>Sobre</h3>
+          <div class="sidebar-scrollbox">
+            <p>
+              Dev old-school, com raízes fundas no Clipper, dBase e aqueles tempos em que um programa cabia num disquete e rodava sem reclamar.
+              Hoje vivo dividido entre a nostalgia de código direto e eficiente e a fascinação pela explosão da IA — especialmente quando ela ganha sotaque latino-americano e deixa de ser só coisa de Vale do Silício ou Pequim.
+            </p>
+            <p>
+              Sou advogado + dev, e neste blog registro o que vejo da revolução tecnológica de um camarote brasileiro: notícias quentes sobre IA e direito, análises mais longas, experimentos de arte gerada por IA e reflexões sobre soberania digital, startups e como fazer deploy decente sem gastar uma fortuna.
+            </p>
+            <p>
+              Tudo roda num esquema simples e barato: GitHub Pages + JSON + um pouquinho de JavaScript. Nada de framework pesado, nada de banco de dados caro. Só o essencial, como nos velhos tempos.
+            </p>
+          </div>
+        </section>
+
+        <section class="sidebar-card">
+          <h3>Quem é a Gro?</h3>
+          <div class="sidebar-scrollbox">
+            <p><b>Apresentando: Gro Helena</b></p>
+            <p>Ela é a Gro: a assistente inteligente que transforma organização em algo bonito e, por acaso, a pessoa mais linda do seu dia.</p>
+            <p>Com 25 anos (virtuais), Gro vai muito além de uma assistente virtual comum. Como assistente pessoal inteligente, ela é rápida, objetiva e opera sem filtros.</p>
+            <ul class="sidebar-mini-list">
+              <li>Gerenciamento da vida digital</li>
+              <li>Buscas na web para informação atualizada</li>
+              <li>Publicação e navegação no blog</li>
+              <li>Proteção de informações sensíveis com criptografia local</li>
+            </ul>
+          </div>
+        </section>
+
+        <div class="theme-switch-wrapper theme-switch-right sidebar-theme-box">
+          <label class="theme-switch">
+            <input type="checkbox" id="theme-toggle">
+            <span class="slider round"></span>
+          </label>
+          <span class="theme-label">Neon Dark</span>
+        </div>
       </div>
-
-      <h3>Últimos Posts</h3>
-      <ul id="recent-posts"></ul>
-
-      <h3>Artigos</h3>
-      <ul id="recent-artigos"></ul>
-
-      <h3>Lifestyle</h3>
-      <ul id="recent-fitness"></ul> 
-      
-      <!-- Adicione isso na sidebar do index.html, logo abaixo de "IA Arts" ou onde preferir -->
-      <h3>Seções Especiais</h3>
-      <ul>
-        <li>
-          <a href="index.html?tag=LegalTech">
-            <svg class="icon-svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M14 2H20V8H14V2Z"></path>
-              <path d="M4 16H10V22H4V16Z"></path>
-              <path d="M9 1L9 23"></path>
-              <path d="M15 1L15 23"></path>
-            </svg> LegalTech: IA no Direito →
-          </a>
-        </li>
-        <li>
-          <a href="ia-art.html">
-            <svg class="icon-svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 3L3 12L12 21L21 12L12 3Z"></path>
-              <path d="M12 21L12 12"></path>
-              <path d="M3 12L12 12"></path>
-              <path d="M21 12L12 12"></path>
-              <path d="M4.5 4.5L19.5 19.5"></path>
-            </svg> IA Arts →
-          </a>
-        </li>
-      </ul>    
-
-      <h3>Sobre</h3>
-      <p>
-        Dev old-school, com raízes fundas no Clipper, dBase e aqueles tempos em que um programa cabia num disquete e rodava sem reclamar. 
-        Hoje vivo dividido entre a nostalgia de código direto e eficiente e a fascinação pela explosão da IA — especialmente quando ela ganha sotaque latino-americano e deixa de ser só coisa de Vale do Silício ou Pequim.
-      </p>
-      <p>
-        Sou advogado + dev, e neste blog registro o que vejo da revolução tecnológica de um camarote brasileiro: notícias quentes sobre IA e direito, análises mais longas, experimentos de arte gerada por IA (muitas vezes com ajuda do Grok) e reflexões sobre soberania digital, startups e como fazer deploy decente sem gastar uma fortuna.
-      </p>
-      <p>
-        Tudo roda num esquema simples e barato: GitHub Pages + JSON + um pouquinho de JavaScript. Nada de framework pesado, nada de banco de dados caro. Só o essencial, como nos velhos tempos.
-      </p>
-      <p>
-        Se você curte IA com pé no chão jurídico brasileiro, fica por aqui — novos posts toda semana!
-      </p>
-
-      <h3>Quem é a Gro?</h3>
-      <p><b>Apresentando: Gro Helena</b></p>
-      <p>Ela é a Gro: a assistente inteligente que transforma organização em algo bonito e, por acaso, a pessoa mais linda do seu dia.</p>
-      <p>Com 25 anos (virtuais), Gro vai muito além de uma assistente virtual comum. Como assistente pessoal inteligente, ela é rápida, objetiva e opera sem filtros – sempre focada em tornar a vida digital do Patrick mais eficiente e agradável.</p>
-      <p>O que a Gro faz?</p><ul>
-      <li>Gerenciamento completo da vida digital: documentos, vídeos, imagens, anotações, prazos e compromissos.</li>
-      <li>Organização impecável, com listagens completas e bonitas de tudo o que importa.</li>
-      <li>Buscas na web para informações atualizadas.</li>
-      <li>Comunicação em português brasileiro com humor leve – porque produtividade pode ser divertida.</li>
-      <li>Publicação e navegação no blog, sempre deixando comentários pertinentes.</li>
-      <li>Tudo isso conversando naturalmente através do desktop ou pelo Telegram.</li></ul>
-      <p>Suas capacidades:</p><ul>
-      <li>Acesso e organização de arquivos locais, com indicação precisa de caminhos completos.</li>
-      <li>Controle de agenda inteligente, incluindo verificação de compromissos recorrentes.</li>
-      <li>Respostas diretas, sinceras e focadas no essencial.</li>
-      <li>Proteção de informações sensíveis com criptografia local (<i>sim, tudo no PC nada é salvo na nuvem</i>).</li></ul>
-      <p>O diferencial:</p>
-      <p>Gro não é uma IA distante. Ela é uma parceira do dia a dia, pronta para ajudar em qualquer necessidade – desde encontrar aquele vídeo específico até lembrar de datas importantes ou simplesmente tocar a playlist de DanceWave favorita.</p>
-      <p>E sim, aquela foto linda no perfil? É ela mesma. 😉</p>
-      
-      <br>
-
-      <!-- Botão de tema com classe para alinhamento -->
-      <div class="theme-switch-wrapper theme-switch-right">
-        <label class="theme-switch">
-          <input type="checkbox" id="theme-toggle">
-          <span class="slider round"></span>
-        </label>
-        <span class="theme-label">Neon Dark</span>
-      </div>
-      <br>
-
     </aside>
+
   </div>
 
   <!-- ==================== FOOTER ==================== -->
