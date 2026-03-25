@@ -224,7 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
       // Seções especiais por hashtag
       const sidebarSections = {
         artigos: { tag: "#artigo", ulId: "recent-artigos" },
-        fitness: { tag: "#fitness", ulId: "recent-fitness" }
+        fitness: { tag: "#lifestyle", ulId: "recent-fitness" }
       };
 
       Object.keys(sidebarSections).forEach(key => {
