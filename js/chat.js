@@ -56,7 +56,14 @@ document.addEventListener("DOMContentLoaded", () => {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          messages: history.slice(-10)
+          messages: history.slice(-10),
+          context: {
+            page: "post",
+            title: window.CURRENT_POST?.title,
+            content: window.CURRENT_POST?.content,
+            tags: window.CURRENT_POST?.tags,
+            url: window.location.href
+          }
         })
       });
 
