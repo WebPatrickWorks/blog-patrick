@@ -57,16 +57,19 @@ document.addEventListener("DOMContentLoaded", () => {
             title: window.CURRENT_POST.title,
             content: window.CURRENT_POST.content?.slice(0, 3000),
             tags: window.CURRENT_POST.tags,
-            url: window.CURRENT_POST.url || window.location.href
+            url: window.CURRENT_POST.url || window.location.href,
+            currentDateTime: new Date().toISOString()
           }
         : window.BLOG_INDEX_CONTEXT
           ? {
               page: "index",
-              posts: window.BLOG_INDEX_CONTEXT.posts
+              posts: window.BLOG_INDEX_CONTEXT.posts,
+              currentDateTime: new Date().toISOString()
             }
           : {
               page: "unknown",
-              url: window.location.href
+              url: window.location.href,
+              currentDateTime: new Date().toISOString()
             };
 
       const response = await fetch(FUNCTION_URL, {
