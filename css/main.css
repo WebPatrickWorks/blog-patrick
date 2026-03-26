@@ -13,107 +13,8 @@
    CHAT WIDGET - GRO HELENA
    ========================================================================== */
 
-   #gro-chat-button {
-  position: fixed;
-  right: 24px;
-  bottom: 24px;
-  z-index: 9999;
-  padding: 14px 18px;
-  border-radius: 999px;
-  cursor: pointer;
-  background: #00ff66;
-  color: #000;
-  font-weight: 700;
-  box-shadow: 0 10px 30px rgba(0, 255, 102, 0.25);
-}
-
-#gro-chat-panel {
-  position: fixed;
-  right: 24px;
-  bottom: 84px;
-  width: 360px;
-  max-width: calc(100vw - 32px);
-  height: 500px;
-  display: none;
-  flex-direction: column;
-  z-index: 9999;
-  border-radius: 18px;
-  overflow: hidden;
-  background: #0f1115;
-  border: 1px solid rgba(255,255,255,0.12);
-  box-shadow: 0 20px 50px rgba(0,0,0,0.35);
-}
-
 #gro-chat-panel.open {
   display: flex;
-}
-
-#gro-chat-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 14px 16px;
-  font-weight: 700;
-  color: #fff;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-}
-
-#gro-chat-close {
-  background: transparent;
-  border: none;
-  color: #fff;
-  font-size: 22px;
-  cursor: pointer;
-}
-
-#gro-chat-messages {
-  flex: 1;
-  overflow-y: auto;
-  padding: 14px;
-}
-
-#gro-chat-input-area {
-  display: flex;
-  gap: 8px;
-  padding: 12px;
-  border-top: 1px solid rgba(255,255,255,0.08);
-}
-
-#gro-chat-input {
-  flex: 1;
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: #171a21;
-  color: #fff;
-}
-
-#gro-chat-send {
-  padding: 10px 14px;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  font-weight: 700;
-  background: #00ff66;
-  color: #000;
-}
-
-.gro-msg {
-  margin-bottom: 10px;
-  padding: 10px 12px;
-  border-radius: 12px;
-  line-height: 1.4;
-  white-space: pre-wrap;
-}
-
-.gro-msg.user {
-  background: rgba(0, 255, 102, 0.12);
-  color: #eafff2;
-}
-
-.gro-msg.assistant {
-  background: rgba(255,255,255,0.06);
-  color: #fff;
 }
 
 .gro-chat-toggle {
@@ -351,5 +252,197 @@
     bottom: 76px;
     width: auto;
     height: min(68vh, 620px);
+  }
+}
+
+/* ==================== BASE ==================== */
+#gro-chat-panel {
+  position: fixed;
+  right: 24px;
+  bottom: 84px;
+  width: 360px;
+  max-width: calc(100vw - 32px);
+  height: 500px;
+  display: flex;
+  flex-direction: column;
+  z-index: 9999;
+
+  border-radius: 18px;
+  overflow: hidden;
+  background: #0f1115;
+  border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+
+  /* animação desktop */
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(16px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+#gro-chat-panel.open {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+/* ==================== BOTÃO ==================== */
+#gro-chat-button {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 9999;
+
+  padding: 14px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+
+  background: #00ff66;
+  color: #000;
+  font-weight: 700;
+
+  box-shadow: 0 10px 30px rgba(0, 255, 102, 0.25);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#gro-chat-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 40px rgba(0, 255, 102, 0.35);
+}
+
+/* ==================== HEADER ==================== */
+#gro-chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 14px 16px;
+  font-weight: 700;
+  color: #fff;
+
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  background: linear-gradient(180deg, #12141a, #0f1115);
+}
+
+#gro-chat-close {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+/* ==================== MENSAGENS ==================== */
+#gro-chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px;
+}
+
+.gro-msg {
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  line-height: 1.4;
+  white-space: pre-wrap;
+}
+
+.gro-msg.user {
+  background: rgba(0, 255, 102, 0.12);
+  color: #eafff2;
+}
+
+.gro-msg.assistant {
+  background: rgba(255,255,255,0.06);
+  color: #fff;
+}
+
+/* ==================== INPUT ==================== */
+#gro-chat-input-area {
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  background: #0f1115;
+}
+
+#gro-chat-input {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: 10px;
+
+  border: 1px solid rgba(255,255,255,0.12);
+  background: #171a21;
+  color: #fff;
+}
+
+#gro-chat-send {
+  padding: 10px 14px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 700;
+
+  background: #00ff66;
+  color: #000;
+}
+
+/* ==================== MOBILE (SIDEBAR FULL) ==================== */
+@media (max-width: 768px) {
+
+  #gro-chat-button {
+    right: 16px;
+    bottom: 16px;
+  }
+
+  #gro-chat-panel {
+    right: 0;
+    bottom: 0;
+
+    width: 100vw;
+    max-width: 100vw;
+    height: 100dvh;
+
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+
+    /* sidebar animation */
+    opacity: 1;
+    pointer-events: none;
+    transform: translateX(100%);
+    transition: transform 0.28s ease;
+  }
+
+  #gro-chat-panel.open {
+    pointer-events: auto;
+    transform: translateX(0);
+  }
+
+  /* Header maior no mobile */
+  #gro-chat-header {
+    padding: 16px 18px;
+    font-size: 16px;
+  }
+
+  /* Área de mensagens mais confortável */
+  #gro-chat-messages {
+    padding: 16px;
+  }
+
+  /* Input otimizado para touch */
+  #gro-chat-input-area {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  #gro-chat-input {
+    min-height: 44px;
+    font-size: 16px;
+  }
+
+  #gro-chat-send {
+    min-height: 44px;
+    padding: 0 16px;
   }
 }
