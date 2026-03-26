@@ -204,53 +204,25 @@
 
 
   <!-- ==================== CHAT DA GRO ==================== -->
-  <button id="gro-chat-toggle" class="gro-chat-toggle" aria-label="Abrir chat da Gro">
-    <span class="gro-chat-toggle-icon">✦</span>
-    <span class="gro-chat-toggle-text">Falar com a Gro</span>
-  </button>
+  <div id="gro-chat-button">Falar com a Gro</div>
 
-  <section id="gro-chat-panel" class="gro-chat-panel" aria-hidden="true">
-    <div class="gro-chat-header">
-      <div>
-        <p class="gro-chat-kicker">Assistente IA</p>
-        <h2>Gro Helena</h2>
-      </div>
-      <button id="gro-chat-close" class="gro-chat-close" aria-label="Fechar chat">×</button>
+  <div id="gro-chat-panel">
+    <div id="gro-chat-header">
+      <span>Gro</span>
+      <button id="gro-chat-close" type="button">×</button>
     </div>
 
-    <div id="gro-chat-messages" class="gro-chat-messages">
-      <article class="gro-chat-message gro-chat-message-bot">
-        <p>Oi. Sou a Gro Helena. Posso conversar sobre os posts do blog, IA, Direito, startups e vida digital.</p>
-      </article>
-    </div>
+    <div id="gro-chat-messages"></div>
 
-    <form id="gro-chat-form" class="gro-chat-form">
-      <textarea
-        id="gro-chat-input"
-        class="gro-chat-input"
-        rows="1"
-        maxlength="900"
-        placeholder="Digite sua mensagem..."
-      ></textarea>
-      <div class="gro-chat-actions">
-        <small class="gro-chat-hint">Enter envia • Shift+Enter quebra linha</small>
-        <button type="submit" id="gro-chat-send" class="gro-chat-send">Enviar</button>
-      </div>
-    </form>
-  </section>
+    <div id="gro-chat-input-area">
+      <input id="gro-chat-input" type="text" placeholder="Digite sua mensagem..." />
+      <button id="gro-chat-send" type="button">Enviar</button>
+    </div>
+  </div>
 
   <script>
     window.BLOG_CHAT_CONFIG = {
-      functionUrl: 'https://yegczfbshkctxedzkdpu.supabase.co/functions/v1/chat-openrouter',
-      publicKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InllZ2N6ZmJzaGtjdHhlZHprZHB1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYyMzc1OTUsImV4cCI6MjA4MTgxMzU5NX0.GU7KfJ4J1gAGK_q_uyYNPsPWqYbXjU2qdVhZq8SsIdM',
-      siteUrl: 'https://webpatrickworks.github.io/blog-patrick',
-      siteName: 'Blog do Patrick',
-      currentContext: {
-        page: 'home',
-        title: document.title,
-        path: window.location.pathname,
-        tag: new URLSearchParams(window.location.search).get('tag') || null
-      }
+      functionUrl: "https://yegczfbshkctxedzkdpu.supabase.co/functions/v1/chat-openrouter"
     };
   </script>
 
