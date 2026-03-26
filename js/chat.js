@@ -50,6 +50,25 @@ document.addEventListener("DOMContentLoaded", () => {
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
 
     try {
+      const contextData = window.CURRENT_POST
+        ? {
+            page: "post",
+            postId: window.CURRENT_POST.id,
+            title: window.CURRENT_POST.title,
+            content: window.CURRENT_POST.content?.slice(0, 3000),
+            tags: window.CURRENT_POST.tags,
+            url: window.CURRENT_POST.url || window.location.href
+          }
+        : window.BLOG_INDEX_CONTEXT
+          ? {
+              page: "index",
+              posts: window.BLOG_INDEX_CONTEXT.posts
+            }
+          : {
+              page: "unknown",
+              url: window.location.href
+            };
+
       const response = await fetch(FUNCTION_URL, {
         method: "POST",
         headers: {
@@ -57,14 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
         },
         body: JSON.stringify({
           messages: history.slice(-10),
-          context: {
-            page: "post",
-            postId: window.CURRENT_POST?.id,
-            title: window.CURRENT_POST?.title,
-            content: window.CURRENT_POST?.content?.slice(0, 3000),
-            tags: window.CURRENT_POST?.tags,
-            url: window.CURRENT_POST?.url || window.location.href
-          }
+          context: contextData
         })
       });
 

@@ -222,6 +222,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
       renderNextPosts();
 
+      // ==================== CONTEXTO GLOBAL DO BLOG (PARA GRO) ====================
+      window.BLOG_INDEX_CONTEXT = {
+        page: "index",
+        posts: posts.slice(0, 20).map(post => {
+
+          const tempDiv = document.createElement("div");
+          tempDiv.innerHTML = post.content || "";
+
+          return {
+            id: post.id,
+            title: post.title,
+            summary: (tempDiv.textContent || tempDiv.innerText || "")
+              .trim()
+              .slice(0, 400),
+            tags: Array.isArray(post.tags) ? post.tags : []
+          };
+        })
+      };      
+
       // ====================== SIDEBAR ======================
       // Últimos Posts – SEM <li>, usando 💭 diretamente
       const recentList = document.getElementById('recent-posts');
