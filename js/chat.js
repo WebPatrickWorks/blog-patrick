@@ -1,52 +1,39 @@
-(function () {
+document.addEventListener("DOMContentLoaded", () => {
   const config = window.BLOG_CHAT_CONFIG || {};
   const FUNCTION_URL = config.functionUrl;
 
   if (!FUNCTION_URL) {
-    console.error("BLOG_CHAT_CONFIG.functionUrl não definido");
+    console.error("BLOG_CHAT_CONFIG.functionUrl não definido.");
     return;
   }
 
-  // ===== Criar UI =====
-  const button = document.createElement("div");
-  button.innerText = "💬 Gro";
-  button.id = "gro-chat-button";
-
-  const panel = document.createElement("div");
-  panel.id = "gro-chat-panel";
-  panel.innerHTML = `
-    <div id="gro-chat-header">Gro</div>
-    <div id="gro-chat-messages"></div>
-    <div id="gro-chat-input-area">
-      <input id="gro-chat-input" placeholder="Digite sua mensagem..." />
-      <button id="gro-chat-send">Enviar</button>
-    </div>
-  `;
-
-  document.body.appendChild(button);
-  document.body.appendChild(panel);
-
+  const button = document.getElementById("gro-chat-button");
+  const panel = document.getElementById("gro-chat-panel");
   const messagesDiv = document.getElementById("gro-chat-messages");
   const input = document.getElementById("gro-chat-input");
   const sendBtn = document.getElementById("gro-chat-send");
+  const closeBtn = document.getElementById("gro-chat-close");
+
+  if (!button || !panel || !messagesDiv || !input || !sendBtn) {
+    console.error("Elementos do chat não encontrados no DOM.");
+    console.log({ button, panel, messagesDiv, input, sendBtn, closeBtn });
+    return;
+  }
 
   let history = [];
 
-  // ===== Toggle painel =====
-  button.onclick = () => {
-    panel.style.display = panel.style.display === "flex" ? "none" : "flex";
-  };
-
-  // ===== Adicionar mensagem na tela =====
   function addMessage(role, text) {
     const msg = document.createElement("div");
-    msg.className = "gro-msg " + role;
-    msg.innerText = text;
+    msg.className = `gro-msg ${role}`;
+    msg.textContent = text;
     messagesDiv.appendChild(msg);
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
   }
 
-  // ===== Enviar mensagem =====
+  function togglePanel() {
+    panel.classList.toggle("open");
+  }
+
   async function sendMessage() {
     const text = input.value.trim();
     if (!text) return;
@@ -54,9 +41,14 @@
     addMessage("user", text);
     history.push({ role: "user", content: text });
     input.value = "";
+    input.focus();
 
-    addMessage("assistant", "...");
-    
+    const thinking = document.createElement("div");
+    thinking.className = "gro-msg assistant";
+    thinking.textContent = "...";
+    messagesDiv.appendChild(thinking);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
     try {
       const response = await fetch(FUNCTION_URL, {
         method: "POST",
@@ -64,29 +56,44 @@
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          messages: history.slice(-10) // limite simples
+          messages: history.slice(-10)
         })
       });
 
       const data = await response.json();
+      thinking.remove();
 
-      // remove "..."
-      messagesDiv.lastChild.remove();
+      if (!response.ok) {
+        console.error("Erro HTTP:", response.status, data);
+        addMessage("assistant", "Não consegui responder agora.");
+        return;
+      }
 
-      const reply = data.reply || "Erro ao responder.";
+      const reply = data.reply || "Não consegui gerar resposta agora.";
       addMessage("assistant", reply);
       history.push({ role: "assistant", content: reply });
-
-    } catch (err) {
-      messagesDiv.lastChild.remove();
-      addMessage("assistant", "Erro de conexão.");
-      console.error(err);
+    } catch (error) {
+      thinking.remove();
+      console.error("Erro ao enviar mensagem:", error);
+      addMessage("assistant", "Erro de conexão com a IA.");
     }
   }
 
-  sendBtn.onclick = sendMessage;
-  input.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") sendMessage();
+  button.addEventListener("click", togglePanel);
+
+  if (closeBtn) {
+    closeBtn.addEventListener("click", togglePanel);
+  }
+
+  sendBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    sendMessage();
   });
 
-})();
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+});
