@@ -59,10 +59,11 @@ document.addEventListener("DOMContentLoaded", () => {
           messages: history.slice(-10),
           context: {
             page: "post",
+            postId: window.CURRENT_POST?.id,
             title: window.CURRENT_POST?.title,
-            content: window.CURRENT_POST?.content,
+            content: window.CURRENT_POST?.content?.slice(0, 3000),
             tags: window.CURRENT_POST?.tags,
-            url: window.location.href
+            url: window.CURRENT_POST?.url || window.location.href
           }
         })
       });
