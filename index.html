@@ -222,7 +222,16 @@
 
   <script>
     window.BLOG_CHAT_CONFIG = {
-      functionUrl: "https://yegczfbshkctxedzkdpu.supabase.co/functions/v1/chat-openrouter"
+      functionUrl: 'https://yegczfbshkctxedzkdpu.supabase.co/functions/v1/chat-openrouter',
+      publicKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InllZ2N6ZmJzaGtjdHhlZHprZHB1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYyMzc1OTUsImV4cCI6MjA4MTgxMzU5NX0.GU7KfJ4J1gAGK_q_uyYNPsPWqYbXjU2qdVhZq8SsIdM',
+      siteUrl: 'https://webpatrickworks.github.io/blog-patrick',
+      siteName: 'Blog do Patrick',
+      currentContext: {
+        page: 'home',
+        title: document.title,
+        path: window.location.pathname,
+        tag: new URLSearchParams(window.location.search).get('tag') || null
+      }
     };
   </script>
 
