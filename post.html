@@ -150,12 +150,6 @@
             container.innerHTML = '<p>Post não encontrado.</p>';
             return;
           }
-          
-          window.CURRENT_POST = {
-            title: post.title,
-            content: stripHTML(post.content),
-            tags: post.tags || []
-          };
 
           container.innerHTML = '';
           document.title = post.title + ' | Blog do Patrick';
@@ -426,6 +420,12 @@
               alert('Erro ao copiar o link. Tente novamente.');
             });
           });
+
+          window.CURRENT_POST = {
+            title: post.title,
+            content: stripHTML(post.content),
+            tags: post.tags || []
+          };          
 
           console.log('Montagem do DOM concluída sem erro');
         })
