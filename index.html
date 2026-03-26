@@ -69,14 +69,12 @@
           <button id="close-sidebar" class="close-btn-mobile" aria-label="Fechar menu lateral">×</button>
         </div>
 
-        <a href="index.html" class="sidebar-hero-link">
-          <div class="sidebar-hero">
-            <div class="sidebar-hero-badge">⚡ Home - singularidade de camarote</div>
-            <p class="sidebar-hero-text">
-              IA, Direito, startups, lifestyle e experimentos digitais com pegada old-school e visual neon.
-            </p>
-          </div>
-        </a>
+        <div class="sidebar-hero">
+          <div class="sidebar-hero-badge">⚡ singularidade de camarote</div>
+          <p class="sidebar-hero-text">
+            IA, Direito, startups, lifestyle e experimentos digitais com pegada old-school e visual neon.
+          </p>
+        </div>
 
         <section class="sidebar-card">
           <h3>Últimos Posts</h3>
@@ -89,7 +87,7 @@
         </section>
 
         <section class="sidebar-card">
-          <h3><a href="index.html?tag=%23lifestyle" class="sidebar-section-link">Lifestyle</a></h3>
+          <h3>Lifestyle</h3>
           <ul id="recent-fitness" class="sidebar-list"></ul>
         </section>
 
@@ -97,7 +95,7 @@
           <h3>Seções Especiais</h3>
           <ul class="sidebar-list sidebar-feature-list">
             <li>
-              <a href="index.html?tag=%23LegalTech">
+              <a href="index.html?tag=LegalTech">
                 <svg class="icon-svg" width="1em" height="1em" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M14 2H20V8H14V2Z"></path>
                   <path d="M4 16H10V22H4V16Z"></path>
@@ -203,6 +201,60 @@
     <script type="text/javascript" src="https://www.freevisitorcounters.com/en/home/counter/1503109/t/9"></script>
   </footer>
 
-  <script src="js/main.js"></script>
+
+
+  <!-- ==================== CHAT DA GRO ==================== -->
+  <button id="gro-chat-toggle" class="gro-chat-toggle" aria-label="Abrir chat da Gro">
+    <span class="gro-chat-toggle-icon">✦</span>
+    <span class="gro-chat-toggle-text">Falar com a Gro</span>
+  </button>
+
+  <section id="gro-chat-panel" class="gro-chat-panel" aria-hidden="true">
+    <div class="gro-chat-header">
+      <div>
+        <p class="gro-chat-kicker">Assistente IA</p>
+        <h2>Gro Helena</h2>
+      </div>
+      <button id="gro-chat-close" class="gro-chat-close" aria-label="Fechar chat">×</button>
+    </div>
+
+    <div id="gro-chat-messages" class="gro-chat-messages">
+      <article class="gro-chat-message gro-chat-message-bot">
+        <p>Oi. Sou a Gro Helena. Posso conversar sobre os posts do blog, IA, Direito, startups e vida digital.</p>
+      </article>
+    </div>
+
+    <form id="gro-chat-form" class="gro-chat-form">
+      <textarea
+        id="gro-chat-input"
+        class="gro-chat-input"
+        rows="1"
+        maxlength="900"
+        placeholder="Digite sua mensagem..."
+      ></textarea>
+      <div class="gro-chat-actions">
+        <small class="gro-chat-hint">Enter envia • Shift+Enter quebra linha</small>
+        <button type="submit" id="gro-chat-send" class="gro-chat-send">Enviar</button>
+      </div>
+    </form>
+  </section>
+
+  <script>
+    window.BLOG_CHAT_CONFIG = {
+      functionUrl: 'https://yegczfbshkctxedzkdpu.supabase.co/functions/v1/chat-openrouter',
+      publicKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InllZ2N6ZmJzaGtjdHhlZHprZHB1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYyMzc1OTUsImV4cCI6MjA4MTgxMzU5NX0.GU7KfJ4J1gAGK_q_uyYNPsPWqYbXjU2qdVhZq8SsIdM',
+      siteUrl: 'https://webpatrickworks.github.io/blog-patrick',
+      siteName: 'Blog do Patrick',
+      currentContext: {
+        page: 'home',
+        title: document.title,
+        path: window.location.pathname,
+        tag: new URLSearchParams(window.location.search).get('tag') || null
+      }
+    };
+  </script>
+
+  <script src="main.js"></script>
+  <script src="chat.js"></script>
 </body>
 </html>
