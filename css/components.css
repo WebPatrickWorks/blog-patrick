@@ -179,7 +179,15 @@ article:hover {
 }
 
 /* Botão carregar mais */
-.load-more-button,
+.load-more-button {
+  display: block;
+  width: fit-content;
+  min-width: 180px;
+  margin: 48px auto 80px;
+  padding: 12px 32px;
+  text-align: center;
+}
+
 .read-more.load-more {
   display: block !important;
   width: fit-content;

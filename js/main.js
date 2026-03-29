@@ -10,18 +10,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Função que cria ou reposiciona o botão no FINAL do container
   function ensureLoadMoreButton() {
-    // Remove o botão antigo se existir (para reposicionar corretamente)
     if (loadMoreBtn && loadMoreBtn.parentNode) {
       loadMoreBtn.parentNode.removeChild(loadMoreBtn);
     }
 
     loadMoreBtn = document.createElement('button');
-    loadMoreBtn.className = 'read-more load-more-button';  
-    loadMoreBtn.textContent = 'Carregar mais';  
+    loadMoreBtn.type = 'button';
+    loadMoreBtn.classList.add('read-more', 'load-more-button');
+    loadMoreBtn.textContent = 'Carregar mais';
 
-    // Sempre adiciona no FINAL do container → abaixo do último post
     container.appendChild(loadMoreBtn);
-
     loadMoreBtn.addEventListener('click', loadMorePosts);
   }
 
