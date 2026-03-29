@@ -70,9 +70,11 @@ body::after {
    TIPOGRAFIA GLOBAL
    ========================================================================== */
 
-h1,
-h2,
-h3,
+h1, h2, h3 {
+  color: var(--text-color);
+  text-shadow: none; /* REMOVE o glow antigo */
+}
+
 h4,
 h5,
 h6 {
@@ -109,7 +111,8 @@ time {
 }
 
 p {
-  margin-top: 0;
+  color: var(--text-muted);
+  line-height: 1.7;
 }
 
 a {
@@ -131,6 +134,11 @@ footer {
 header {
   text-align: center;
   margin-bottom: 60px;
+}
+
+::selection {
+  background: var(--accent);
+  color: #fff;
 }
 
 /* ==========================================================================
@@ -167,21 +175,27 @@ header {
    ========================================================================== */
 
 [data-theme="modern"] {
-  --bg-dark: #0f1117;
-  --neon-green: #a5b4fc;
-  --neon-green-light: #c7d2fe;
-  --neon-green-icon: #c7d2fe52;
-  --neon-green-dim: #818cf8;
-  --neon-green-border: #6366f1;
-  --neon-green-back: #667892;
-  --card-bg: rgba(15, 23, 42, 0.322);
-  --glow-shadow: 0 0 20px rgba(99, 102, 241, 0.18);
-  --text-shadow-glow: 0 0 10px #a5b4fc;
+  --bg-color: #0b0f17;
+  --bg-secondary: #0f1623;
+
+  --text-color: #e6edf3;
+  --text-muted: #9aa4b2;
+
+  --accent: #7c9cff;         /* azul premium */
+  --accent-soft: rgba(124, 156, 255, 0.12);
+
+  --border-color: rgba(255, 255, 255, 0.08);
+
+  --card-bg: #121826;
+  --card-bg-hover: #151d2f;
+
+  --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.35);
+  --shadow-strong: 0 20px 60px rgba(0, 0, 0, 0.55);
 }
 
-[data-theme="modern"] body {
-  background: var(--bg-dark);
-  color: #8697cf;
+body[data-theme="modern"] {
+  background: radial-gradient(circle at top, #101726, #0b0f17 60%);
+  color: var(--text-color);
 }
 
 [data-theme="modern"] h1,
