@@ -16,8 +16,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     loadMoreBtn = document.createElement('button');
-    loadMoreBtn.textContent = 'Carregar mais';
-    loadMoreBtn.className = 'read-more load-more-button';    
+    loadMoreBtn.className = 'read-more load-more-button';  
+    loadMoreBtn.textContent = 'Carregar mais';  
 
     // Sempre adiciona no FINAL do container → abaixo do último post
     container.appendChild(loadMoreBtn);
