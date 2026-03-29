@@ -1,5 +1,10 @@
 /* ==========================================================================
-   COMPONENTES: article/post, tags, read-more, recent lists, etc.
+   COMPONENTS.CSS
+   Componentes reutilizáveis: posts, botões, tags, banners, links e imagens
+   ========================================================================== */
+
+/* ==========================================================================
+   CARDS E POSTS
    ========================================================================== */
 
 article {
@@ -11,8 +16,7 @@ article {
   box-shadow: var(--glow-shadow);
   backdrop-filter: blur(4px);
   transition: all 0.3s ease;
-
-  background-image: 
+  background-image:
     radial-gradient(circle at 50% 50%, rgba(0, 255, 100, 0.15) 0%, rgba(0, 255, 65, 0.005) 30%, transparent 60%),
     radial-gradient(circle at 50% 50%, transparent 10%, rgba(0, 255, 65, 0.04) 11%, transparent 12%, rgba(0, 255, 65, 0.03) 20%, transparent 21%, rgba(0, 255, 65, 0.02) 35%, transparent 36%),
     radial-gradient(circle at 30% 70%, rgba(0, 255, 150, 0.08) 0%, transparent 50%),
@@ -27,6 +31,71 @@ article:hover {
   box-shadow: 0 0 40px rgba(0, 255, 65, 0.3);
   transform: translateY(-4px);
 }
+
+.post-card {
+  background: var(--card-bg);
+  border: 1px solid var(--neon-green-border);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: var(--glow-shadow);
+  margin-bottom: 48px;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.post-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 0 40px rgba(0, 255, 65, 0.35);
+  border-color: var(--neon-green-light);
+}
+
+.post-card img {
+  width: 100%;
+  max-height: 280px;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
+.post-content {
+  padding: 24px 20px 32px;
+}
+
+.post-content p {
+  margin: 14px 0;
+}
+
+.post-content ul,
+.post-content ol,
+.content ul,
+.content ol {
+  margin: 16px 0;
+  padding-left: 24px;
+}
+
+.post-content h3,
+.content h3 {
+  margin: 28px 0 12px;
+  font-size: 1.3rem;
+}
+
+.excerpt {
+  color: var(--neon-green-dim);
+  line-height: 1.65;
+}
+
+.featured-image {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto 32px;
+  border-radius: 8px;
+  box-shadow: var(--glow-shadow);
+}
+
+/* ==========================================================================
+   TAGS
+   ========================================================================== */
 
 .tags {
   display: flex;
@@ -44,7 +113,12 @@ article:hover {
   box-shadow: 0 0 8px rgba(0, 255, 65, 0.2);
 }
 
-.read-more {
+/* ==========================================================================
+   BOTÕES E LINKS DE AÇÃO
+   ========================================================================== */
+
+.read-more,
+.share-btn {
   margin-top: 20px;
   padding: 10px 24px;
   background: transparent;
@@ -54,22 +128,33 @@ article:hover {
   border-radius: 4px;
   font-weight: 500;
   display: inline-block;
-  transition: all 0.3s;
+  transition: all 0.3s ease;
   text-shadow: 0 0 5px var(--neon-green);
+  cursor: pointer;
 }
 
-.read-more:hover {
+.read-more:hover,
+.share-btn:hover {
   background: var(--neon-green);
   color: var(--bg-dark);
   box-shadow: 0 0 15px var(--neon-green);
 }
 
-/* Back link (usado em várias páginas) */
+.share-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+  border-radius: 6px;
+  padding: 10px 20px;
+}
+
 .back-link {
   display: inline-block;
   margin: 20px 0;
   color: var(--neon-green-dim);
   text-decoration: none;
+  transition: all 0.3s ease;
 }
 
 .back-link:hover {
@@ -77,7 +162,6 @@ article:hover {
   text-shadow: 0 0 8px var(--neon-green);
 }
 
-/* Botão voltar da página de Posts */
 .back-link-post {
   background: none;
   border: none;
@@ -86,6 +170,7 @@ article:hover {
   font-size: inherit;
   text-decoration: none;
   padding: 0;
+  transition: all 0.3s ease;
 }
 
 .back-link-post:hover {
@@ -93,8 +178,41 @@ article:hover {
   text-shadow: 0 0 8px var(--neon-green);
 }
 
+/* Botão carregar mais */
+.load-more-button,
+.read-more.load-more {
+  display: block !important;
+  width: fit-content;
+  min-width: 180px;
+  margin: 48px auto 80px !important;
+  text-align: center;
+}
+
 /* ==========================================================================
-   LEGALTECH MODE - Banner old-school
+   HEADER DO POST
+   ========================================================================== */
+
+.post-header {
+  margin-bottom: 32px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--neon-green-border);
+}
+
+.post-header h1 {
+  font-size: 2.4rem;
+  line-height: 1.15;
+  margin: 0 0 12px;
+}
+
+.post-header time {
+  display: block;
+  color: var(--neon-green-dim);
+  font-size: 0.95rem;
+  margin-bottom: 16px;
+}
+
+/* ==========================================================================
+   BANNERS E ESTADOS
    ========================================================================== */
 
 .tag-mode-banner {
@@ -134,158 +252,8 @@ body.tag-mode article {
   padding-left: 36px;
 }
 
-@keyframes blink {
-  50% { opacity: 0; }
-}
-
-/* Pequeno ajuste visual nos articles quando em modo filtrado (opcional, mas fica legal) */
-body.legaltech-mode article {
-  border-left: 4px solid var(--neon-green-light);
-  padding-left: 36px;
-}
-
-
-/* ==========================================================================
-   POST HEADER
-   ========================================================================== */
-.post-header {
-  margin-bottom: 32px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid var(--neon-green-border);
-}
-
-.post-header h1 {
-  font-size: 2.4rem;
-  line-height: 1.15;
-  margin: 0 0 12px 0;
-}
-
-.post-header time {
-  display: block;
-  color: var(--neon-green-dim);
-  font-size: 0.95rem;
-  margin-bottom: 16px;
-}
-
-/* Botão Compartilhar */
-.share-btn {
-  background: transparent;
-  color: var(--neon-green);
-  border: 2px solid var(--neon-green);
-  padding: 10px 20px;
-  border-radius: 6px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 0.95rem;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.share-btn:hover {
-  background: var(--neon-green);
-  color: #000;
-  box-shadow: 0 0 15px var(--neon-green);
-}
-
-/* Responsivo */
-@media (max-width: 720px) {
-  .post-header h1 {
-    font-size: 2.05rem;
-  }
-  
-  .share-btn {
-    padding: 9px 18px;
-    font-size: 0.9rem;
-  }
-}
-
-/* Imagem em destaque na página individual (post.html) */
-.featured-image {
-  width: 100%;                 /* ocupa toda a largura disponível */
-  max-width: 100%;             /* respeita o container de 900 px */
-  height: auto;                /* mantém proporção original – sem cortes */
-  display: block;
-  margin: 0 auto 32px;         /* centraliza e dá respiro */
-  border-radius: 8px;
-  box-shadow: var(--glow-shadow);
-}
-
-/* Responsividade adicional (já coberta pelo max-width:100%) */
-@media (max-width: 720px) {
-  .featured-image {
-    margin: 0 auto 24px;
-  }
-}
-
-/* ==========================================================================
-   Botão "Carregar mais"
-   ========================================================================== */
-
-/* Garantir que o container dos posts permita centralização do botão */
-.content #posts-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;          /* centraliza filhos horizontalmente se quiser */
-  width: 100%;
-}
-
-/* Estilo reforçado pro botão carregar mais */
-.read-more.load-more {          /* opcional: adicione essa classe no JS se quiser especificidade */
-  display: block !important;
-  margin: 48px auto 80px !important;
-  width: fit-content;
-  min-width: 180px;
-  text-align: center;
-}
-
-/* Se o botão ainda desalinhar em mobile, força */
-@media (max-width: 768px) {
-  .read-more {
-    margin-left: auto !important;
-    margin-right: auto !important;
-  }
-}
-
-
-/* ==========================================================================
-   Icone do Instagram
-   ========================================================================== */
-.social-link {
-  margin-right: 12px;               /* espaço entre o ícone e o texto */
-  display: inline-flex;
-  align-items: center;
-  color: var(--neon-green-dim);     /* cor inicial mais suave */
-  text-decoration: none;
-  transition: all 0.2s ease;
-}
-
-.social-link:hover,
-.social-link:focus {
-  color: var(--neon-green-light);
-  text-shadow: 0 0 8px var(--neon-green);
-  transform: scale(1.15);           /* leve zoom ao passar o mouse */
-}
-
-.instagram-svg {
-  vertical-align: middle;
-  margin-right: 4px;                /* pequeno espaço extra se quiser */
-}
-
-/* Opcional: se quiser o ícone um pouco maior que o coração */
-.instagram-svg {
-  width: 1.2em;
-  height: 1.2em;
-}
-
-
-/* ==========================================================================
-   Disclaimer posts "antigos"
-   ========================================================================== */
-
 .outdated-banner {
-  background: rgba(255, 193, 7, 0.15);       /* amarelo suave de alerta */
+  background: rgba(255, 193, 7, 0.15);
   border: 1px solid #ffc107;
   border-radius: 8px;
   padding: 16px 20px;
@@ -304,50 +272,158 @@ body.legaltech-mode article {
 }
 
 /* ==========================================================================
-   Config icons sidebar
+   LINKS SOCIAIS E ÍCONES
    ========================================================================== */
+
 .icon-svg {
   display: inline-block;
-  vertical-align: middle;  /* Alinha com o texto */
-  margin-right: 8px;       /* Espaço entre ícone e texto */
+  vertical-align: middle;
+  margin-right: 8px;
   transition: all 0.3s ease;
 }
 
 a:hover .icon-svg {
-  stroke: var(--neon-green-icon);  /* Muda cor no hover */
-  filter: drop-shadow(0 0 6px var(--neon-green));  /* Glow neon */
+  stroke: var(--neon-green-icon);
+  filter: drop-shadow(0 0 6px var(--neon-green));
 }
 
-/* ==========================================================================
-   Social Media - footer
-   ========================================================================== */
-
 .social-links {
-  margin: 0 0 12px;                /* espaço abaixo da linha de redes */
-  text-align: center;              /* centraliza tudo */
+  margin: 0 0 12px;
+  text-align: center;
   font-size: 1rem;
 }
 
 .social-link {
+  margin-right: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   color: var(--neon-green-dim);
   text-decoration: none;
   transition: all 0.2s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;                        /* espaço entre ícone e texto */
 }
 
-.social-link:hover {
+.social-link:hover,
+.social-link:focus {
   color: var(--neon-green-light);
   text-shadow: 0 0 8px var(--neon-green);
+  transform: scale(1.08);
 }
 
-.social-link svg {
+.social-link svg,
+.instagram-svg,
+.x-svg {
   vertical-align: middle;
 }
 
-/* Ajuste ícones um pouquinho maiores se quiser */
-.x-svg, .instagram-svg {
+.instagram-svg,
+.x-svg {
   width: 1.2em;
   height: 1.2em;
+}
+
+/* ==========================================================================
+   INTERAÇÕES DO POST (likes/comentários)
+   ========================================================================== */
+
+.interactions {
+  margin-top: 48px;
+  padding: 24px;
+  border-top: 1px solid var(--neon-green-border);
+}
+
+.likes-section {
+  margin-bottom: 32px;
+}
+
+.like-btn {
+  font-size: 1.3rem;
+  background: none;
+  border: none;
+  color: var(--neon-green);
+  cursor: pointer;
+}
+
+.comments-heading {
+  margin: 0 0 16px;
+  color: var(--neon-green-light);
+}
+
+.comment-form {
+  display: flex;
+  gap: 12px;
+}
+
+.comment-input {
+  flex: 1;
+  padding: 12px;
+  background: rgba(0, 255, 65, 0.05);
+  border: 1px solid var(--neon-green-border);
+  color: var(--neon-green);
+  border-radius: 6px;
+  resize: vertical;
+}
+
+.comment-submit {
+  padding: 12px 24px;
+  background: var(--neon-green);
+  color: #000;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   RESPONSIVO
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  article {
+    padding: 24px 18px;
+    margin-bottom: 32px;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  article:hover,
+  .read-more:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .post-content {
+    padding: 20px 16px 28px;
+  }
+
+  .post-card img {
+    max-height: 220px;
+  }
+
+  .read-more {
+    width: 100%;
+    text-align: center;
+    box-sizing: border-box;
+  }
+
+  .post-header h1 {
+    font-size: 2.05rem;
+  }
+
+  .share-btn {
+    padding: 9px 18px;
+    font-size: 0.9rem;
+  }
+
+  .featured-image {
+    margin: 0 auto 24px;
+  }
+
+  .comment-form {
+    flex-direction: column;
+  }
+
+  .comment-submit {
+    width: 100%;
+  }
 }

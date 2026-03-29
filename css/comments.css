@@ -1,24 +1,33 @@
 /* ==========================================================================
-   COMENTÁRIOS
+   COMMENTS.CSS
+   Estilos específicos da listagem e dos cards de comentários
    ========================================================================== */
 
-/* Cards de comentários - compactos e com borda neon sutil */
-.comment-card {
-  background: rgba(0, 255, 65, 0.04);          /* fundo levemente neon */
-  border: 1px solid var(--neon-green-border);  /* borda fina neon */
+/* Container principal da lista */
+#comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Wrapper usado em post.html para envolver a listagem */
+.comment-card-main {
+  background: rgba(0, 255, 65, 0.04);
+  border: 0;
   border-radius: 6px;
-  padding: 12px 16px;                          /* padding interno menor */
-  margin-bottom: 12px;                         /* espaço entre cards (reduzido) */
+  padding: 0;
+  margin-bottom: 8px;
   box-shadow: 0 2px 8px rgba(0, 255, 65, 0.1);
   transition: all 0.2s ease;
 }
 
-.comment-card-main {
-  background: rgba(0, 255, 65, 0.04);          /* fundo levemente neon */
-  border: 0px;  /* borda fina neon */
+/* Card individual */
+.comment-card {
+  background: rgba(0, 255, 65, 0.04);
+  border: 1px solid var(--neon-green-border);
   border-radius: 6px;
-  padding: 0;                          /* padding interno menor */
-  margin-bottom: 8px;                         /* espaço entre cards (reduzido) */
+  padding: 12px 16px;
+  margin-bottom: 0;
   box-shadow: 0 2px 8px rgba(0, 255, 65, 0.1);
   transition: all 0.2s ease;
 }
@@ -28,11 +37,12 @@
   box-shadow: 0 4px 16px rgba(0, 255, 65, 0.2);
 }
 
+/* Cabeçalho do comentário */
 .comment-header {
   display: flex;
   align-items: baseline;
-  gap: 8px;
   flex-wrap: wrap;
+  gap: 8px;
 }
 
 .comment-header strong {
@@ -46,15 +56,29 @@
   opacity: 0.9;
 }
 
+/* Corpo do comentário */
 .comment-content {
+  margin: 6px 0 0;
   padding-top: 0;
-  margin-top: -6px;  
   color: var(--neon-green);
+  line-height: 1.6;
+  word-break: break-word;
 }
 
-/* Ajuste no container geral de comentários (se quiser mais compacto) */
-#comments-list {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;                                    /* gap menor entre cards */
+/* ==========================================================================
+   RESPONSIVO
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  .comment-card {
+    padding: 12px 14px;
+  }
+
+  .comment-header {
+    gap: 6px;
+  }
+
+  .comment-content {
+    font-size: 0.96rem;
+  }
 }

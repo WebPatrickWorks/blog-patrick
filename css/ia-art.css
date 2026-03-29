@@ -1,5 +1,10 @@
 /* ==========================================================================
-   ESPECÍFICO DA PÁGINA IA Arts
+   IA-ART.CSS
+   Estilos exclusivos da página IA Arts
+   ========================================================================== */
+
+/* ==========================================================================
+   GRID DE OBRAS
    ========================================================================== */
 
 .grid-obras {
@@ -9,84 +14,58 @@
   margin: 32px 0;
 }
 
-@media (max-width: 980px) {
-  .grid-obras {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 24px 20px;
-  }
-}
-
-@media (max-width: 720px) {
-  .grid-obras {
-    grid-template-columns: 1fr;
-    gap: 28px;
-  }
-}
-
 .obra-card {
   background: var(--card-bg);
   border: 1px solid var(--neon-green-border);
   border-radius: 8px;
   overflow: hidden;
   box-shadow: var(--glow-shadow);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
   max-width: 100%;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
 .obra-card:hover {
   transform: translateY(-6px);
   box-shadow: 0 0 40px rgba(0, 255, 65, 0.35);
+  border-color: var(--neon-green-light);
 }
 
 .obra-card img {
-  aspect-ratio: 16 / 9;
-  object-fit: cover;
   width: 100%;
   height: auto;
   display: block;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
 }
 
-.obra-card p.obra-title {
-  font-size: 1.05rem;
+.obra-card.short img {
+  aspect-ratio: 9 / 16;
+}
+
+.obra-title {
   margin: 10px 14px 4px;
-  color: var(--neon-green-light);
+  font-size: 1.05rem;
   font-weight: 500;
+  color: var(--neon-green-light);
 }
 
-.obra-card p.obra-desc {
-  font-size: 0.875rem;
+.obra-desc {
   margin: 0 14px 14px;
+  font-size: 0.875rem;
   line-height: 1.45;
   color: var(--neon-green-dim);
 }
 
-.player-wrapper {
-  position: relative;
-  width: 60%;
-  max-width: 85vw;
-  margin: 70px auto 60px;
-  padding-bottom: 34%;
-  height: 0;
-  background: #000;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.player-wrapper iframe {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  border: none;
-}
+/* ==========================================================================
+   FILTRO DE TEMAS
+   ========================================================================== */
 
 #temas-list li {
   margin: 4px 0;
-  cursor: pointer;
   padding: 5px 12px;
-  transition: all 0.2s;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 #temas-list li.active {
@@ -100,31 +79,31 @@
   width: 1.2em;
   text-align: center;
   opacity: 0;
-  transition: opacity 0.2s;
+  transition: opacity 0.2s ease;
 }
 
 #temas-list li.active .checkmark {
   opacity: 1;
 }
 
-
 /* ==========================================================================
-   AJUSTES ESPECÍFICOS PARA O MODAL do PLAYER
+   MODAL / PLAYER DE VÍDEO
    ========================================================================== */
 
-/* Modal overlay - fundo escuro + posicionamento para descer mais */
 #modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.88);           /* fundo bem escuro para destacar o player */
+  z-index: 2000;
+
   display: flex;
-  align-items: flex-start;                /* começa de cima */
+  align-items: flex-start;
   justify-content: center;
-  padding-top: 12vh;                      /* ← aumentado: desce mais o modal (12% da altura da tela) */
+  padding-top: 12vh;
+
+  background: rgba(0, 0, 0, 0.88);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.4s ease;
-  z-index: 9999;
+  transition: opacity 0.35s ease;
 }
 
 #modal-overlay.active {
@@ -132,54 +111,54 @@
   pointer-events: auto;
 }
 
-/* Conteúdo do modal - sem margens internas, vídeo ocupa tudo */
 .modal-content {
   position: relative;
   width: 100%;
-  max-width: 960px;                       /* ou 90vw se preferir responsivo total */
+  max-width: 960px;
   margin: 0 auto;
+  overflow: hidden;
+
   background: #000;
   border-radius: 12px;
-  overflow: hidden;
   box-shadow: 0 0 60px rgba(0, 255, 65, 0.25);
 }
 
-/* Player wrapper - remove qualquer margem/padding e força 100% */
 .player-wrapper {
   position: relative;
-  width: 100%;                            /* ocupa toda a largura do modal */
-  padding-bottom: 56.25%;                 /* proporção 16:9 clássica */
+  width: 100%;
   height: 0;
+  margin: 0;
+  padding-bottom: 56.25%;
+  overflow: hidden;
   background: #000;
-  margin: 0;                              /* ← sem margens! */
 }
 
-/* Iframe ocupa 100% do wrapper, sem bordas ou espaços */
 .player-wrapper iframe {
   position: absolute;
-  top: 0;
-  left: 0;
+  inset: 0;
   width: 100%;
   height: 100%;
   border: none;
 }
 
-/* Botão fechar - continua visível e estilizado */
 .close-modal {
   position: absolute;
   top: 16px;
   right: 20px;
   z-index: 10;
-  background: rgba(10, 14, 23, 0.75);
-  color: var(--neon-green-light);
-  border: 2px solid var(--neon-green-dim);
-  border-radius: 50%;
+
   width: 44px;
   height: 44px;
+  border: 2px solid var(--neon-green-dim);
+  border-radius: 50%;
+
+  background: rgba(10, 14, 23, 0.75);
+  color: var(--neon-green-light);
   font-size: 2.1rem;
   line-height: 40px;
   text-align: center;
   cursor: pointer;
+
   transition: all 0.25s ease;
 }
 
@@ -190,4 +169,41 @@
   border-color: var(--neon-green);
   transform: rotate(90deg) scale(1.05);
   box-shadow: 0 0 20px var(--neon-green);
+}
+
+/* ==========================================================================
+   RESPONSIVO
+   ========================================================================== */
+
+@media (max-width: 980px) {
+  .grid-obras {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px 20px;
+  }
+}
+
+@media (max-width: 720px) {
+  .grid-obras {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  #modal-overlay {
+    padding: 72px 12px 20px;
+    align-items: flex-start;
+  }
+
+  .modal-content {
+    max-width: none;
+    border-radius: 10px;
+  }
+
+  .close-modal {
+    top: 12px;
+    right: 12px;
+    width: 40px;
+    height: 40px;
+    font-size: 1.9rem;
+    line-height: 36px;
+  }
 }

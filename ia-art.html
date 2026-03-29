@@ -50,7 +50,9 @@
 
     <main class="content">
       <div id="obras-grid" class="grid-obras"></div>
-      <button id="carregar-mais" class="read-more" style="display: none; margin: 40px auto;">Carregar mais</button>
+      <button id="carregar-mais" class="read-more load-more-button" hidden>
+        Carregar mais
+      </button>
     </main>
   </div>
 
@@ -97,7 +99,7 @@
         todasObras = (data.obras || []).sort((a, b) => new Date(b.date) - new Date(a.date));
       } catch (err) {
         console.error(err);
-        grid.innerHTML = '<p style="text-align:center; color:var(--neon-green-dim);">Ops... não consegui carregar as obras. Verifique o console.</p>';
+        grid.innerHTML = '<p class="empty-state">Ops... não consegui carregar as obras. Verifique o console.</p>';
         return;
       }
 
@@ -196,7 +198,7 @@
           grid.appendChild(card);
         });
 
-        btnMais.style.display = (inicio + POR_PAGINA < filtradas.length) ? 'block' : 'none';
+        btnMais.hidden = !(inicio + POR_PAGINA < filtradas.length);
       }
 
       function abrirModal(obra) {

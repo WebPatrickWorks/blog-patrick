@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Carregando post...</title>
   <link rel="stylesheet" href="css/main.css">
-  <link rel="stylesheet" href="css/comments.css">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <!-- Cloudflare Web Analytics --><script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "7839603b0b7341f6be8508063bbb734a"}'></script><!-- End Cloudflare Web Analytics -->
 </head>
@@ -28,19 +27,27 @@
     <p>Carregando post...</p>
   </main>
 
-  <div class="interactions" style="margin-top: 48px; padding: 24px; border-top: 1px solid var(--neon-green-border);">
-    <div class="likes-section" style="margin-bottom: 32px;">
-      <button id="like-btn" class="like-btn" style="font-size: 1.3rem; background: none; border: none; color: var(--neon-green); cursor: pointer;">
+  <div class="interactions">
+    <div class="likes-section">
+      <button id="like-btn" class="like-btn">
         🤍 <span id="likes-count">0</span>
       </button>
     </div>
 
-    <h3 style="margin: 0 0 16px; color: var(--neon-green-light);">Comentários</h3>
+    <h3 class="comments-heading">Comentários</h3>
     <div id="comments-list" class="comment-card-main"></div>
 
-    <div style="display: flex; gap: 12px;">
-      <textarea id="comment-input" placeholder="Deixe seu comentário..." rows="3" style="flex:1; padding:12px; background:rgba(0,255,65,0.05); border:1px solid var(--neon-green-border); color:var(--neon-green); border-radius:6px;"></textarea>
-      <button onclick="submitComment()" style="padding:12px 24px; background:var(--neon-green); color:#000; border:none; border-radius:6px; cursor:pointer;">Enviar</button>
+    <div class="comment-form">
+      <textarea
+        id="comment-input"
+        class="comment-input"
+        placeholder="Deixe seu comentário..."
+        rows="3"
+      ></textarea>
+
+      <button onclick="submitComment()" class="comment-submit">
+        Enviar
+      </button>
     </div>
   </div>
 
@@ -72,7 +79,7 @@
       siteUrl: 'https://webpatrickworks.github.io/blog-patrick',
       siteName: 'Blog do Patrick',
       currentContext: {
-        page: 'home',
+        page: 'post',
         title: document.title,
         path: window.location.pathname,
         tag: new URLSearchParams(window.location.search).get('tag') || null

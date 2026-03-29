@@ -16,13 +16,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     loadMoreBtn = document.createElement('button');
-    loadMoreBtn.className = 'read-more';
     loadMoreBtn.textContent = 'Carregar mais';
-    loadMoreBtn.style.display = 'block';
-    loadMoreBtn.style.margin = '48px auto 80px';
-    loadMoreBtn.style.minWidth = '180px';
-    loadMoreBtn.style.width = 'fit-content';
-    loadMoreBtn.style.padding = '12px 32px';
+    loadMoreBtn.className = 'read-more load-more-button';    
 
     // Sempre adiciona no FINAL do container → abaixo do último post
     container.appendChild(loadMoreBtn);
@@ -120,8 +115,10 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       const endMsg = document.createElement('p');
+      endMsg.className = 'end-of-list-message';
+      endMsg.innerHTML = 'Chegamos ao fim… por enquanto <span class="wink-svg">...</span>';
+
       endMsg.textContent = '';
-      endMsg.innerHTML = 'Chegamos ao fim… por enquanto <span class="wink-svg"><svg width="1em" height="1em" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><circle cx="9" cy="10" r="2" fill="currentColor"/><circle cx="15" cy="10" r="2" fill="currentColor"/><path d="M8 15 C 10 18 14 18 16 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>';
       endMsg.style.textAlign = 'center';
       endMsg.style.color = 'var(--neon-green-dim)';
       endMsg.style.margin = '60px 0 100px';
