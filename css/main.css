@@ -25,29 +25,31 @@
   bottom: 84px;
   z-index: 9999;
 
-  width: 360px;
+  width: 370px;
   max-width: calc(100vw - 32px);
-  height: 500px;
+  height: 520px;
 
   display: flex;
   flex-direction: column;
   overflow: hidden;
 
-  border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: #0f1115;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
+  background:
+    linear-gradient(180deg, rgba(18, 24, 38, 0.96), rgba(11, 15, 23, 0.98));
+  backdrop-filter: blur(18px);
+  box-shadow: var(--shadow-strong);
 
   opacity: 0;
   pointer-events: none;
-  transform: translateY(16px);
+  transform: translateY(16px) scale(0.98);
   transition: opacity 0.25s ease, transform 0.25s ease;
 }
 
 #gro-chat-panel.open {
   opacity: 1;
   pointer-events: auto;
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
 }
 
 /* Botão flutuante */
@@ -57,22 +59,40 @@
   bottom: 24px;
   z-index: 9999;
 
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   padding: 14px 18px;
+
+  border: 1px solid rgba(124, 156, 255, 0.24);
   border-radius: 999px;
   cursor: pointer;
 
-  background: #00ff66;
-  color: #000;
+  background:
+    linear-gradient(180deg, rgba(124, 156, 255, 0.18), rgba(124, 156, 255, 0.10));
+  color: var(--text-primary);
   font-weight: 700;
   line-height: 1.2;
+  letter-spacing: 0.01em;
 
-  box-shadow: 0 10px 30px rgba(0, 255, 102, 0.25);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 12px 32px rgba(124, 156, 255, 0.18);
+  backdrop-filter: blur(14px);
+  transition: transform 0.22s ease, box-shadow 0.22s ease, background 0.22s ease, border-color 0.22s ease;
+}
+
+#gro-chat-button::before {
+  content: "✦";
+  color: var(--accent);
+  font-size: 0.95rem;
+  line-height: 1;
 }
 
 #gro-chat-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 14px 40px rgba(0, 255, 102, 0.35);
+  border-color: rgba(124, 156, 255, 0.34);
+  background:
+    linear-gradient(180deg, rgba(124, 156, 255, 0.24), rgba(124, 156, 255, 0.14));
+  box-shadow: 0 18px 42px rgba(124, 156, 255, 0.24);
 }
 
 /* Cabeçalho */
@@ -81,81 +101,141 @@
   align-items: center;
   justify-content: space-between;
 
-  padding: 14px 16px;
+  padding: 16px 18px;
   font-weight: 700;
-  color: #fff;
+  color: var(--text-primary);
 
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  background: linear-gradient(180deg, #12141a, #0f1115);
+  border-bottom: 1px solid var(--border-color);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.015));
+}
+
+#gro-chat-header span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+#gro-chat-header span::before {
+  content: "●";
+  color: var(--accent);
+  font-size: 0.78rem;
 }
 
 #gro-chat-close {
-  background: transparent;
-  border: none;
-  color: #fff;
-  font-size: 22px;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-primary);
+  font-size: 20px;
   cursor: pointer;
   line-height: 1;
+  transition: all 0.22s ease;
+}
+
+#gro-chat-close:hover {
+  color: #fff;
+  background: var(--accent);
+  border-color: var(--accent);
+  transform: rotate(90deg);
 }
 
 /* Área de mensagens */
 #gro-chat-messages {
   flex: 1;
   overflow-y: auto;
-  padding: 14px;
+  padding: 16px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.01), rgba(255, 255, 255, 0.00));
+}
+
+#gro-chat-messages::-webkit-scrollbar {
+  width: 8px;
+}
+
+#gro-chat-messages::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 999px;
+}
+
+#gro-chat-messages::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(124, 156, 255, 0.55), rgba(167, 139, 250, 0.55));
+  border-radius: 999px;
 }
 
 .gro-msg {
-  margin-bottom: 10px;
-  padding: 10px 12px;
-  border-radius: 12px;
-  line-height: 1.4;
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  line-height: 1.55;
   white-space: pre-wrap;
   word-break: break-word;
+  font-size: 0.96rem;
 }
 
 .gro-msg.user {
-  background: rgba(0, 255, 102, 0.12);
-  color: #eafff2;
+  margin-left: 28px;
+  background: rgba(124, 156, 255, 0.14);
+  border: 1px solid rgba(124, 156, 255, 0.18);
+  color: var(--text-primary);
 }
 
 .gro-msg.assistant {
-  background: rgba(255, 255, 255, 0.06);
-  color: #fff;
+  margin-right: 28px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: var(--text-secondary);
 }
 
 /* Área de input */
 #gro-chat-input-area {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   padding: 12px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  background: #0f1115;
+  border-top: 1px solid var(--border-color);
+  background: rgba(11, 15, 23, 0.88);
 }
 
 #gro-chat-input {
   flex: 1;
   min-width: 0;
-  padding: 10px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 10px;
-  background: #171a21;
-  color: #fff;
+  padding: 11px 13px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
+}
+
+#gro-chat-input:focus {
+  border-color: rgba(124, 156, 255, 0.34);
+  box-shadow: 0 0 0 3px rgba(124, 156, 255, 0.12);
+  background: rgba(255, 255, 255, 0.045);
 }
 
 #gro-chat-input::placeholder {
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-muted);
 }
 
 #gro-chat-send {
-  padding: 10px 14px;
+  padding: 11px 15px;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   cursor: pointer;
   font-weight: 700;
 
-  background: #00ff66;
-  color: #000;
+  background: var(--accent);
+  color: #fff;
+  transition: background 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+#gro-chat-send:hover {
+  background: var(--accent-strong);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 30px rgba(124, 156, 255, 0.22);
 }
 
 /* ==========================================================================
