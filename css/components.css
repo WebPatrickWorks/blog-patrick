@@ -236,7 +236,7 @@ article:hover {
 }
 
 .visitor-counter a {
-  display: inline-block;
+  display: flex;
 }
 
 /* ==========================================================================
