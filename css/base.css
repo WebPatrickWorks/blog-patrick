@@ -85,29 +85,15 @@ h1 {
   font-family: 'JetBrains Mono', monospace;
   font-size: 3.2rem;
   font-weight: 700;
-  color: var(--neon-green-light);
-  text-shadow: var(--text-shadow-glow), 0 0 20px var(--neon-green);
+  color: var(--text-color);
   margin: 0;
-  letter-spacing: 2px;
-}
-
-h1::after {
-  content: "_";
-  animation: blink 1s step-end infinite;
+  letter-spacing: 1px;
 }
 
 h2 {
   font-size: 2rem;
-  color: var(--neon-green-light);
-  text-shadow: 0 0 8px var(--neon-green);
+  color: var(--text-color);
   margin-top: 0;
-}
-
-time {
-  color: var(--neon-green-dim);
-  font-size: 0.95rem;
-  display: block;
-  margin: 12px 0;
 }
 
 p {
@@ -124,10 +110,17 @@ img {
   display: block;
 }
 
+time {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  display: block;
+  margin: 12px 0;
+}
+
 footer {
   text-align: center;
   margin-top: 80px;
-  color: var(--neon-green-dim);
+  color: var(--text-muted);
   font-size: 0.9rem;
 }
 
@@ -139,6 +132,41 @@ header {
 ::selection {
   background: var(--accent);
   color: #fff;
+}
+
+[data-theme="neon"] h1 {
+  color: var(--neon-green-light);
+  text-shadow: var(--text-shadow-glow), 0 0 20px var(--neon-green);
+  letter-spacing: 2px;
+}
+
+[data-theme="neon"] h2 {
+  color: var(--neon-green-light);
+  text-shadow: 0 0 8px var(--neon-green);
+}
+
+[data-theme="neon"] time,
+[data-theme="neon"] footer {
+  color: var(--neon-green-dim);
+}
+
+[data-theme="modern"] h1 {
+  color: var(--text-color);
+  letter-spacing: -0.5px;
+}
+
+[data-theme="modern"] h2 {
+  color: var(--text-color);
+}
+
+[data-theme="modern"] time,
+[data-theme="modern"] footer {
+  color: var(--text-muted);
+}
+
+[data-theme="neon"] h1::after {
+  content: "_";
+  animation: blink 1s step-end infinite;
 }
 
 /* ==========================================================================
