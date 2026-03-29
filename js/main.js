@@ -99,14 +99,18 @@ document.addEventListener('DOMContentLoaded', () => {
       container.appendChild(article);
     });
 
-    displayedCount = end;
+    displayedCount = Math.min(end, allPosts.length);
+
+    // Remove mensagem final antiga, se existir
+    const oldEndMsg = container.querySelector('.end-of-list-message');
+    if (oldEndMsg) oldEndMsg.remove();
 
     // Decide o que fazer com o botão
     if (displayedCount < allPosts.length) {
-      // Ainda tem mais → garante botão no final
-      ensureLoadMoreButton();
+      if (!loadMoreBtn || !loadMoreBtn.parentNode) {
+        ensureLoadMoreButton();
+      }
     } else {
-      // Acabou → remove botão e adiciona mensagem final
       if (loadMoreBtn && loadMoreBtn.parentNode) {
         loadMoreBtn.parentNode.removeChild(loadMoreBtn);
         loadMoreBtn = null;
@@ -114,13 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const endMsg = document.createElement('p');
       endMsg.className = 'end-of-list-message';
-      endMsg.innerHTML = 'Chegamos ao fim… por enquanto <span class="wink-svg">...</span>';
-
-      endMsg.textContent = '';
-      endMsg.style.textAlign = 'center';
-      endMsg.style.color = 'var(--neon-green-dim)';
-      endMsg.style.margin = '60px 0 100px';
-      endMsg.style.fontSize = '1.1rem';
+      endMsg.innerHTML = 'Chegamos ao fim… por enquanto <span class="wink-svg">😉</span>';
       container.appendChild(endMsg);
     }
   }
