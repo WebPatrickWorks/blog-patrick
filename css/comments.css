@@ -12,29 +12,31 @@
 
 /* Wrapper usado em post.html para envolver a listagem */
 .comment-card-main {
-  background: rgba(0, 255, 65, 0.04);
+  background: transparent;
   border: 0;
-  border-radius: 6px;
+  border-radius: 0;
   padding: 0;
   margin-bottom: 8px;
-  box-shadow: 0 2px 8px rgba(0, 255, 65, 0.1);
-  transition: all 0.2s ease;
+  box-shadow: none;
+  transition: none;
 }
 
 /* Card individual */
 .comment-card {
-  background: rgba(0, 255, 65, 0.04);
-  border: 1px solid var(--neon-green-border);
-  border-radius: 6px;
-  padding: 12px 16px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0.012));
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 14px 16px;
   margin-bottom: 0;
-  box-shadow: 0 2px 8px rgba(0, 255, 65, 0.1);
-  transition: all 0.2s ease;
+  box-shadow: var(--shadow-soft);
+  transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
 }
 
 .comment-card:hover {
-  border-color: var(--neon-green-light);
-  box-shadow: 0 4px 16px rgba(0, 255, 65, 0.2);
+  transform: translateY(-1px);
+  border-color: rgba(124, 156, 255, 0.22);
+  box-shadow: var(--shadow-strong);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.015));
 }
 
 /* Cabeçalho do comentário */
@@ -46,22 +48,22 @@
 }
 
 .comment-header strong {
-  color: var(--neon-green-light);
+  color: var(--text-primary);
   font-weight: 600;
 }
 
 .comment-header small {
-  color: var(--neon-green-dim);
+  color: var(--text-muted);
   font-size: 0.85rem;
-  opacity: 0.9;
+  opacity: 0.95;
 }
 
 /* Corpo do comentário */
 .comment-content {
-  margin: 6px 0 0;
+  margin: 8px 0 0;
   padding-top: 0;
-  color: var(--neon-green);
-  line-height: 1.6;
+  color: var(--text-secondary);
+  line-height: 1.7;
   word-break: break-word;
 }
 

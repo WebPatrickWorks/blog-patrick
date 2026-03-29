@@ -8,53 +8,46 @@
    ========================================================================== */
 
 article {
-  background: var(--card-bg);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0.012));
   padding: 32px;
   margin-bottom: 48px;
-  border: 1px solid var(--neon-green-border);
-  border-radius: 8px;
-  box-shadow: var(--glow-shadow);
-  backdrop-filter: blur(4px);
-  transition: all 0.3s ease;
-  background-image:
-    radial-gradient(circle at 50% 50%, rgba(0, 255, 100, 0.15) 0%, rgba(0, 255, 65, 0.005) 30%, transparent 60%),
-    radial-gradient(circle at 50% 50%, transparent 10%, rgba(0, 255, 65, 0.04) 11%, transparent 12%, rgba(0, 255, 65, 0.03) 20%, transparent 21%, rgba(0, 255, 65, 0.02) 35%, transparent 36%),
-    radial-gradient(circle at 30% 70%, rgba(0, 255, 150, 0.08) 0%, transparent 50%),
-    radial-gradient(circle at 70% 30%, rgba(0, 255, 100, 0.07) 0%, transparent 45%);
-  background-size: 200% 200%, 180% 180%, 300% 300%, 250% 250%;
-  background-position: center;
-  background-blend-mode: screen, overlay, screen, screen;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(10px);
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
 }
 
 article:hover {
-  border-color: var(--neon-green-light);
-  box-shadow: 0 0 40px rgba(0, 255, 65, 0.3);
   transform: translateY(-4px);
+  border-color: rgba(124, 156, 255, 0.22);
+  box-shadow: var(--shadow-strong);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.015));
 }
 
 .post-card {
   background: var(--card-bg);
   border: 1px solid var(--border-color);
-  border-radius: 14px;
-
+  border-radius: var(--radius-lg);
+  overflow: hidden;
   padding: 20px;
   margin-bottom: 28px;
-
   box-shadow: var(--shadow-soft);
-
-  transition: all 0.25s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease, background 0.25s ease;
 }
 
 .post-card:hover {
   transform: translateY(-4px);
   background: var(--card-bg-hover);
+  border-color: rgba(124, 156, 255, 0.22);
   box-shadow: var(--shadow-strong);
 }
 
 .post-card h2 {
   font-size: 1.4rem;
   font-weight: 700;
-  letter-spacing: -0.3px;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
 }
 
 .post-card img {
@@ -63,6 +56,8 @@ article:hover {
   height: auto;
   display: block;
   object-fit: cover;
+  margin-bottom: 18px;
+  border-radius: 12px;
 }
 
 .post-content {
@@ -79,17 +74,19 @@ article:hover {
 .content ol {
   margin: 16px 0;
   padding-left: 24px;
+  color: var(--text-secondary);
 }
 
 .post-content h3,
 .content h3 {
   margin: 28px 0 12px;
   font-size: 1.3rem;
+  color: var(--text-primary);
 }
 
 .excerpt {
-  color: var(--neon-green-dim);
-  line-height: 1.65;
+  color: var(--text-secondary);
+  line-height: 1.75;
 }
 
 .featured-image {
@@ -98,8 +95,8 @@ article:hover {
   height: auto;
   display: block;
   margin: 0 auto 32px;
-  border-radius: 8px;
-  box-shadow: var(--glow-shadow);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-soft);
 }
 
 /* ==========================================================================
@@ -113,13 +110,13 @@ article:hover {
 }
 
 .tags span {
-  background: rgba(0, 255, 65, 0.1);
-  color: var(--neon-green);
+  background: var(--accent-soft);
+  color: var(--accent);
   padding: 6px 14px;
-  border: 1px solid var(--neon-green);
-  border-radius: 4px;
-  font-size: 0.85rem;
-  box-shadow: 0 0 8px rgba(0, 255, 65, 0.2);
+  border: 1px solid rgba(124, 156, 255, 0.18);
+  border-radius: 999px;
+  font-size: 0.84rem;
+  font-weight: 500;
 }
 
 /* ==========================================================================
@@ -129,24 +126,25 @@ article:hover {
 .read-more,
 .share-btn {
   margin-top: 20px;
-  padding: 10px 24px;
-  background: transparent;
-  color: var(--neon-green);
-  border: 2px solid var(--neon-green);
+  padding: 10px 18px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  border: 1px solid rgba(124, 156, 255, 0.18);
   text-decoration: none;
-  border-radius: 4px;
-  font-weight: 500;
+  border-radius: 10px;
+  font-weight: 600;
   display: inline-block;
-  transition: all 0.3s ease;
-  text-shadow: 0 0 5px var(--neon-green);
+  transition: background 0.22s ease, color 0.22s ease, border-color 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease;
   cursor: pointer;
 }
 
 .read-more:hover,
 .share-btn:hover {
-  background: var(--neon-green);
-  color: var(--bg-dark);
-  box-shadow: 0 0 15px var(--neon-green);
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+  box-shadow: 0 10px 30px rgba(124, 156, 255, 0.22);
+  transform: translateY(-1px);
 }
 
 .share-btn {
@@ -154,37 +152,35 @@ article:hover {
   align-items: center;
   gap: 8px;
   font-size: 0.95rem;
-  border-radius: 6px;
-  padding: 10px 20px;
 }
 
 .back-link {
   display: inline-block;
   margin: 20px 0;
-  color: var(--neon-green-dim);
+  color: var(--text-secondary);
   text-decoration: none;
-  transition: all 0.3s ease;
+  transition: color 0.22s ease, transform 0.22s ease;
 }
 
 .back-link:hover {
-  color: var(--neon-green-light);
-  text-shadow: 0 0 8px var(--neon-green);
+  color: var(--text-primary);
+  transform: translateX(-2px);
 }
 
 .back-link-post {
   background: none;
   border: none;
-  color: var(--neon-green-dim);
+  color: var(--text-secondary);
   cursor: pointer;
   font-size: inherit;
   text-decoration: none;
   padding: 0;
-  transition: all 0.3s ease;
+  transition: color 0.22s ease, transform 0.22s ease;
 }
 
 .back-link-post:hover {
-  color: var(--neon-green-light);
-  text-shadow: 0 0 8px var(--neon-green);
+  color: var(--text-primary);
+  transform: translateX(-2px);
 }
 
 /* Botão carregar mais */
@@ -197,19 +193,11 @@ article:hover {
   text-align: center;
 }
 
-.read-more.load-more {
-  display: block !important;
-  width: fit-content;
-  min-width: 180px;
-  margin: 48px auto 80px !important;
-  text-align: center;
-}
-
 .end-of-list-message {
   margin: 60px 0 100px;
   text-align: center;
-  color: var(--neon-green-dim);
-  font-size: 1.1rem;
+  color: var(--text-muted);
+  font-size: 1.05rem;
 }
 
 /* ==========================================================================
@@ -219,7 +207,7 @@ article:hover {
 .post-header {
   margin-bottom: 32px;
   padding-bottom: 20px;
-  border-bottom: 1px solid var(--neon-green-border);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .post-header h1 {
@@ -230,7 +218,7 @@ article:hover {
 
 .post-header time {
   display: block;
-  color: var(--neon-green-dim);
+  color: var(--text-muted);
   font-size: 0.95rem;
   margin-bottom: 16px;
 }
@@ -256,56 +244,50 @@ article:hover {
   text-align: center;
   margin: 40px 0 60px;
   padding: 28px 20px;
-  border: 2px dashed var(--neon-green-dim);
-  background: rgba(0, 255, 65, 0.05);
-  backdrop-filter: blur(4px);
-  font-family: 'JetBrains Mono', monospace;
-  box-shadow: var(--glow-shadow);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(circle at top right, rgba(124, 156, 255, 0.10), transparent 40%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0.015));
+  backdrop-filter: blur(8px);
+  box-shadow: var(--shadow-soft);
 }
 
 .tag-mode-banner h2 {
-  font-size: 2.2rem;
-  color: var(--neon-green-light);
-  text-shadow: 0 0 12px var(--neon-green);
-  margin: 0 0 16px;
-  letter-spacing: 1px;
-}
-
-.tag-mode-banner h2::after {
-  content: " _";
-  animation: blink 1s step-end infinite;
+  font-size: 2rem;
+  color: var(--text-primary);
+  margin: 0 0 14px;
+  letter-spacing: -0.02em;
 }
 
 .tag-mode-banner p {
-  color: var(--neon-green-dim);
+  color: var(--text-secondary);
   font-size: 1rem;
   margin: 0;
-  opacity: 0.9;
-  line-height: 1.6;
+  line-height: 1.7;
 }
 
 body.tag-mode article {
-  border-left: 4px solid var(--neon-green-light);
+  border-left: 3px solid var(--accent);
   padding-left: 36px;
 }
 
 .outdated-banner {
-  background: rgba(255, 193, 7, 0.15);
-  border: 1px solid #ffc107;
-  border-radius: 8px;
+  background: rgba(245, 158, 11, 0.10);
+  border: 1px solid rgba(245, 158, 11, 0.28);
+  border-radius: 12px;
   padding: 16px 20px;
   margin: 24px 0 32px;
-  color: var(--neon-green-light);
+  color: var(--text-primary);
   font-size: 0.95rem;
-  line-height: 1.5;
+  line-height: 1.6;
   text-align: center;
-  backdrop-filter: blur(4px);
-  box-shadow: 0 0 15px rgba(255, 193, 7, 0.2);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 10px 30px rgba(245, 158, 11, 0.12);
 }
 
 .outdated-banner strong {
-  color: #ff9800;
-  text-shadow: 0 0 6px rgba(255, 152, 0, 0.5);
+  color: #f59e0b;
 }
 
 /* ==========================================================================
@@ -316,12 +298,11 @@ body.tag-mode article {
   display: inline-block;
   vertical-align: middle;
   margin-right: 8px;
-  transition: all 0.3s ease;
+  transition: transform 0.22s ease, opacity 0.22s ease, filter 0.22s ease;
 }
 
 a:hover .icon-svg {
-  stroke: var(--neon-green-icon);
-  filter: drop-shadow(0 0 6px var(--neon-green));
+  filter: drop-shadow(0 0 8px rgba(124, 156, 255, 0.18));
 }
 
 .social-links {
@@ -335,16 +316,15 @@ a:hover .icon-svg {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  color: var(--neon-green-dim);
+  color: var(--text-secondary);
   text-decoration: none;
-  transition: all 0.2s ease;
+  transition: color 0.22s ease, transform 0.22s ease;
 }
 
 .social-link:hover,
 .social-link:focus {
-  color: var(--neon-green-light);
-  text-shadow: 0 0 8px var(--neon-green);
-  transform: scale(1.08);
+  color: var(--text-primary);
+  transform: translateY(-1px);
 }
 
 .social-link svg,
@@ -366,7 +346,7 @@ a:hover .icon-svg {
 .interactions {
   margin-top: 48px;
   padding: 24px;
-  border-top: 1px solid var(--neon-green-border);
+  border-top: 1px solid var(--border-color);
 }
 
 .likes-section {
@@ -377,13 +357,18 @@ a:hover .icon-svg {
   font-size: 1.3rem;
   background: none;
   border: none;
-  color: var(--neon-green);
+  color: var(--accent);
   cursor: pointer;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.like-btn:hover {
+  transform: scale(1.04);
 }
 
 .comments-heading {
   margin: 0 0 16px;
-  color: var(--neon-green-light);
+  color: var(--text-primary);
 }
 
 .comment-form {
@@ -393,22 +378,37 @@ a:hover .icon-svg {
 
 .comment-input {
   flex: 1;
-  padding: 12px;
-  background: rgba(0, 255, 65, 0.05);
-  border: 1px solid var(--neon-green-border);
-  color: var(--neon-green);
-  border-radius: 6px;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: 10px;
   resize: vertical;
+  outline: none;
+  transition: border-color 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
+}
+
+.comment-input:focus {
+  border-color: rgba(124, 156, 255, 0.32);
+  box-shadow: 0 0 0 3px rgba(124, 156, 255, 0.12);
+  background: rgba(255, 255, 255, 0.045);
 }
 
 .comment-submit {
   padding: 12px 24px;
-  background: var(--neon-green);
-  color: #000;
+  background: var(--accent);
+  color: #fff;
   border: none;
-  border-radius: 6px;
+  border-radius: 10px;
   cursor: pointer;
   font-weight: 600;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
+}
+
+.comment-submit:hover {
+  background: var(--accent-strong);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 30px rgba(124, 156, 255, 0.22);
 }
 
 /* ==========================================================================
@@ -437,25 +437,11 @@ a:hover .icon-svg {
     max-height: 220px;
   }
 
-.read-more {
-  display: inline-block;
-  margin-top: 12px;
-  padding: 8px 14px;
-
-  border-radius: 8px;
-  background: var(--accent-soft);
-  color: var(--accent);
-
-  font-weight: 600;
-  font-size: 0.9rem;
-
-  transition: all 0.2s ease;
-}
-
-.read-more:hover {
-  background: var(--accent);
-  color: #fff;
-}
+  .read-more {
+    width: 100%;
+    text-align: center;
+    box-sizing: border-box;
+  }
 
   .post-header h1 {
     font-size: 2.05rem;

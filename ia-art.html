@@ -23,14 +23,6 @@
       Singularidade de camarote — IA • startups • vida • deploy baratinho
     </p>     
     
-    <div class="theme-switch-wrapper">
-      <label class="theme-switch">
-        <input type="checkbox" id="theme-toggle">
-        <span class="slider"></span>
-      </label>
-      <span class="theme-label">Neon Dark</span>
-    </div>
-
     <a href="index.html" class="back-link">← Voltar para a página inicial</a>
   </header>
 
@@ -260,7 +252,9 @@
       const closeBtn = document.getElementById('close-sidebar');
       const sidebar = document.getElementById('sidebar');
 
-      // Sempre cria um novo overlay dedicado para o sidebar
+      if (!sidebar) return;
+
+      // Cria overlay dedicado para o sidebar
       const sidebarOverlay = document.createElement('div');
       sidebarOverlay.classList.add('sidebar-overlay');
       document.body.appendChild(sidebarOverlay);
@@ -289,50 +283,15 @@
         document.body.classList.remove('sidebar-open');
       });
 
-      const toggle = document.getElementById('theme-toggle');
-      const label = document.querySelector('.theme-label');
-      
-      if (!toggle || !label) {
-        console.warn('Theme toggle ou label não encontrado nesta página');
-        return;
-      }
-
-      // Carrega tema salvo (default: 'neon')
-      const currentTheme = localStorage.getItem('theme') || 'neon';
-      document.documentElement.setAttribute('data-theme', currentTheme);
-      
-      // Atualiza checkbox e texto do label
-      if (currentTheme === 'modern') {
-        toggle.checked = true;
-        label.textContent = 'Modern Tech';
-      } else if (currentTheme === 'light') {
-        toggle.checked = true;
-        label.textContent = 'Light Mode';
-      } else {
-        toggle.checked = false;
-        label.textContent = 'Neon Dark';
-      }
-
-      // Evento de mudança
-      toggle.addEventListener('change', () => {
-        let theme;
-        if (toggle.checked) {
-          if (document.documentElement.getAttribute('data-theme') === 'modern') {
-            theme = 'light';
-            label.textContent = 'Light Mode';
-          } else {
-            theme = 'modern';
-            label.textContent = 'Modern Tech';
-          }
-        } else {
-          theme = 'neon';
-          label.textContent = 'Neon Dark';
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && sidebar.classList.contains('active')) {
+          sidebar.classList.remove('active');
+          sidebarOverlay.classList.remove('active');
+          document.body.classList.remove('sidebar-open');
         }
-        
-        document.documentElement.setAttribute('data-theme', theme);
-        localStorage.setItem('theme', theme);
-      });      
+      });
     });
   </script>
+
 </body>
 </html>
