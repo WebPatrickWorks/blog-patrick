@@ -28,6 +28,37 @@ document.addEventListener("DOMContentLoaded", () => {
     msg.textContent = text;
     messagesDiv.appendChild(msg);
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    return msg;
+  }
+
+  function addThinkingMessage() {
+    const msg = document.createElement("div");
+    msg.className = "gro-msg assistant gro-thinking";
+    msg.innerHTML = `
+      <span class="typing-dots" aria-label="Gro está pensando">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    `;
+    messagesDiv.appendChild(msg);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    return msg;
+  }
+
+  async function typeMessage(element, text, speed = 18) {
+    element.textContent = "";
+    element.classList.add("is-typing");
+
+    let i = 0;
+    while (i < text.length) {
+      element.textContent += text.charAt(i);
+      i++;
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      await new Promise(resolve => setTimeout(resolve, speed));
+    }
+
+    element.classList.remove("is-typing");
   }
 
   function togglePanel() {
@@ -43,11 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
     input.value = "";
     input.focus();
 
-    const thinking = document.createElement("div");
-    thinking.className = "gro-msg assistant";
-    thinking.textContent = "...";
-    messagesDiv.appendChild(thinking);
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    const thinking = addThinkingMessage();
 
     try {
       const contextData = window.CURRENT_POST
@@ -93,7 +120,9 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       const reply = data.reply || "Não consegui gerar resposta agora.";
-      addMessage("assistant", reply);
+      const replyEl = addMessage("assistant", "");
+      await typeMessage(replyEl, reply, 14);
+
       history.push({ role: "assistant", content: reply });
     } catch (error) {
       thinking.remove();

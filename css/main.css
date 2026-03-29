@@ -295,3 +295,68 @@
     padding: 0 16px;
   }
 }
+
+/* ==========================================================================
+   EFEITO PENSANDO E DIGITANDO
+   ========================================================================== */
+
+.gro-thinking {
+  display: inline-flex;
+  align-items: center;
+  min-height: 46px;
+}
+
+.typing-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.typing-dots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.28;
+  animation: groDotPulse 1.2s infinite ease-in-out;
+}
+
+.typing-dots span:nth-child(2) {
+  animation-delay: 0.18s;
+}
+
+.typing-dots span:nth-child(3) {
+  animation-delay: 0.36s;
+}
+
+@keyframes groDotPulse {
+  0%, 80%, 100% {
+    transform: translateY(0) scale(0.9);
+    opacity: 0.28;
+  }
+  40% {
+    transform: translateY(-4px) scale(1.08);
+    opacity: 1;
+  }
+}
+
+.gro-msg.is-typing::after {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 1.1em;
+  margin-left: 3px;
+  vertical-align: -2px;
+  background: var(--accent);
+  border-radius: 2px;
+  animation: groCaretBlink 0.75s steps(1) infinite;
+}
+
+@keyframes groCaretBlink {
+  0%, 50% {
+    opacity: 1;
+  }
+  51%, 100% {
+    opacity: 0;
+  }
+}
