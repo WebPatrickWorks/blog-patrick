@@ -10,7 +10,7 @@
 </head>
 <body>
   <header>
-    <h1>Blog do Patrick</h1>
+    <h1>Centro Oculto</h1>
     <button class="back-link-post" onclick="history.back()">← Voltar para a lista de posts</button>
   </header>
 
@@ -67,8 +67,8 @@
     window.BLOG_CHAT_CONFIG = {
       functionUrl: 'https://yegczfbshkctxedzkdpu.supabase.co/functions/v1/chat-openrouter',
       publicKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InllZ2N6ZmJzaGtjdHhlZHprZHB1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYyMzc1OTUsImV4cCI6MjA4MTgxMzU5NX0.GU7KfJ4J1gAGK_q_uyYNPsPWqYbXjU2qdVhZq8SsIdM',
-      siteUrl: 'https://webpatrickworks.github.io/blog-patrick',
-      siteName: 'Blog do Patrick',
+      siteUrl: 'https://centrooculto.com',
+      siteName: 'Centro Oculto',
       currentContext: {
         page: 'post',
         title: document.title,
@@ -105,7 +105,7 @@
           }
 
           container.innerHTML = '';
-          document.title = post.title + ' | Blog do Patrick';
+          document.title = post.title + ' | Centro Oculto';
 
           // PRIMEIRO: limpa o content (não depende de data)
           let cleanContent = post.content.replace(/^<h1>.*?<\/h1>\s*/i, '').trim();
@@ -137,7 +137,7 @@
                   <strong>Aviso importante:</strong><br>
                   Essa postagem foi feita em ${formattedDate} (${daysOld} dias atrás) e <strong>pode estar desatualizada</strong>.<br>
                   Em caso de notícias, verifique as fontes originais (linkadas no artigo) ou busque notícias recentes para o status atual.<br>
-                  O Blog do Patrick não se responsabiliza por decisões baseadas em informações obsoletas.
+                  O Centro Oculto não se responsabiliza por decisões baseadas em informações obsoletas.
                 </div>
               `;
             }
