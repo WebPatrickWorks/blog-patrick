@@ -22,7 +22,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const STORAGE_KEYS = {
     visitorId: "gro_visitor_id",
     sessionId: "gro_chat_session_id",
-    consent: "gro_chat_history_enabled"
+    consent: "gro_chat_history_enabled",
+    introShown: "gro_chat_intro_shown"
+  };
+
+  const INTRO_MESSAGES = {
+    home: "Nem tudo que importa está visível.\n\nSe quiser, posso te mostrar o que está por trás do que você está lendo.",
+    index: "Nem tudo que importa está visível.\n\nSe quiser, posso te mostrar o que está por trás do que você está lendo.",
+    post: "Estou olhando este conteúdo com você.\n\nSe quiser, posso destacar a ideia central, as implicações ou o que não está óbvio aqui.",
+    unknown: "Nem tudo que importa está visível.\n\nFaça sua pergunta e eu vou direto ao que realmente importa."
   };
 
   let history = [];
@@ -65,6 +73,25 @@ document.addEventListener("DOMContentLoaded", () => {
     return value === "true";
   }
 
+  function hasShownIntro() {
+    return sessionStorage.getItem(STORAGE_KEYS.introShown) === "true";
+  }
+
+  function markIntroAsShown() {
+    sessionStorage.setItem(STORAGE_KEYS.introShown, "true");
+  }
+
+  function getCurrentPageType() {
+    if (window.CURRENT_POST) return "post";
+    if (window.BLOG_INDEX_CONTEXT) return "index";
+    return config?.currentContext?.page || "unknown";
+  }
+
+  function getIntroMessage() {
+    const pageType = getCurrentPageType();
+    return INTRO_MESSAGES[pageType] || INTRO_MESSAGES.unknown;
+  }
+
   function addMessage(role, text) {
     const msg = document.createElement("div");
     msg.className = `gro-msg ${role}`;
@@ -100,6 +127,18 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     element.classList.remove("is-typing");
+  }
+
+  async function showIntroMessage() {
+    if (hasShownIntro() || messagesDiv.children.length > 0 || history.length > 0) return;
+
+    const thinking = addThinkingMessage();
+    await new Promise(resolve => setTimeout(resolve, 550));
+    thinking.remove();
+
+    const introEl = addMessage("assistant", "");
+    await typeMessage(introEl, getIntroMessage(), 16);
+    markIntroAsShown();
   }
 
   function togglePanel() {
@@ -217,8 +256,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   button.addEventListener("click", async () => {
     togglePanel();
+
     if (panel.classList.contains("open")) {
       await restoreHistoryOnce();
+      await showIntroMessage();
     }
   });
 
