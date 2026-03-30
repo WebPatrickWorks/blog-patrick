@@ -95,7 +95,13 @@ document.addEventListener("DOMContentLoaded", () => {
   function addMessage(role, text) {
     const msg = document.createElement("div");
     msg.className = `gro-msg ${role}`;
-    msg.textContent = text;
+
+    if (role === "assistant") {
+      msg.innerHTML = formatGroText(text);
+    } else {
+      msg.textContent = text;
+    }
+
     messagesDiv.appendChild(msg);
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
     return msg;
@@ -116,6 +122,23 @@ document.addEventListener("DOMContentLoaded", () => {
     return msg;
   }
 
+  function escapeHtml(text) {
+    return text
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function formatGroText(text) {
+    const safe = escapeHtml(text);
+
+    return safe
+      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+      .replace(/\n/g, "<br>");
+  }  
+
   async function typeMessage(element, text, speed = 14) {
     element.textContent = "";
     element.classList.add("is-typing");
@@ -127,6 +150,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     element.classList.remove("is-typing");
+    element.innerHTML = formatGroText(text);
   }
 
   async function showIntroMessage() {
