@@ -16,11 +16,54 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!button || !panel || !messagesDiv || !input || !sendBtn) {
     console.error("Elementos do chat não encontrados no DOM.");
-    console.log({ button, panel, messagesDiv, input, sendBtn, closeBtn });
     return;
   }
 
+  const STORAGE_KEYS = {
+    visitorId: "gro_visitor_id",
+    sessionId: "gro_chat_session_id",
+    consent: "gro_chat_history_enabled"
+  };
+
   let history = [];
+  let restored = false;
+
+  function generateUUID() {
+    if (window.crypto?.randomUUID) return window.crypto.randomUUID();
+
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, c => {
+      const r = crypto.getRandomValues(new Uint8Array(1))[0] % 16;
+      const v = c === "x" ? r : (r & 0x3) | 0x8;
+      return v.toString(16);
+    });
+  }
+
+  function getVisitorId() {
+    let id = localStorage.getItem(STORAGE_KEYS.visitorId);
+    if (!id) {
+      id = generateUUID();
+      localStorage.setItem(STORAGE_KEYS.visitorId, id);
+    }
+    return id;
+  }
+
+  function getSessionId() {
+    let id = sessionStorage.getItem(STORAGE_KEYS.sessionId);
+    if (!id) {
+      id = generateUUID();
+      sessionStorage.setItem(STORAGE_KEYS.sessionId, id);
+    }
+    return id;
+  }
+
+  function getHistoryEnabled() {
+    const value = localStorage.getItem(STORAGE_KEYS.consent);
+    if (value === null) {
+      localStorage.setItem(STORAGE_KEYS.consent, "true");
+      return true;
+    }
+    return value === "true";
+  }
 
   function addMessage(role, text) {
     const msg = document.createElement("div");
@@ -46,14 +89,12 @@ document.addEventListener("DOMContentLoaded", () => {
     return msg;
   }
 
-  async function typeMessage(element, text, speed = 18) {
+  async function typeMessage(element, text, speed = 14) {
     element.textContent = "";
     element.classList.add("is-typing");
 
-    let i = 0;
-    while (i < text.length) {
+    for (let i = 0; i < text.length; i++) {
       element.textContent += text.charAt(i);
-      i++;
       messagesDiv.scrollTop = messagesDiv.scrollHeight;
       await new Promise(resolve => setTimeout(resolve, speed));
     }
@@ -63,6 +104,43 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function togglePanel() {
     panel.classList.toggle("open");
+  }
+
+  async function restoreHistoryOnce() {
+    if (restored || !getHistoryEnabled()) return;
+    restored = true;
+
+    try {
+      const response = await fetch(FUNCTION_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "restore",
+          visitorId: getVisitorId(),
+          sessionId: getSessionId()
+        })
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        console.warn("Falha ao restaurar histórico:", data);
+        return;
+      }
+
+      if (Array.isArray(data.messages) && data.messages.length) {
+        history = data.messages.map(m => ({
+          role: m.role,
+          content: m.content
+        }));
+
+        messagesDiv.innerHTML = "";
+        for (const msg of history) {
+          addMessage(msg.role, msg.content);
+        }
+      }
+    } catch (error) {
+      console.warn("Erro ao restaurar histórico:", error);
+    }
   }
 
   async function sendMessage() {
@@ -99,15 +177,21 @@ document.addEventListener("DOMContentLoaded", () => {
               currentDateTime: new Date().toISOString()
             };
 
+      const payload = {
+        action: "chat",
+        visitorId: getVisitorId(),
+        sessionId: getSessionId(),
+        historyEnabled: getHistoryEnabled(),
+        messages: history.slice(-10),
+        context: contextData
+      };
+
       const response = await fetch(FUNCTION_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({
-          messages: history.slice(-10),
-          context: contextData
-        })
+        body: JSON.stringify(payload)
       });
 
       const data = await response.json();
@@ -131,7 +215,12 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  button.addEventListener("click", togglePanel);
+  button.addEventListener("click", async () => {
+    togglePanel();
+    if (panel.classList.contains("open")) {
+      await restoreHistoryOnce();
+    }
+  });
 
   if (closeBtn) {
     closeBtn.addEventListener("click", togglePanel);
