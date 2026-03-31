@@ -224,6 +224,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const thinking = addThinkingMessage();
 
     try {
+      const nowInBrazil = new Date().toLocaleString("sv-SE", {
+        timeZone: "America/Sao_Paulo"
+      }).replace(" ", "T");
+
       const contextData = window.CURRENT_POST
         ? {
             page: "post",
@@ -232,18 +236,21 @@ document.addEventListener("DOMContentLoaded", () => {
             content: window.CURRENT_POST.content?.slice(0, 3000),
             tags: window.CURRENT_POST.tags,
             url: window.CURRENT_POST.url || window.location.href,
-            currentDateTime: new Date().toISOString()
+            currentDateTime: nowInBrazil,
+            timeZone: "America/Sao_Paulo"
           }
         : window.BLOG_INDEX_CONTEXT
           ? {
               page: "index",
               posts: window.BLOG_INDEX_CONTEXT.posts,
-              currentDateTime: new Date().toISOString()
+              currentDateTime: nowInBrazil,
+              timeZone: "America/Sao_Paulo"
             }
           : {
               page: "unknown",
               url: window.location.href,
-              currentDateTime: new Date().toISOString()
+              currentDateTime: nowInBrazil,
+              timeZone: "America/Sao_Paulo"
             };
 
       const payload = {
