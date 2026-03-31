@@ -200,6 +200,15 @@
   opacity: 0.9;
 }
 
+.gro-msg.assistant h3 {
+  margin: 18px 0 6px;
+}
+
+.gro-msg.assistant h3 + ul,
+.gro-msg.assistant h3 + ol {
+  margin-top: 6px;
+}
+
 /* Área de input */
 #gro-chat-input-area {
   display: flex;
