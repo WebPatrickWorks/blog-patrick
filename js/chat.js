@@ -135,6 +135,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const safe = escapeHtml(text);
 
     return safe
+      // Heading ### (ANTES de tudo)
+      .replace(/^### (.+)$/gm, "<h3>$1</h3>")
+          
       // Negrito primeiro
       .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
       
