@@ -168,7 +168,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const urlParams = new URLSearchParams(window.location.search);
       const filterTag = urlParams.get('tag');
 
-      let postsToRender = freshPosts;
+      // Home agora exibe TODOS os posts visíveis.
+      // freshPosts fica preservado para destaque futuro, mas não limita mais a listagem.
+      let postsToRender = visiblePosts;
+      //let postsToRender = freshPosts;
 
       if (filterTag) {
         postsToRender = visiblePosts.filter(post =>
