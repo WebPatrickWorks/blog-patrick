@@ -109,15 +109,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     displayedCount = Math.min(end, allPosts.length);
 
-    // Remove mensagem final antiga, se existir
     const oldEndMsg = container.querySelector('.end-of-list-message');
     if (oldEndMsg) oldEndMsg.remove();
 
-    // Decide o que fazer com o botão
     if (displayedCount < allPosts.length) {
-      if (!loadMoreBtn || !loadMoreBtn.parentNode) {
-        ensureLoadMoreButton();
-      }
+      ensureLoadMoreButton();
     } else {
       if (loadMoreBtn && loadMoreBtn.parentNode) {
         loadMoreBtn.parentNode.removeChild(loadMoreBtn);
