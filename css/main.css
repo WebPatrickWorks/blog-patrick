@@ -201,12 +201,12 @@
 }
 
 .gro-msg.assistant h3 {
-  margin: 18px 0 6px;
+  margin: 18px 0 4px;
 }
 
 .gro-msg.assistant h3 + ul,
 .gro-msg.assistant h3 + ol {
-  margin-top: 6px;
+  margin-top: 4px;
 }
 
 /* Área de input */
