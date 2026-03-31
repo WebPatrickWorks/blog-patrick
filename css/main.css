@@ -194,6 +194,12 @@
   font-weight: 700;
 }
 
+.gro-msg.assistant em {
+  font-style: italic;
+  color: var(--text-primary);
+  opacity: 0.9;
+}
+
 /* Área de input */
 #gro-chat-input-area {
   display: flex;

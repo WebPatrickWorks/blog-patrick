@@ -135,9 +135,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const safe = escapeHtml(text);
 
     return safe
+      // Negrito primeiro
       .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+      
+      // Itálico depois (evita conflito com **)
+      .replace(/\*(?!\*)(.+?)\*(?!\*)/g, "<em>$1</em>")
+      
+      // Quebra de linha
       .replace(/\n/g, "<br>");
-  }  
+  }
 
   async function typeMessage(element, text, speed = 14) {
     element.textContent = "";
