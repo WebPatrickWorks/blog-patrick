@@ -29,14 +29,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const slice = allPosts.slice(start, end);
 
     slice.forEach(post => {
-      const article = document.createElement('div'); // ou 'article'
+      const article = document.createElement('div');
       article.className = 'post-card';
+
+      const postDate = new Date(post.date);
+      const daysOld = (new Date() - postDate) / (1000 * 60 * 60 * 24);
+      const isFresh = daysOld <= FRESH_DAYS;
 
       let html = '';
 
-      // Imagem opcional no topo (como hero/thumbnail)
       if (post.image) {
-        html += `<img src="${post.image}" alt="${post.title}" loading="lazy">`;
+        html += `
+          <div class="post-thumb-wrap">
+            ${isFresh ? '<span class="post-badge-fresh">Recente</span>' : ''}
+            <img src="${post.image}" alt="${post.title}" loading="lazy">
+          </div>
+        `;
       }
 
       let displayTitle = post.title;
@@ -52,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (firstH2 && firstH2.textContent.trim()) {
           displayTitle = firstH2.textContent.trim();
         }
-      }      
+      } 
 
       // =============================================
       // 2. Extrai excerpt

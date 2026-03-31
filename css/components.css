@@ -56,7 +56,6 @@ article:hover {
   height: auto;
   display: block;
   object-fit: cover;
-  margin-bottom: 18px;
   border-radius: 12px;
 }
 
@@ -97,6 +96,40 @@ article:hover {
   margin: 0 auto 32px;
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-soft);
+}
+
+.post-thumb-wrap {
+  position: relative;
+  margin-bottom: 18px;
+}
+
+.post-thumb-wrap img {
+  width: 100%;
+  max-height: 280px;
+  height: auto;
+  display: block;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.post-badge-fresh {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(16, 185, 129, 0.16);
+  border: 1px solid rgba(16, 185, 129, 0.28);
+  color: #a7f3d0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 10px 24px rgba(16, 185, 129, 0.14);
 }
 
 /* ==========================================================================
@@ -435,6 +468,13 @@ a:hover .icon-svg {
 
   .post-card img {
     max-height: 220px;
+  }
+
+  .post-badge-fresh {
+    top: 10px;
+    left: 10px;
+    font-size: 0.74rem;
+    padding: 5px 10px;
   }
 
   .read-more {
