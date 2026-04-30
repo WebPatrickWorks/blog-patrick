@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Simulador BTC | Centro Oculto</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <style>
+    .sim-hero { text-align: center; margin-bottom: 48px; }
+    .sim-hero h2 { font-family: 'JetBrains Mono', monospace; font-size: 1.6rem; color: var(--text-primary); margin: 0 0 10px; letter-spacing: -0.02em; }
+    .sim-hero p { color: var(--text-secondary); font-size: 0.97rem; margin: 0; }
+
+    .btc-live { display: flex; align-items: center; justify-content: center; gap: 14px; margin: 28px 0 36px; padding: 18px 28px; background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015)); border: 1px solid var(--border-color); border-radius: var(--radius-lg); flex-wrap: wrap; }
+    .btc-price-label { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em; }
+    #btc-price-display { font-family: 'JetBrains Mono', monospace; font-size: 2.2rem; font-weight: 700; color: var(--text-primary); letter-spacing: -0.04em; transition: color 0.4s ease; }
+    #btc-price-display.up { color: #10b981; } #btc-price-display.down { color: #ef4444; }
+    #btc-change-badge { font-family: 'JetBrains Mono', monospace; font-size: 0.88rem; font-weight: 600; padding: 4px 12px; border-radius: 999px; background: rgba(16,185,129,0.12); color: #10b981; border: 1px solid rgba(16,185,129,0.24); transition: all 0.4s ease; }
+    #btc-change-badge.down { background: rgba(239,68,68,0.12); color: #ef4444; border-color: rgba(239,68,68,0.24); }
+    .btc-pulse { width: 10px; height: 10px; border-radius: 50%; background: #10b981; animation: pulse 2s infinite; }
+    @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(16,185,129,0.5); } 70% { box-shadow: 0 0 0 8px rgba(16,185,129,0); } 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0); } }
+
+    .sim-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin-bottom: 32px; }
+    .sim-card { background: linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.012)); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 16px 18px; transition: border-color 0.25s ease; }
+    .sim-card:hover { border-color: rgba(124,156,255,0.22); }
+    .sim-card-label { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
+    .sim-card-value { font-family: 'JetBrains Mono', monospace; font-size: 1.35rem; font-weight: 700; color: var(--text-primary); transition: color 0.4s ease; }
+    .sim-card-value.positive { color: #10b981; } .sim-card-value.negative { color: #ef4444; }
+    .sim-card-sub { font-size: 0.78rem; color: var(--text-muted); margin-top: 4px; }
+
+    .chart-wrapper { background: linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.012)); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 24px; margin-bottom: 32px; }
+    .chart-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+    .chart-title { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-secondary); }
+    .chart-legend { display: flex; gap: 16px; font-size: 0.78rem; color: var(--text-muted); }
+    .legend-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; vertical-align: middle; }
+
+    /* ── PAINEL IA ── */
+    .ia-analysis-panel { background: linear-gradient(135deg, rgba(124,156,255,0.05), rgba(167,139,250,0.05)); border: 1px solid rgba(124,156,255,0.22); border-radius: var(--radius-lg); padding: 24px; margin-bottom: 32px; position: relative; overflow: hidden; }
+    .ia-analysis-panel::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--accent), var(--accent-secondary)); }
+    .ia-panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; flex-wrap: wrap; gap: 10px; }
+    .ia-panel-title { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent); display: flex; align-items: center; gap: 8px; }
+    .ia-thinking-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); opacity: 0; transition: opacity 0.3s ease; }
+    .ia-thinking-dot.active { opacity: 1; animation: pulse 1s infinite; }
+    .ia-confidence-badge { font-size: 0.75rem; font-weight: 700; padding: 3px 10px; border-radius: 999px; letter-spacing: 0.05em; }
+    .ia-confidence-badge.alta  { background: rgba(16,185,129,0.15);  color: #10b981; border: 1px solid rgba(16,185,129,0.25); }
+    .ia-confidence-badge.media { background: rgba(245,158,11,0.12);  color: #f59e0b; border: 1px solid rgba(245,158,11,0.22); }
+    .ia-confidence-badge.baixa { background: rgba(239,68,68,0.10);   color: #ef4444; border: 1px solid rgba(239,68,68,0.20); }
+    #ia-analysis-text { font-size: 0.93rem; line-height: 1.75; color: var(--text-secondary); white-space: pre-wrap; min-height: 60px; }
+    #ia-analysis-text.loading { opacity: 0.5; font-style: italic; }
+    .ia-decision-bar { display: flex; align-items: center; gap: 12px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border-color); flex-wrap: wrap; }
+    .ia-decision-label { font-size: 0.75rem; color: var(--text-muted); letter-spacing: 0.06em; text-transform: uppercase; }
+    .ia-decision-value { font-family: 'JetBrains Mono', monospace; font-size: 1.05rem; font-weight: 700; padding: 4px 14px; border-radius: 6px; }
+    .ia-decision-value.buy  { background: rgba(16,185,129,0.15);  color: #10b981; }
+    .ia-decision-value.sell { background: rgba(239,68,68,0.12);   color: #ef4444; }
+    .ia-decision-value.hold { background: rgba(245,158,11,0.10);  color: #f59e0b; }
+    .ia-cycle-info { font-size: 0.75rem; color: var(--text-muted); margin-left: auto; }
+    .typing-cursor::after { content: '▋'; color: var(--accent); animation: blink 0.8s steps(1) infinite; }
+    @keyframes blink { 0%,50% { opacity: 1; } 51%,100% { opacity: 0; } }
+
+    .indicators-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 32px; }
+    .indicator-chip { background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 10px 14px; text-align: center; }
+    .indicator-chip .ind-label { font-size: 0.7rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 5px; }
+    .indicator-chip .ind-value { font-family: 'JetBrains Mono', monospace; font-size: 1.05rem; font-weight: 700; color: var(--text-primary); }
+    .indicator-chip .ind-signal { font-size: 0.72rem; margin-top: 3px; font-weight: 600; }
+    .signal-buy { color: #10b981; } .signal-sell { color: #ef4444; } .signal-hold { color: #f59e0b; } .signal-neutral { color: var(--text-muted); }
+
+    .fib-panel { background: linear-gradient(180deg, rgba(167,139,250,0.06), rgba(167,139,250,0.02)); border: 1px solid rgba(167,139,250,0.18); border-radius: var(--radius-lg); padding: 22px 24px; margin-bottom: 32px; }
+    .fib-title { font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent-secondary); margin-bottom: 16px; }
+    .fib-levels { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 10px; }
+    .fib-level { background: rgba(167,139,250,0.06); border: 1px solid rgba(167,139,250,0.14); border-radius: var(--radius-sm); padding: 10px 12px; text-align: center; }
+    .fib-level .fib-pct { font-size: 0.72rem; color: var(--accent-secondary); font-weight: 700; letter-spacing: 0.06em; margin-bottom: 4px; }
+    .fib-level .fib-price { font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; font-weight: 700; color: var(--text-primary); }
+    .fib-signal-bar { margin-top: 14px; padding: 10px 14px; background: rgba(167,139,250,0.08); border-radius: var(--radius-sm); font-size: 0.88rem; color: var(--text-secondary); border: 1px solid rgba(167,139,250,0.14); }
+
+    .sim-controls { background: linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.012)); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 24px; margin-bottom: 32px; }
+    .controls-title { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 20px; }
+    .controls-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+    .ctrl-group label { display: block; font-size: 0.78rem; color: var(--text-muted); margin-bottom: 6px; letter-spacing: 0.04em; text-transform: uppercase; }
+    .ctrl-group select, .ctrl-group input[type="number"] { width: 100%; padding: 10px 12px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: var(--radius-sm); color: var(--text-primary); font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; outline: none; transition: border-color 0.22s ease; -webkit-appearance: none; }
+    .ctrl-group select:focus, .ctrl-group input[type="number"]:focus { border-color: rgba(124,156,255,0.4); box-shadow: 0 0 0 3px rgba(124,156,255,0.1); }
+    .btn-row { display: flex; gap: 12px; flex-wrap: wrap; }
+    .btn-sim { flex: 1; min-width: 120px; padding: 12px 18px; border-radius: var(--radius-sm); font-family: 'JetBrains Mono', monospace; font-size: 0.88rem; font-weight: 700; cursor: pointer; border: 1px solid transparent; transition: all 0.22s ease; letter-spacing: 0.03em; }
+    #btn-start { background: var(--accent); color: #fff; border-color: var(--accent); }
+    #btn-start:hover { background: var(--accent-strong); transform: translateY(-1px); box-shadow: 0 10px 28px rgba(124,156,255,0.28); }
+    #btn-pause { background: rgba(245,158,11,0.14); color: #f59e0b; border-color: rgba(245,158,11,0.28); }
+    #btn-pause:hover { background: rgba(245,158,11,0.22); }
+    #btn-reset { background: rgba(239,68,68,0.1); color: #ef4444; border-color: rgba(239,68,68,0.22); }
+    #btn-reset:hover { background: rgba(239,68,68,0.18); }
+
+    .trade-log { background: linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.012)); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 24px; margin-bottom: 32px; }
+    .log-title { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; }
+    #operations-log { max-height: 400px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+    #operations-log::-webkit-scrollbar { width: 6px; }
+    #operations-log::-webkit-scrollbar-track { background: rgba(255,255,255,0.04); border-radius: 999px; }
+    #operations-log::-webkit-scrollbar-thumb { background: rgba(124,156,255,0.4); border-radius: 999px; }
+    .log-entry { border-radius: var(--radius-sm); font-size: 0.85rem; border: 1px solid var(--border-color); overflow: hidden; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+    .log-entry.buy  { border-color: rgba(16,185,129,0.2); }
+    .log-entry.sell { border-color: rgba(239,68,68,0.2); }
+    .log-entry.hold { border-color: rgba(245,158,11,0.15); }
+    .log-entry-top { display: flex; align-items: center; gap: 10px; padding: 10px 14px; }
+    .log-entry.buy  .log-entry-top { background: rgba(16,185,129,0.06); }
+    .log-entry.sell .log-entry-top { background: rgba(239,68,68,0.06); }
+    .log-entry.hold .log-entry-top { background: rgba(245,158,11,0.04); }
+    .log-action { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 0.78rem; letter-spacing: 0.06em; padding: 2px 8px; border-radius: 4px; min-width: 40px; text-align: center; }
+    .log-entry.buy  .log-action { background: rgba(16,185,129,0.2);  color: #10b981; }
+    .log-entry.sell .log-action { background: rgba(239,68,68,0.2);   color: #ef4444; }
+    .log-entry.hold .log-action { background: rgba(245,158,11,0.15); color: #f59e0b; }
+    .log-details { flex: 1; color: var(--text-secondary); }
+    .log-pnl { font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; font-weight: 700; }
+    .log-pnl.pos { color: #10b981; } .log-pnl.neg { color: #ef4444; }
+    .log-ia-comment { padding: 10px 14px 12px; font-size: 0.83rem; line-height: 1.65; color: var(--text-muted); border-top: 1px solid var(--border-color); background: rgba(124,156,255,0.03); font-style: italic; }
+
+    .status-bar { display: flex; align-items: center; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--text-muted); margin-bottom: 24px; }
+    .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--text-muted); }
+    .status-dot.running { background: #10b981; animation: pulse 2s infinite; }
+    .status-dot.paused  { background: #f59e0b; }
+    .status-dot.stopped { background: #ef4444; }
+    .risk-warning { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.22); border-radius: var(--radius-md); padding: 14px 18px; font-size: 0.84rem; color: var(--text-secondary); line-height: 1.65; margin-bottom: 40px; }
+    .risk-warning strong { color: #f59e0b; }
+    .log-empty { text-align: center; color: var(--text-muted); font-size: 0.9rem; padding: 32px 0; }
+
+    @media (max-width: 768px) { .controls-grid { grid-template-columns: 1fr; } .fib-levels { grid-template-columns: repeat(3, 1fr); } #btc-price-display { font-size: 1.7rem; } .sim-cards { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 480px) { .fib-levels { grid-template-columns: repeat(2, 1fr); } .btn-row { flex-direction: column; } .btn-sim { min-width: unset; } }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Centro Oculto</h1>
+    <p class="subtitle desktop-only"><i>Nem tudo que importa está visível.</i></p>
+    <a href="index.html" class="back-link">← Voltar para a página inicial</a>
+  </header>
+
+  <main style="max-width: 860px; margin: 0 auto;">
+
+    <div class="sim-hero">
+      <h2>⚡ Simulador BTC / Day Trade</h2>
+      <p>LLM analisa BTC em tempo real com Fibonacci + RSI + EMAs e raciocina sobre cada operação.</p>
+    </div>
+
+    <div class="btc-live">
+      <div class="btc-pulse"></div>
+      <span class="btc-price-label">BTC/USD</span>
+      <span id="btc-price-display">Carregando...</span>
+      <span id="btc-change-badge">—</span>
+      <span style="font-size:0.78rem;color:var(--text-muted);" id="last-update">—</span>
+    </div>
+
+    <div class="status-bar">
+      <div class="status-dot stopped" id="status-dot"></div>
+      <span id="status-text">Simulação parada. Configure e clique em Iniciar.</span>
+    </div>
+
+    <div class="sim-cards">
+      <div class="sim-card"><div class="sim-card-label">Patrimônio Total</div><div class="sim-card-value" id="card-total">R$ 500,00</div><div class="sim-card-sub" id="card-total-sub">capital inicial</div></div>
+      <div class="sim-card"><div class="sim-card-label">Saldo Livre</div><div class="sim-card-value" id="card-cash">R$ 500,00</div><div class="sim-card-sub">em reais (BRL)</div></div>
+      <div class="sim-card"><div class="sim-card-label">Em BTC</div><div class="sim-card-value" id="card-btc">0,000000</div><div class="sim-card-sub" id="card-btc-sub">≈ R$ 0,00</div></div>
+      <div class="sim-card"><div class="sim-card-label">Resultado</div><div class="sim-card-value" id="card-pnl">R$ 0,00</div><div class="sim-card-sub" id="card-pnl-pct">0,00%</div></div>
+      <div class="sim-card"><div class="sim-card-label">Operações</div><div class="sim-card-value" id="card-ops">0</div><div class="sim-card-sub" id="card-wins">0 lucros / 0 perdas</div></div>
+      <div class="sim-card"><div class="sim-card-label">Melhor Trade</div><div class="sim-card-value positive" id="card-best">—</div><div class="sim-card-sub" id="card-worst">pior: —</div></div>
+    </div>
+
+    <div class="chart-wrapper">
+      <div class="chart-header">
+        <span class="chart-title">Evolução do Patrimônio</span>
+        <div class="chart-legend">
+          <span><span class="legend-dot" style="background:#7c9cff;"></span>Patrimônio</span>
+          <span><span class="legend-dot" style="background:rgba(124,156,255,0.25);"></span>Capital Inicial</span>
+        </div>
+      </div>
+      <div style="position:relative;height:220px;">
+        <canvas id="patrimonio-chart" role="img" aria-label="Gráfico de evolução do patrimônio simulado">Evolução do patrimônio ao longo das operações simuladas.</canvas>
+      </div>
+    </div>
+
+    <!-- PAINEL DE ANÁLISE DO LLM -->
+    <div class="ia-analysis-panel">
+      <div class="ia-panel-header">
+        <div class="ia-panel-title">
+          <div class="ia-thinking-dot" id="ia-dot"></div>
+          ◈ Análise do LLM
+        </div>
+        <span class="ia-confidence-badge" id="ia-confidence-badge" style="display:none;"></span>
+      </div>
+      <div id="ia-analysis-text">Inicie a simulação para ver o raciocínio do modelo sobre o mercado de BTC em tempo real.</div>
+      <div class="ia-decision-bar">
+        <span class="ia-decision-label">Decisão</span>
+        <span class="ia-decision-value hold" id="ia-decision-value">—</span>
+        <span class="ia-cycle-info" id="ia-cycle-info">—</span>
+      </div>
+    </div>
+
+    <div class="indicators-row">
+      <div class="indicator-chip"><div class="ind-label">RSI (14)</div><div class="ind-value" id="ind-rsi">—</div><div class="ind-signal signal-neutral" id="ind-rsi-sig">aguardando</div></div>
+      <div class="indicator-chip"><div class="ind-label">EMA 9</div><div class="ind-value" id="ind-ema9">—</div><div class="ind-signal signal-neutral" id="ind-ema9-sig">—</div></div>
+      <div class="indicator-chip"><div class="ind-label">EMA 21</div><div class="ind-value" id="ind-ema21">—</div><div class="ind-signal signal-neutral" id="ind-ema21-sig">—</div></div>
+      <div class="indicator-chip"><div class="ind-label">MACD</div><div class="ind-value" id="ind-macd">—</div><div class="ind-signal signal-neutral" id="ind-macd-sig">—</div></div>
+      <div class="indicator-chip"><div class="ind-label">Confiança IA</div><div class="ind-value" id="ind-confidence" style="font-size:0.9rem;">—</div><div class="ind-signal signal-neutral" id="ind-confidence-sig">—</div></div>
+    </div>
+
+    <div class="fib-panel">
+      <div class="fib-title">◈ Níveis de Fibonacci (retração)</div>
+      <div class="fib-levels">
+        <div class="fib-level"><div class="fib-pct">0%</div><div class="fib-price" id="fib-0">—</div></div>
+        <div class="fib-level"><div class="fib-pct">23.6%</div><div class="fib-price" id="fib-236">—</div></div>
+        <div class="fib-level"><div class="fib-pct">38.2%</div><div class="fib-price" id="fib-382">—</div></div>
+        <div class="fib-level"><div class="fib-pct">50%</div><div class="fib-price" id="fib-50">—</div></div>
+        <div class="fib-level"><div class="fib-pct">61.8%</div><div class="fib-price" id="fib-618">—</div></div>
+        <div class="fib-level"><div class="fib-pct">100%</div><div class="fib-price" id="fib-100">—</div></div>
+      </div>
+      <div class="fib-signal-bar" id="fib-signal-bar">Fibonacci calculado com base nos últimos 50 preços coletados.</div>
+    </div>
+
+    <div class="sim-controls">
+      <div class="controls-title">Configuração da Simulação</div>
+      <div class="controls-grid">
+        <div class="ctrl-group"><label>Capital Inicial (R$)</label><input type="number" id="cfg-capital" value="500" min="100" max="100000" step="50"></div>
+        <div class="ctrl-group"><label>% por operação</label><select id="cfg-pct"><option value="0.1">10% do saldo</option><option value="0.2">20% do saldo</option><option value="0.3">30% do saldo</option><option value="0.5" selected>50% do saldo</option><option value="1.0">100% (all-in)</option></select></div>
+        <div class="ctrl-group"><label>Intervalo de análise</label><select id="cfg-interval"><option value="30000">30 segundos</option><option value="60000" selected>1 minuto</option><option value="120000">2 minutos</option><option value="300000">5 minutos</option></select></div>
+        <div class="ctrl-group"><label>Estratégia base</label><select id="cfg-strategy"><option value="fibonacci">Fibonacci + RSI</option><option value="ema">Cruzamento EMA</option><option value="macd">MACD Signal</option><option value="combined" selected>Combinada (todas)</option></select></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-sim" id="btn-start">▶ Iniciar</button>
+        <button class="btn-sim" id="btn-pause">⏸ Pausar</button>
+        <button class="btn-sim" id="btn-reset">↺ Zerar</button>
+      </div>
+    </div>
+
+    <div class="trade-log">
+      <div class="log-title">
+        <span>Log de Operações</span>
+        <span id="log-count" style="font-size:0.78rem;color:var(--text-muted);">0 entradas</span>
+      </div>
+      <div id="operations-log">
+        <div class="log-empty">Nenhuma operação ainda. Inicie a simulação para ver as decisões da IA.</div>
+      </div>
+    </div>
+
+    <div class="risk-warning">
+      <strong>⚠️ Simulação educacional.</strong> Este simulador usa dados reais do BTC mas opera em ambiente fictício, sem dinheiro real.
+      Estratégias de day trade têm alto risco. Nenhuma decisão financeira deve ser baseada nesta ferramenta.
+    </div>
+
+  </main>
+
+  <footer>
+    <p>Feito com <svg class="heart-svg" width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg> e JSON | <a href="https://centrooculto.com">Código-fonte</a></p>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+  <script>
+  const FUNCTION_URL = 'https://yegczfbshkctxedzkdpu.supabase.co/functions/v1/chat-openrouter';
+
+  const state = {
+    running:false, paused:false, capital:500, cash:500,
+    btcHeld:0, btcBuyPrice:0, prices:[], patrimonyHistory:[500],
+    operations:0, wins:0, losses:0, bestTrade:null, worstTrade:null,
+    currentPrice:null, prevPrice:null, intervalId:null, cycleCount:0,
+    logEntries:[],
+  };
+
+  const $=id=>document.getElementById(id);
+  let patriChart=null;
+
+  function initChart(){
+    const ctx=$('patrimonio-chart').getContext('2d');
+    if(patriChart)patriChart.destroy();
+    patriChart=new Chart(ctx,{
+      type:'line',
+      data:{labels:['0'],datasets:[
+        {label:'Patrimônio',data:[state.capital],borderColor:'#7c9cff',backgroundColor:'rgba(124,156,255,0.10)',borderWidth:2,fill:true,tension:0.4,pointRadius:0,pointHoverRadius:4},
+        {label:'Inicial',data:[state.capital],borderColor:'rgba(124,156,255,0.28)',borderWidth:1,borderDash:[6,4],fill:false,tension:0,pointRadius:0}
+      ]},
+      options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+        scales:{
+          x:{ticks:{color:'#6b7280',font:{size:10},maxTicksLimit:8},grid:{color:'rgba(255,255,255,0.05)'}},
+          y:{ticks:{color:'#6b7280',font:{size:10},callback:v=>'R$'+v.toLocaleString('pt-BR',{minimumFractionDigits:0})},grid:{color:'rgba(255,255,255,0.05)'}}
+        }
+      }
+    });
+  }
+
+  function updateChart(){
+    if(!patriChart)return;
+    patriChart.data.labels=state.patrimonyHistory.map((_,i)=>String(i));
+    patriChart.data.datasets[0].data=[...state.patrimonyHistory];
+    patriChart.data.datasets[1].data=state.patrimonyHistory.map(()=>state.capital);
+    patriChart.update('none');
+  }
+
+  async function fetchBTCPrice(){
+    try{
+      const res=await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd,brl&include_24hr_change=true');
+      const d=await res.json();
+      return{usd:d.bitcoin.usd,brl:d.bitcoin.brl,change:d.bitcoin.usd_24h_change};
+    }catch{
+      if(state.prices.length>0){const l=state.prices[state.prices.length-1];const delta=(Math.random()-0.495)*200;return{usd:l+delta,brl:(l+delta)*5.8,change:0};}
+      return null;
+    }
+  }
+
+  function calcEMA(prices,period){
+    if(prices.length<period)return null;
+    const k=2/(period+1);let ema=prices.slice(0,period).reduce((a,b)=>a+b,0)/period;
+    for(let i=period;i<prices.length;i++)ema=prices[i]*k+ema*(1-k);
+    return ema;
+  }
+  function calcRSI(prices,period=14){
+    if(prices.length<period+1)return null;
+    const recent=prices.slice(-(period+1));let gains=0,losses=0;
+    for(let i=1;i<recent.length;i++){const d=recent[i]-recent[i-1];if(d>0)gains+=d;else losses-=d;}
+    const ag=gains/period,al=losses/period;
+    if(al===0)return 100;return 100-100/(1+ag/al);
+  }
+  function calcMACD(prices){const e12=calcEMA(prices,12),e26=calcEMA(prices,26);if(!e12||!e26)return null;return e12-e26;}
+  function calcFib(prices){
+    if(prices.length<10)return null;
+    const s=prices.slice(-50),h=Math.max(...s),l=Math.min(...s),d=h-l;
+    return{level0:h,level236:h-d*0.236,level382:h-d*0.382,level50:h-d*0.5,level618:h-d*0.618,level100:l};
+  }
+  function fibSig(price,fib){
+    if(!fib)return'neutro';
+    if(price<=fib.level618*1.002)return'compra forte (suporte 61.8%)';
+    if(price<=fib.level50*1.002)return'compra (suporte 50%)';
+    if(price<=fib.level382*1.002)return'compra leve (suporte 38.2%)';
+    if(price>=fib.level236*0.998)return'venda (resistência 23.6%)';
+    return'neutro';
+  }
+
+  async function requestLLM(ind){
+    const{price,change,rsi,ema9,ema21,macd,fib,fs}=ind;
+    const total=state.cash+state.btcHeld*price;
+    try{
+      const res=await fetch(FUNCTION_URL,{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({
+          action:'btc-analysis',
+          marketData:{
+            price,priceChange24h:change,rsi,ema9,ema21,macd,fibonacci:fib,fibSignal:fs,
+            strategy:$('cfg-strategy').value,
+            position:{held:state.btcHeld>0.000001,btcQty:state.btcHeld,buyPrice:state.btcBuyPrice,cashBRL:state.cash},
+            recentPrices:state.prices.slice(-10),
+            lastTrades:state.logEntries.slice(-3),
+            patrimony:total,capital:state.capital,
+          }
+        })
+      });
+      if(!res.ok)throw new Error('HTTP '+res.status);
+      return await res.json();
+    }catch(e){console.error('LLM error:',e);return null;}
+  }
+
+  async function typeText(el,text,speed=10){
+    el.textContent='';el.classList.add('typing-cursor');
+    for(let i=0;i<text.length;i++){el.textContent+=text[i];if(i%4===0)await new Promise(r=>setTimeout(r,speed));}
+    el.classList.remove('typing-cursor');
+  }
+
+  function executeOp(action,price){
+    const pct=parseFloat($('cfg-pct').value);
+    let fa=action,pnl=null;const FEE=0.001;
+    if(fa==='buy'&&state.cash<10)fa='hold';
+    if(fa==='sell'&&state.btcHeld<0.000001)fa='hold';
+    if(fa==='buy'){const inv=state.cash*pct;state.cash-=inv;state.btcHeld+=(inv*(1-FEE))/price;state.btcBuyPrice=price;}
+    if(fa==='sell'){
+      const rev=state.btcHeld*price,net=rev*(1-FEE);
+      pnl=net-(state.btcHeld*state.btcBuyPrice);state.cash+=net;state.btcHeld=0;
+      if(pnl>0){state.wins++;if(state.bestTrade===null||pnl>state.bestTrade)state.bestTrade=pnl;}
+      else{state.losses++;if(state.worstTrade===null||pnl<state.worstTrade)state.worstTrade=pnl;}
+    }
+    if(fa!=='hold')state.operations++;
+    const tot=state.cash+state.btcHeld*price;
+    state.patrimonyHistory.push(parseFloat(tot.toFixed(2)));
+    return{action:fa,pnl,tot};
+  }
+
+  function updatePriceUI(pd){
+    const el=$('btc-price-display');
+    el.textContent='$'+pd.usd.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+    el.classList.remove('up','down');
+    if(state.prevPrice!==null)el.classList.add(pd.usd>state.prevPrice?'up':'down');
+    const b=$('btc-change-badge');
+    b.textContent=(pd.change>=0?'+':'')+pd.change.toFixed(2)+'% (24h)';
+    b.classList.toggle('down',pd.change<0);
+    $('last-update').textContent='atualizado '+new Date().toLocaleTimeString('pt-BR');
+  }
+
+  function updateCards(price){
+    const tot=state.cash+state.btcHeld*price,pnl=tot-state.capital,pct=(pnl/state.capital)*100;
+    $('card-total').textContent='R$ '+tot.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+    $('card-total').className='sim-card-value'+(pnl>0?' positive':pnl<0?' negative':'');
+    $('card-total-sub').textContent='inicial: R$ '+state.capital.toLocaleString('pt-BR',{minimumFractionDigits:2});
+    $('card-cash').textContent='R$ '+state.cash.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+    $('card-btc').textContent=state.btcHeld.toFixed(6);
+    $('card-btc-sub').textContent='≈ R$ '+(state.btcHeld*price).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+    $('card-pnl').textContent=(pnl>=0?'+':'')+' R$ '+pnl.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
+    $('card-pnl').className='sim-card-value'+(pnl>0?' positive':pnl<0?' negative':'');
+    $('card-pnl-pct').textContent=(pct>=0?'+':'')+pct.toFixed(2)+'%';
+    $('card-ops').textContent=state.operations;
+    $('card-wins').textContent=state.wins+' lucros / '+state.losses+' perdas';
+    $('card-best').textContent=state.bestTrade!==null?'+R$ '+state.bestTrade.toFixed(2):'—';
+    $('card-worst').textContent=state.worstTrade!==null?'pior: R$ '+state.worstTrade.toFixed(2):'pior: —';
+  }
+
+  function updateIndicators(rsi,ema9,ema21,macd,conf){
+    const fmt=v=>v!=null?v.toFixed(2):'—';
+    const fmtP=v=>v?'$'+Math.round(v).toLocaleString('en-US'):'—';
+    $('ind-rsi').textContent=fmt(rsi);
+    const rs=rsi?(rsi<35?'sobrevenda':rsi>65?'sobrecompra':'neutro'):'—';
+    $('ind-rsi-sig').textContent=rs;
+    $('ind-rsi-sig').className='ind-signal '+(rs==='sobrevenda'?'signal-buy':rs==='sobrecompra'?'signal-sell':'signal-hold');
+    $('ind-ema9').textContent=fmtP(ema9);$('ind-ema21').textContent=fmtP(ema21);
+    if(ema9&&ema21){
+      const up=ema9>ema21;
+      $('ind-ema9-sig').textContent=up?'acima EMA21':'abaixo EMA21';$('ind-ema9-sig').className='ind-signal '+(up?'signal-buy':'signal-sell');
+      $('ind-ema21-sig').textContent=up?'tendência alta':'tendência baixa';$('ind-ema21-sig').className='ind-signal '+(up?'signal-buy':'signal-sell');
+    }
+    $('ind-macd').textContent=fmt(macd);
+    if(macd!=null){$('ind-macd-sig').textContent=macd>0?'positivo':'negativo';$('ind-macd-sig').className='ind-signal '+(macd>0?'signal-buy':'signal-sell');}
+    if(conf){
+      $('ind-confidence').textContent=conf;
+      $('ind-confidence-sig').textContent=conf==='alta'?'sinal forte':conf==='média'?'sinal moderado':'sinal fraco';
+      $('ind-confidence-sig').className='ind-signal '+(conf==='alta'?'signal-buy':conf==='média'?'signal-hold':'signal-sell');
+    }
+  }
+
+  function updateFib(fib,fs){
+    if(!fib)return;
+    const f=v=>'$'+Math.round(v).toLocaleString('en-US');
+    $('fib-0').textContent=f(fib.level0);$('fib-236').textContent=f(fib.level236);
+    $('fib-382').textContent=f(fib.level382);$('fib-50').textContent=f(fib.level50);
+    $('fib-618').textContent=f(fib.level618);$('fib-100').textContent=f(fib.level100);
+    $('fib-signal-bar').textContent='◈ Sinal Fibonacci: '+(fs||'neutro');
+  }
+
+  function updateIAPanel(analysis,decision,confidence){
+    const clean=analysis.replace(/DECISÃO:\s*(COMPRAR|VENDER|AGUARDAR)\s*\|\s*CONFIANÇA:\s*(baixa|média|alta)/gi,'').trim();
+    typeText($('ia-analysis-text'),clean,10);
+    const dEl=$('ia-decision-value');
+    dEl.textContent=decision==='buy'?'COMPRAR':decision==='sell'?'VENDER':'AGUARDAR';
+    dEl.className='ia-decision-value '+(decision==='buy'?'buy':decision==='sell'?'sell':'hold');
+    const cb=$('ia-confidence-badge');
+    const confClass=confidence==='média'?'media':confidence||'baixa';
+    cb.textContent='confiança: '+(confidence||'—');
+    cb.className='ia-confidence-badge '+confClass;
+    cb.style.display='inline-block';
+    $('ia-cycle-info').textContent='ciclo #'+state.cycleCount+' — '+new Date().toLocaleTimeString('pt-BR');
+  }
+
+  function addLog(action,price,pnl,analysis){
+    const logDiv=$('operations-log');
+    const empty=logDiv.querySelector('.log-empty');if(empty)empty.remove();
+    const entry=document.createElement('div');
+    entry.className='log-entry '+(action==='buy'?'buy':action==='sell'?'sell':'hold');
+    const at=action==='buy'?'BUY':action==='sell'?'SELL':'HOLD';
+    const time=new Date().toLocaleTimeString('pt-BR');
+    const pnlTxt=pnl!==null?((pnl>=0?'+R$ ':'R$ ')+pnl.toFixed(2)):'';
+    const short=analysis?analysis.replace(/DECISÃO:.*$/gim,'').trim().split('.').slice(0,2).join('.').trim()+'.':'';
+    entry.innerHTML=`
+      <div class="log-entry-top">
+        <span class="log-action">${at}</span>
+        <span class="log-details">$${Math.round(price).toLocaleString('en-US')} · ${time}</span>
+        <span class="log-pnl ${pnl!==null&&pnl>=0?'pos':'neg'}">${pnlTxt}</span>
+      </div>
+      ${short?`<div class="log-ia-comment">${short}</div>`:''}
+    `;
+    logDiv.insertBefore(entry,logDiv.firstChild);
+    state.logEntries.push({action,price,pnlBRL:pnl,reason:short,time});
+    $('log-count').textContent=state.logEntries.length+' entradas';
+  }
+
+  function setStatus(mode){
+    $('status-dot').className='status-dot '+mode;
+    $('status-text').textContent=
+      mode==='running'?'Simulação em execução — LLM analisando BTC...':
+      mode==='paused'?'Simulação pausada.':
+      'Simulação parada. Configure e clique em Iniciar.';
+  }
+
+  async function cycle(){
+    if(!state.running||state.paused)return;
+    state.cycleCount++;
+
+    const pd=await fetchBTCPrice();if(!pd)return;
+    const{usd:price,change}=pd;
+    state.prevPrice=state.currentPrice;state.currentPrice=price;
+    state.prices.push(price);if(state.prices.length>200)state.prices.shift();
+
+    updatePriceUI(pd);
+
+    const rsi=calcRSI(state.prices),ema9=calcEMA(state.prices,9),ema21=calcEMA(state.prices,21),macd=calcMACD(state.prices);
+    const fib=calcFib(state.prices),fs=fib?fibSig(price,fib):'neutro';
+
+    updateIndicators(rsi,ema9,ema21,macd,null);
+    if(fib)updateFib(fib,fs);
+
+    if(state.prices.length<15){
+      $('ia-analysis-text').textContent=`Coletando dados... (${state.prices.length}/15 preços)`;
+      state.patrimonyHistory.push(parseFloat((state.cash+state.btcHeld*price).toFixed(2)));
+      updateCards(price);updateChart();return;
+    }
+
+    $('ia-dot').classList.add('active');
+    $('ia-analysis-text').classList.add('loading');
+    $('ia-analysis-text').textContent='Analisando mercado...';
+
+    const llm=await requestLLM({price,change,rsi,ema9,ema21,macd,fib,fs});
+
+    $('ia-dot').classList.remove('active');
+    $('ia-analysis-text').classList.remove('loading');
+
+    const decision=llm?.decision||'hold';
+    const confidence=llm?.confidence||'baixa';
+    const analysis=llm?.analysis||'Não foi possível obter análise neste ciclo.';
+
+    updateIAPanel(analysis,decision,confidence);
+    updateIndicators(rsi,ema9,ema21,macd,confidence);
+
+    const result=executeOp(decision,price);
+
+    if(result.action!=='hold'||state.cycleCount%3===0){
+      addLog(result.action,price,result.pnl,analysis);
+    }
+
+    updateCards(price);updateChart();
+  }
+
+  $('btn-start').addEventListener('click',()=>{
+    if(state.running&&!state.paused)return;
+    if(!state.running){
+      const cap=parseFloat($('cfg-capital').value)||500;
+      Object.assign(state,{capital:cap,cash:cap,btcHeld:0,btcBuyPrice:0,operations:0,wins:0,losses:0,bestTrade:null,worstTrade:null,patrimonyHistory:[cap],logEntries:[],cycleCount:0,prices:[],currentPrice:null,prevPrice:null});
+      $('operations-log').innerHTML='<div class="log-empty">Carregando dados do mercado...</div>';
+      $('log-count').textContent='0 entradas';
+      $('ia-analysis-text').textContent='Aguardando dados suficientes para análise...';
+      $('ia-confidence-badge').style.display='none';
+      initChart();
+    }
+    state.running=true;state.paused=false;setStatus('running');
+    const interval=parseInt($('cfg-interval').value);
+    clearInterval(state.intervalId);
+    state.intervalId=setInterval(cycle,interval);
+    cycle();
+  });
+
+  $('btn-pause').addEventListener('click',()=>{
+    if(!state.running)return;
+    state.paused=!state.paused;
+    $('btn-pause').textContent=state.paused?'▶ Retomar':'⏸ Pausar';
+    setStatus(state.paused?'paused':'running');
+  });
+
+  $('btn-reset').addEventListener('click',()=>{
+    clearInterval(state.intervalId);
+    const cap=parseFloat($('cfg-capital').value)||500;
+    Object.assign(state,{running:false,paused:false,capital:cap,cash:cap,btcHeld:0,btcBuyPrice:0,prices:[],currentPrice:null,prevPrice:null,operations:0,wins:0,losses:0,bestTrade:null,worstTrade:null,patrimonyHistory:[cap],logEntries:[],cycleCount:0});
+    $('btn-pause').textContent='⏸ Pausar';
+    $('operations-log').innerHTML='<div class="log-empty">Nenhuma operação ainda. Inicie a simulação para ver as decisões da IA.</div>';
+    $('log-count').textContent='0 entradas';
+    $('btc-price-display').textContent='Carregando...';$('btc-change-badge').textContent='—';
+    $('ia-analysis-text').textContent='Inicie a simulação para ver o raciocínio do modelo sobre o mercado de BTC em tempo real.';
+    $('ia-confidence-badge').style.display='none';
+    $('ia-decision-value').textContent='—';$('ia-decision-value').className='ia-decision-value hold';
+    $('ia-cycle-info').textContent='—';
+    setStatus('stopped');initChart();updateCards(0);
+  });
+
+  (async()=>{const d=await fetchBTCPrice();if(d){updatePriceUI(d);state.currentPrice=d.usd;}})();
+  setInterval(async()=>{if(!state.running){const d=await fetchBTCPrice();if(d){state.prevPrice=state.currentPrice;state.currentPrice=d.usd;updatePriceUI(d);}}},15000);
+
+  initChart();setStatus('stopped');
+  </script>
+</body>
+</html>
