@@ -306,14 +306,14 @@
     if (prevPrice !== null && price > 0) priceEl.classList.add(price>prevPrice?'up':'down');
     prevPrice = price;
 
-    const ch = parseFloat(s.price_change24h||0);
+    const ch = parseFloat(s.price_change24h || 0);
     const chEl = $('btc-change');
-    chEl.textContent=(ch>=0?'+':'')+ch.toFixed(2)+'% (24h)';
-    chEl.classList.toggle('down', ch<0);
-    chEl.className='';
-    chEl.classList.add(ch<0?'down':'');
-    // reaplica estilo inline pois a classe badge não existe
-    chEl.style.cssText=`font-family:'JetBrains Mono',monospace;font-size:.85rem;font-weight:600;padding:3px 11px;border-radius:999px;background:${ch>=0?'rgba(16,185,129,0.12)':'rgba(239,68,68,0.12)'};color:${ch>=0?'#10b981':'#ef4444'};border:1px solid ${ch>=0?'rgba(16,185,129,0.24)':'rgba(239,68,68,0.24)'}`;
+    chEl.textContent = (ch >= 0 ? '+' : '') + ch.toFixed(2) + '% (24h)';
+    if (ch < 0) {
+      chEl.classList.add('down');
+    } else {
+      chEl.classList.remove('down');
+    }
 
     // Cards
     $('c-total').textContent     = brl(total);
@@ -427,51 +427,58 @@
   //  CARGA INICIAL
   // ══════════════════════════════════════════════════════════
   async function loadInitial() {
+    // ── 1. Estado do simulador ──
     try {
-      // Estado
-      const { data: stateRows } = await sb.from('btc_simulator_state').select('*').eq('id',1).single();
-      if (stateRows) applyState(stateRows);
+      const { data, error } = await sb
+        .from('btc_simulator_state')
+        .select('*')
+        .eq('id', 1)
+        .maybeSingle();
+      if (error) throw error;
+      if (data) {
+        applyState(data);
+        $('status-left').textContent = '● Conectado — robô em operação';
+      } else {
+        $('status-left').textContent = '○ Aguardando primeiro ciclo do robô...';
+      }
+    } catch (e) {
+      console.error('Erro ao carregar estado:', e);
+      $('status-left').textContent = '✗ Erro ao carregar estado: ' + e.message;
+    }
 
-      // Histórico de preços para gráfico + Fibonacci
+    // ── 2. Histórico de preços → Fibonacci ──
+    try {
       const { data: priceRows } = await sb
         .from('btc_price_history')
-        .select('price_usd, recorded_at')
+        .select('price_usd')
         .order('recorded_at', { ascending: true })
         .limit(150);
       if (priceRows && priceRows.length > 0) {
-        const prices = priceRows.map(r => parseFloat(r.price_usd));
-        // Reconstrói histórico de patrimônio (aproximado) para o gráfico
-        updateFibUI(prices);
+        updateFibUI(priceRows.map(r => parseFloat(r.price_usd)));
       }
+    } catch (e) {
+      console.error('Erro ao carregar preços:', e);
+    }
 
-      // Log inicial (últimas 80 operações)
+    // ── 3. Log de operações ──
+    try {
       const { data: ops } = await sb
         .from('btc_operations_log')
         .select('*')
         .order('created_at', { ascending: false })
         .limit(80);
-
       const scroll = $('log-scroll');
       scroll.innerHTML = '';
-
       if (ops && ops.length > 0) {
-        ops.forEach(op => addLogEntry(op, false)); // false = append (já vêm desc, adicionamos em ordem)
+        ops.forEach(op => addLogEntry(op, false));
         $('log-count').textContent = ops.length + '+ entradas';
-
-        // Atualiza LLM com a mais recente que tiver análise
         const withLLM = ops.find(o => o.llm_analysis);
         if (withLLM) applyLastLLM(withLLM);
       } else {
         scroll.innerHTML = '<div class="log-empty">Aguardando primeira operação do robô...</div>';
       }
-
-      $('status-left').textContent = '● Conectado ao Supabase Realtime';
-
     } catch (e) {
-      console.error('Erro na carga inicial:', e);
-      $('status-left').textContent = '✗ Erro ao carregar dados';
-      $('live-badge').className = 'live-badge offline';
-      $('live-badge').innerHTML = '<div class="live-dot"></div>offline';
+      console.error('Erro ao carregar log:', e);
     }
   }
 
