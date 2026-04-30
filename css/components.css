@@ -1,71 +1,471 @@
 /* ==========================================================================
-   COMPONENTS.CSS
-   Componentes reutilizáveis: posts, botões, tags, banners, links e imagens
+   COMPONENTS.CSS — Centro Oculto
+   Cards full-image 2 colunas + overlay deslizante + componentes globais
    ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,300;0,400;0,600;0,700;0,800;0,900;1,400;1,700&family=DM+Serif+Display:ital@0;1&family=Barlow:wght@300;400;500&display=swap');
 
 /* ==========================================================================
-   CARDS E POSTS
+   TIPOGRAFIA GLOBAL — OVERRIDE
+   Barlow Condensed como voz principal, DM Serif Display como acento
    ========================================================================== */
 
-article {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0.012));
-  padding: 32px;
-  margin-bottom: 48px;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-soft);
-  backdrop-filter: blur(10px);
-  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+h1 {
+  font-family: 'Barlow Condensed', sans-serif !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.05em !important;
+  text-transform: uppercase;
 }
 
-article:hover {
-  transform: translateY(-4px);
-  border-color: rgba(124, 156, 255, 0.22);
-  box-shadow: var(--shadow-strong);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.015));
+h2 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
+
+h3 {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.subtitle,
+header .subtitle {
+  font-family: 'DM Serif Display', serif !important;
+  font-style: italic !important;
+  font-weight: 400 !important;
+  letter-spacing: 0.01em !important;
+  color: var(--accent) !important;
+  opacity: 1 !important;
+}
+
+/* ==========================================================================
+   GRID DE POSTS — 2 COLUNAS
+   ========================================================================== */
+
+.posts-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+  margin-bottom: 12px;
+}
+
+/* Primeiro card (hero): ocupa as 2 colunas se tiver imagem */
+.pc-hero {
+  grid-column: span 2;
+}
+
+.pc-hero .pc-img-wrap {
+  aspect-ratio: 21 / 9;
+}
+
+.pc-grid-item {
+  grid-column: span 1;
+}
+
+/* ==========================================================================
+   CARD FULL-IMAGE
+   ========================================================================== */
 
 .post-card {
   background: var(--card-bg);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   overflow: hidden;
-  padding: 20px;
-  margin-bottom: 28px;
+  margin-bottom: 0;
   box-shadow: var(--shadow-soft);
-  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+  transition: box-shadow 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
 }
 
 .post-card:hover {
-  transform: translateY(-4px);
-  background: var(--card-bg-hover);
+  border-color: rgba(124, 156, 255, 0.28);
+  box-shadow: var(--shadow-strong);
+  transform: translateY(-3px);
+}
+
+/* Link que envolve o card inteiro */
+.pc-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  height: 100%;
+}
+
+/* Wrapper da imagem com overlay */
+.pc-img-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: #0d1220;
+}
+
+.pc-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.55s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.post-card:hover .pc-img {
+  transform: scale(1.05);
+}
+
+/* Badge "Recente" */
+.pc-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 4px;
+  background: rgba(16, 185, 129, 0.18);
+  border: 1px solid rgba(16, 185, 129, 0.32);
+  color: #6ee7b7;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  backdrop-filter: blur(6px);
+}
+
+/* Overlay padrão (repouso) — barra fumê na base */
+.pc-overlay-default {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  padding: 32px 16px 14px;
+  background: linear-gradient(to top,
+    rgba(5, 7, 14, 0.88) 0%,
+    rgba(5, 7, 14, 0.50) 55%,
+    transparent 100%
+  );
+  transition: opacity 0.32s ease, transform 0.32s ease;
+}
+
+.post-card:hover .pc-overlay-default {
+  opacity: 0;
+  transform: translateY(6px);
+  pointer-events: none;
+}
+
+/* Overlay hover — painel completo que sobe de baixo */
+.pc-overlay-hover {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 3;
+  padding: 16px;
+  background: rgba(4, 6, 13, 0.92);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-top: 1px solid rgba(124, 156, 255, 0.18);
+  transform: translateY(100%);
+  transition: transform 0.36s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.post-card:hover .pc-overlay-hover {
+  transform: translateY(0);
+}
+
+/* Labels de tag dentro dos overlays */
+.pc-tag-label {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 7px;
+}
+
+.pc-pill {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 3px;
+  background: rgba(124, 156, 255, 0.14);
+  color: var(--accent);
+  border: 1px solid rgba(124, 156, 255, 0.2);
+}
+
+/* Título nos overlays */
+.pc-title {
+  font-family: 'Barlow Condensed', sans-serif !important;
+  font-size: 1.1rem !important;
+  font-weight: 800 !important;
+  line-height: 1.2 !important;
+  color: #f0f4fa !important;
+  text-transform: uppercase;
+  letter-spacing: 0.03em !important;
+  margin: 0 !important;
+}
+
+/* Excerpt no hover */
+.pc-excerpt {
+  font-family: 'DM Serif Display', serif;
+  font-style: italic;
+  font-size: 0.83rem;
+  line-height: 1.5;
+  color: #9aafcc;
+  margin: 8px 0 10px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Meta: data + CTA */
+.pc-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 8px;
+  border-top: 1px solid rgba(124, 156, 255, 0.1);
+}
+
+.pc-date {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  color: #5c7088;
+  text-transform: uppercase;
+}
+
+.pc-cta {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  transition: color 0.2s;
+}
+
+.post-card:hover .pc-cta {
+  color: #a5baff;
+}
+
+/* ==========================================================================
+   CARD TEXTUAL (sem imagem)
+   ========================================================================== */
+
+.pc-text-card {
+  display: block;
+  position: relative;
+  min-height: 180px;
+}
+
+.pc-text-inner {
+  padding: 22px 20px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  height: 100%;
+}
+
+.pc-badge-text {
+  position: relative;
+  top: auto;
+  left: auto;
+  margin-bottom: 2px;
+  align-self: flex-start;
+}
+
+.pc-title-text {
+  font-family: 'Barlow Condensed', sans-serif !important;
+  font-size: 1.25rem !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.03em !important;
+  text-transform: uppercase;
+  color: var(--text-primary) !important;
+  line-height: 1.2 !important;
+  margin: 0 !important;
+  transition: color 0.22s ease;
+}
+
+.pc-link:hover .pc-title-text {
+  color: var(--accent) !important;
+}
+
+.pc-excerpt-text {
+  font-family: 'DM Serif Display', serif;
+  font-style: italic;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--text-secondary);
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  flex: 1;
+}
+
+.pc-meta-text {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-color);
+  margin-top: auto;
+}
+
+/* ==========================================================================
+   TAGS GLOBAIS (usadas fora dos cards)
+   ========================================================================== */
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tags span {
+  background: var(--accent-soft);
+  color: var(--accent);
+  padding: 5px 12px;
+  border: 1px solid rgba(124, 156, 255, 0.18);
+  border-radius: 4px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* ==========================================================================
+   BOTÕES E LINKS DE AÇÃO
+   ========================================================================== */
+
+.read-more,
+.share-btn {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  border: 1px solid rgba(124, 156, 255, 0.18);
+  text-decoration: none;
+  border-radius: 6px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  display: inline-block;
+  transition: background 0.22s ease, color 0.22s ease, border-color 0.22s ease,
+              transform 0.22s ease, box-shadow 0.22s ease;
+  cursor: pointer;
+}
+
+.read-more:hover,
+.share-btn:hover {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+  box-shadow: 0 10px 30px rgba(124, 156, 255, 0.22);
+  transform: translateY(-1px);
+}
+
+.share-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.back-link {
+  display: inline-block;
+  margin: 20px 0;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 0.22s ease, transform 0.22s ease;
+}
+
+.back-link:hover {
+  color: var(--text-primary);
+  transform: translateX(-3px);
+}
+
+.back-link-post {
+  background: none;
+  border: none;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  cursor: pointer;
+  text-decoration: none;
+  padding: 0;
+  transition: color 0.22s ease, transform 0.22s ease;
+}
+
+.back-link-post:hover {
+  color: var(--text-primary);
+  transform: translateX(-3px);
+}
+
+/* Botão carregar mais */
+.load-more-button {
+  display: block;
+  width: fit-content;
+  min-width: 200px;
+  margin: 36px auto 60px;
+  padding: 12px 36px;
+  text-align: center;
+}
+
+.end-of-list-message {
+  margin: 48px 0 80px;
+  text-align: center;
+  color: var(--text-muted);
+  font-family: 'DM Serif Display', serif;
+  font-style: italic;
+  font-size: 1.05rem;
+}
+
+/* ==========================================================================
+   ARTICLE — PÁGINA DE POST
+   ========================================================================== */
+
+article {
+  background: linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.012));
+  padding: 32px;
+  margin-bottom: 48px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(10px);
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+article:hover {
+  transform: translateY(-3px);
   border-color: rgba(124, 156, 255, 0.22);
   box-shadow: var(--shadow-strong);
-}
-
-.post-card h2 {
-  font-size: 1.4rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  color: var(--text-primary);
-}
-
-.post-card img {
-  width: 100%;
-  max-height: 280px;
-  height: auto;
-  display: block;
-  object-fit: cover;
-  border-radius: 12px;
 }
 
 .post-content {
   padding: 24px 20px 32px;
 }
 
-.post-content p {
-  margin: 14px 0;
-}
+.post-content p { margin: 14px 0; }
 
 .post-content ul,
 .post-content ol,
@@ -98,141 +498,6 @@ article:hover {
   box-shadow: var(--shadow-soft);
 }
 
-.post-thumb-wrap {
-  position: relative;
-  margin-bottom: 18px;
-}
-
-.post-thumb-wrap img {
-  width: 100%;
-  max-height: 280px;
-  height: auto;
-  display: block;
-  object-fit: cover;
-  border-radius: 12px;
-}
-
-.post-badge-fresh {
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  z-index: 2;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border-radius: 999px;
-  background: rgba(16, 185, 129, 0.16);
-  border: 1px solid rgba(16, 185, 129, 0.28);
-  color: #a7f3d0;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  backdrop-filter: blur(8px);
-  box-shadow: 0 10px 24px rgba(16, 185, 129, 0.14);
-}
-
-/* ==========================================================================
-   TAGS
-   ========================================================================== */
-
-.tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.tags span {
-  background: var(--accent-soft);
-  color: var(--accent);
-  padding: 6px 14px;
-  border: 1px solid rgba(124, 156, 255, 0.18);
-  border-radius: 999px;
-  font-size: 0.84rem;
-  font-weight: 500;
-}
-
-/* ==========================================================================
-   BOTÕES E LINKS DE AÇÃO
-   ========================================================================== */
-
-.read-more,
-.share-btn {
-  margin-top: 20px;
-  padding: 10px 18px;
-  background: var(--accent-soft);
-  color: var(--accent);
-  border: 1px solid rgba(124, 156, 255, 0.18);
-  text-decoration: none;
-  border-radius: 10px;
-  font-weight: 600;
-  display: inline-block;
-  transition: background 0.22s ease, color 0.22s ease, border-color 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease;
-  cursor: pointer;
-}
-
-.read-more:hover,
-.share-btn:hover {
-  background: var(--accent);
-  color: #fff;
-  border-color: var(--accent);
-  box-shadow: 0 10px 30px rgba(124, 156, 255, 0.22);
-  transform: translateY(-1px);
-}
-
-.share-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.95rem;
-}
-
-.back-link {
-  display: inline-block;
-  margin: 20px 0;
-  color: var(--text-secondary);
-  text-decoration: none;
-  transition: color 0.22s ease, transform 0.22s ease;
-}
-
-.back-link:hover {
-  color: var(--text-primary);
-  transform: translateX(-2px);
-}
-
-.back-link-post {
-  background: none;
-  border: none;
-  color: var(--text-secondary);
-  cursor: pointer;
-  font-size: inherit;
-  text-decoration: none;
-  padding: 0;
-  transition: color 0.22s ease, transform 0.22s ease;
-}
-
-.back-link-post:hover {
-  color: var(--text-primary);
-  transform: translateX(-2px);
-}
-
-/* Botão carregar mais */
-.load-more-button {
-  display: block;
-  width: fit-content;
-  min-width: 180px;
-  margin: 48px auto 80px;
-  padding: 12px 32px;
-  text-align: center;
-}
-
-.end-of-list-message {
-  margin: 60px 0 100px;
-  text-align: center;
-  color: var(--text-muted);
-  font-size: 1.05rem;
-}
-
 /* ==========================================================================
    HEADER DO POST
    ========================================================================== */
@@ -252,21 +517,11 @@ article:hover {
 .post-header time {
   display: block;
   color: var(--text-muted);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
+  font-family: 'Barlow Condensed', sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   margin-bottom: 16px;
-}
-
-/* ==========================================================================
-   CONTADOR DE VISITAS
-   ========================================================================== */
-
-.visitor-counter {
-  margin-top: 18px;
-  text-align: center;
-}
-
-.visitor-counter a {
-  display: inline-flex;
 }
 
 /* ==========================================================================
@@ -275,22 +530,22 @@ article:hover {
 
 .tag-mode-banner {
   text-align: center;
-  margin: 40px 0 60px;
+  margin: 0 0 28px;
   padding: 28px 20px;
   border: 1px solid var(--border-strong);
   border-radius: var(--radius-lg);
   background:
-    radial-gradient(circle at top right, rgba(124, 156, 255, 0.10), transparent 40%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0.015));
+    radial-gradient(circle at top right, rgba(124,156,255,0.10), transparent 40%),
+    linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.015));
   backdrop-filter: blur(8px);
   box-shadow: var(--shadow-soft);
+  grid-column: span 2;
 }
 
 .tag-mode-banner h2 {
-  font-size: 2rem;
+  font-size: 1.8rem;
   color: var(--text-primary);
-  margin: 0 0 14px;
-  letter-spacing: -0.02em;
+  margin: 0 0 10px;
 }
 
 .tag-mode-banner p {
@@ -300,80 +555,23 @@ article:hover {
   line-height: 1.7;
 }
 
-body.tag-mode article {
-  border-left: 3px solid var(--accent);
-  padding-left: 36px;
-}
-
 .outdated-banner {
-  background: rgba(245, 158, 11, 0.10);
-  border: 1px solid rgba(245, 158, 11, 0.28);
-  border-radius: 12px;
+  background: rgba(245,158,11,0.10);
+  border: 1px solid rgba(245,158,11,0.28);
+  border-radius: 10px;
   padding: 16px 20px;
   margin: 24px 0 32px;
   color: var(--text-primary);
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   line-height: 1.6;
   text-align: center;
   backdrop-filter: blur(8px);
-  box-shadow: 0 10px 30px rgba(245, 158, 11, 0.12);
 }
 
-.outdated-banner strong {
-  color: #f59e0b;
-}
+.outdated-banner strong { color: #f59e0b; }
 
 /* ==========================================================================
-   LINKS SOCIAIS E ÍCONES
-   ========================================================================== */
-
-.icon-svg {
-  display: inline-block;
-  vertical-align: middle;
-  margin-right: 8px;
-  transition: transform 0.22s ease, opacity 0.22s ease, filter 0.22s ease;
-}
-
-a:hover .icon-svg {
-  filter: drop-shadow(0 0 8px rgba(124, 156, 255, 0.18));
-}
-
-.social-links {
-  margin: 0 0 12px;
-  text-align: center;
-  font-size: 1rem;
-}
-
-.social-link {
-  margin-right: 12px;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  color: var(--text-secondary);
-  text-decoration: none;
-  transition: color 0.22s ease, transform 0.22s ease;
-}
-
-.social-link:hover,
-.social-link:focus {
-  color: var(--text-primary);
-  transform: translateY(-1px);
-}
-
-.social-link svg,
-.instagram-svg,
-.x-svg {
-  vertical-align: middle;
-}
-
-.instagram-svg,
-.x-svg {
-  width: 1.2em;
-  height: 1.2em;
-}
-
-/* ==========================================================================
-   INTERAÇÕES DO POST (likes/comentários)
+   INTERAÇÕES DO POST (likes / comentários)
    ========================================================================== */
 
 .interactions {
@@ -382,9 +580,7 @@ a:hover .icon-svg {
   border-top: 1px solid var(--border-color);
 }
 
-.likes-section {
-  margin-bottom: 32px;
-}
+.likes-section { margin-bottom: 32px; }
 
 .like-btn {
   font-size: 1.3rem;
@@ -395,24 +591,16 @@ a:hover .icon-svg {
   transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
-.like-btn:hover {
-  transform: scale(1.04);
-}
+.like-btn:hover { transform: scale(1.06); }
 
-.comments-heading {
-  margin: 0 0 16px;
-  color: var(--text-primary);
-}
+.comments-heading { margin: 0 0 16px; color: var(--text-primary); }
 
-.comment-form {
-  display: flex;
-  gap: 12px;
-}
+.comment-form { display: flex; gap: 12px; }
 
 .comment-input {
   flex: 1;
   padding: 12px 14px;
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255,255,255,0.03);
   border: 1px solid var(--border-color);
   color: var(--text-primary);
   border-radius: 10px;
@@ -422,9 +610,9 @@ a:hover .icon-svg {
 }
 
 .comment-input:focus {
-  border-color: rgba(124, 156, 255, 0.32);
-  box-shadow: 0 0 0 3px rgba(124, 156, 255, 0.12);
-  background: rgba(255, 255, 255, 0.045);
+  border-color: rgba(124,156,255,0.32);
+  box-shadow: 0 0 0 3px rgba(124,156,255,0.12);
+  background: rgba(255,255,255,0.045);
 }
 
 .comment-submit {
@@ -434,73 +622,91 @@ a:hover .icon-svg {
   border: none;
   border-radius: 10px;
   cursor: pointer;
-  font-weight: 600;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   transition: transform 0.22s ease, box-shadow 0.22s ease, background 0.22s ease;
 }
 
 .comment-submit:hover {
   background: var(--accent-strong);
   transform: translateY(-1px);
-  box-shadow: 0 10px 30px rgba(124, 156, 255, 0.22);
+  box-shadow: 0 10px 30px rgba(124,156,255,0.22);
 }
+
+/* ==========================================================================
+   LINKS SOCIAIS
+   ========================================================================== */
+
+.social-link {
+  margin-right: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: color 0.22s ease, transform 0.22s ease;
+}
+
+.social-link:hover { color: var(--text-primary); transform: translateY(-1px); }
+
+.icon-svg {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 6px;
+  transition: transform 0.22s ease, opacity 0.22s ease;
+}
+
+.instagram-svg, .x-svg { vertical-align: middle; }
+.instagram-svg, .x-svg { width: 1.1em; height: 1.1em; }
+
+/* ==========================================================================
+   CONTADOR DE VISITAS
+   ========================================================================== */
+
+.visitor-counter { margin-top: 18px; text-align: center; }
+.visitor-counter a { display: inline-flex; }
 
 /* ==========================================================================
    RESPONSIVO
    ========================================================================== */
 
 @media (max-width: 768px) {
+  .posts-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .pc-hero,
+  .pc-grid-item {
+    grid-column: span 1;
+  }
+
+  .pc-hero .pc-img-wrap {
+    aspect-ratio: 16 / 10;
+  }
+
   article {
-    padding: 24px 18px;
-    margin-bottom: 32px;
-    box-sizing: border-box;
-    overflow: hidden;
+    padding: 20px 16px;
+    margin-bottom: 24px;
   }
 
-  article:hover,
-  .read-more:hover {
-    transform: none;
-    box-shadow: none;
-  }
+  .post-header h1 { font-size: 1.9rem; }
 
-  .post-content {
-    padding: 20px 16px 28px;
-  }
+  .comment-form { flex-direction: column; }
+  .comment-submit { width: 100%; }
 
-  .post-card img {
-    max-height: 220px;
-  }
+  .tag-mode-banner { grid-column: span 1; }
+}
 
-  .post-badge-fresh {
-    top: 10px;
-    left: 10px;
-    font-size: 0.74rem;
-    padding: 5px 10px;
-  }
-
-  .read-more {
-    width: 100%;
-    text-align: center;
-    box-sizing: border-box;
-  }
-
-  .post-header h1 {
-    font-size: 2.05rem;
-  }
-
-  .share-btn {
-    padding: 9px 18px;
-    font-size: 0.9rem;
-  }
-
-  .featured-image {
-    margin: 0 auto 24px;
-  }
-
-  .comment-form {
-    flex-direction: column;
-  }
-
-  .comment-submit {
-    width: 100%;
-  }
+@media (max-width: 480px) {
+  .pc-title { font-size: 0.95rem !important; }
+  .pc-excerpt { font-size: 0.78rem; }
 }

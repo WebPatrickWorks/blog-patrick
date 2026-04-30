@@ -380,3 +380,22 @@
     opacity: 0;
   }
 }
+
+
+
+
+
+
+body {
+  max-width: 1280px;
+  padding: 40px 32px;
+  font-family: 'Barlow', 'Inter', sans-serif;
+}
+ 
+@media (max-width: 768px) {
+  body { padding: 20px 16px; }
+}
+ 
+@media (max-width: 480px) {
+  body { padding: 15px 12px; }
+}
