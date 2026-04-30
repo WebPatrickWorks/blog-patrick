@@ -118,6 +118,22 @@
     /* ── Leitura apenas ── */
     .readonly-notice { display:flex; align-items:center; gap:8px; justify-content:center; margin-bottom:32px; padding:10px 18px; background:rgba(124,156,255,0.06); border:1px solid rgba(124,156,255,0.16); border-radius:999px; font-size:0.8rem; color:var(--text-muted); font-family:'JetBrains Mono',monospace; width:fit-content; margin-left:auto; margin-right:auto; }
 
+    /* ── Indicadores ── */
+    .indicators-wrap { background: linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.012)); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 20px 22px; margin-bottom: 28px; }
+    .ind-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 8px; }
+    .ind-title { font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-secondary); }
+    .ind-updated { font-size: 0.72rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+    .ind-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(125px, 1fr)); gap: 12px; }
+    .ind-chip { background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px 14px; text-align: center; transition: border-color 0.25s ease; }
+    .ind-chip:hover { border-color: rgba(124,156,255,0.2); }
+    .ind-label { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
+    .ind-value { font-family: 'JetBrains Mono', monospace; font-size: 1.05rem; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+    .ind-signal { font-size: 0.72rem; font-weight: 600; }
+    .ind-signal.buy     { color: #10b981; }
+    .ind-signal.sell    { color: #ef4444; }
+    .ind-signal.neutral { color: var(--text-muted); }
+    .ind-signal.warn    { color: #f59e0b; }
+
     @media(max-width:768px){ .sim-cards{grid-template-columns:repeat(2,1fr);} .fib-levels{grid-template-columns:repeat(3,1fr);} #btc-price{font-size:1.7rem;} .log-scroll{height:360px;} }
     @media(max-width:480px){ .fib-levels{grid-template-columns:repeat(2,1fr);} }
   </style>
@@ -192,6 +208,41 @@
         <span class="ia-dec-label">Última decisão</span>
         <span class="ia-dec-val hold" id="ia-dec">—</span>
         <span class="ia-dec-time" id="ia-dec-time">—</span>
+      </div>
+    </div>
+
+    <!-- Indicadores técnicos -->
+    <div class="indicators-wrap" id="indicators-wrap">
+      <div class="ind-header">
+        <span class="ind-title">◈ Indicadores Técnicos</span>
+        <span class="ind-updated" id="ind-updated">—</span>
+      </div>
+      <div class="ind-grid">
+        <div class="ind-chip">
+          <div class="ind-label">RSI (14)</div>
+          <div class="ind-value" id="ind-rsi">—</div>
+          <div class="ind-signal neutral" id="ind-rsi-sig">aguardando</div>
+        </div>
+        <div class="ind-chip">
+          <div class="ind-label">EMA 9</div>
+          <div class="ind-value" id="ind-ema9">—</div>
+          <div class="ind-signal neutral" id="ind-ema9-sig">—</div>
+        </div>
+        <div class="ind-chip">
+          <div class="ind-label">EMA 21</div>
+          <div class="ind-value" id="ind-ema21">—</div>
+          <div class="ind-signal neutral" id="ind-ema21-sig">—</div>
+        </div>
+        <div class="ind-chip">
+          <div class="ind-label">MACD</div>
+          <div class="ind-value" id="ind-macd">—</div>
+          <div class="ind-signal neutral" id="ind-macd-sig">—</div>
+        </div>
+        <div class="ind-chip">
+          <div class="ind-label">Fibonacci</div>
+          <div class="ind-value" id="ind-fib" style="font-size:0.82rem;">—</div>
+          <div class="ind-signal neutral" id="ind-fib-sig">—</div>
+        </div>
       </div>
     </div>
 
@@ -339,6 +390,9 @@
     // Painel LLM
     $('ia-panel').style.display = s.llm_enabled ? 'block' : 'none';
 
+    // Indicadores
+    if (s.indicators) applyIndicators(s.indicators, s.updated_at);
+
     // Gráfico
     if (!patriChart) initChart(cap);
     pushChartPoint(total);
@@ -404,6 +458,57 @@
     $('ia-dec-time').textContent = new Date(op.created_at).toLocaleTimeString('pt-BR');
   }
 
+  // ── Aplica indicadores do estado ──
+  function applyIndicators(ind, updatedAt) {
+    if (!ind) return;
+
+    const fmtP = v => v != null ? '$' + parseFloat(v).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '—';
+    const fmt  = v => v != null ? parseFloat(v).toFixed(2) : '—';
+
+    // RSI
+    const rsiEl    = $('ind-rsi');
+    const rsiSigEl = $('ind-rsi-sig');
+    rsiEl.textContent = fmt(ind.rsi);
+    const rsiSig  = ind.rsi_signal || 'neutro';
+    rsiSigEl.textContent = rsiSig;
+    rsiSigEl.className   = 'ind-signal ' +
+      (rsiSig === 'sobrevenda' ? 'buy' : rsiSig === 'sobrecompra' ? 'sell' : 'warn');
+
+    // EMA 9
+    $('ind-ema9').textContent    = fmtP(ind.ema9);
+    $('ind-ema9-sig').textContent = ind.ema_signal === 'alta' ? 'acima EMA21' : ind.ema_signal === 'baixa' ? 'abaixo EMA21' : '—';
+    $('ind-ema9-sig').className   = 'ind-signal ' + (ind.ema_signal === 'alta' ? 'buy' : ind.ema_signal === 'baixa' ? 'sell' : 'neutral');
+
+    // EMA 21
+    $('ind-ema21').textContent    = fmtP(ind.ema21);
+    $('ind-ema21-sig').textContent = ind.ema_signal === 'alta' ? 'tendência alta' : ind.ema_signal === 'baixa' ? 'tendência baixa' : '—';
+    $('ind-ema21-sig').className   = 'ind-signal ' + (ind.ema_signal === 'alta' ? 'buy' : ind.ema_signal === 'baixa' ? 'sell' : 'neutral');
+
+    // MACD
+    const macdEl    = $('ind-macd');
+    const macdSigEl = $('ind-macd-sig');
+    macdEl.textContent    = ind.macd != null ? (ind.macd >= 0 ? '+' : '') + parseFloat(ind.macd).toFixed(2) : '—';
+    macdSigEl.textContent = ind.macd_signal || '—';
+    macdSigEl.className   = 'ind-signal ' + (ind.macd_signal === 'positivo' ? 'buy' : ind.macd_signal === 'negativo' ? 'sell' : 'neutral');
+
+    // Fibonacci sinal
+    const fibSig = ind.fib_signal || 'neutro';
+    $('ind-fib').textContent    = fibSig;
+    $('ind-fib-sig').textContent = ind.fib
+      ? `61.8%: $${Math.round(ind.fib.level618).toLocaleString('en-US')}`
+      : '—';
+    $('ind-fib-sig').className = 'ind-signal ' +
+      (fibSig.includes('compra') ? 'buy' : fibSig.includes('venda') ? 'sell' : 'neutral');
+
+    // Timestamp
+    if (updatedAt) {
+      $('ind-updated').textContent = 'atualizado ' + new Date(updatedAt).toLocaleTimeString('pt-BR');
+    }
+
+    // Também atualiza Fibonacci completo
+    if (ind.fib) updateFibUI(null, ind.fib);
+  }
+
   // ── Fibonacci (recalcula localmente com preços do BD) ──
   function calcFib(prices) {
     if (prices.length < 10) return null;
@@ -411,8 +516,9 @@
     return { level0:h, level236:h-d*0.236, level382:h-d*0.382, level50:h-d*0.5, level618:h-d*0.618, level100:l };
   }
 
-  function updateFibUI(prices) {
-    const fib = calcFib(prices);
+  function updateFibUI(prices, fibDirect) {
+    // Aceita array de preços (calcula) ou objeto fib direto (do Supabase)
+    const fib = fibDirect || (prices ? calcFib(prices) : null);
     if (!fib) return;
     const f = v => '$'+Math.round(v).toLocaleString('en-US');
     $('fib-0').textContent   = f(fib.level0);
