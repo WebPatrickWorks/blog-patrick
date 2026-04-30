@@ -57,9 +57,9 @@ html {
 
 body {
   margin: 0 auto;
-  max-width: 900px;
-  padding: 40px 20px;
-  font-family: 'Inter', 'JetBrains Mono', monospace;
+  max-width: 1280px;
+  padding: 40px 32px;
+  font-family: 'Barlow', 'Inter', sans-serif;
   line-height: 1.7;
   color: var(--text-primary);
   background: radial-gradient(circle at top, #101726 0%, var(--bg-primary) 60%);
@@ -207,7 +207,7 @@ footer {
 
 @media (max-width: 768px) {
   body {
-    padding: 20px 12px;
+    padding: 20px 16px;
   }
 
   header {
