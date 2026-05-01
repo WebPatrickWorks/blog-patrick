@@ -653,7 +653,7 @@
   //  WATCHDOG — detecta se o robô está offline
   //  Considera offline se updated_at > OFFLINE_THRESHOLD ms
   // ══════════════════════════════════════════════════════════
-  const OFFLINE_THRESHOLD = 12 * 60 * 1000; // 12 minutos (2× o ciclo padrão de 5min + folga)
+  const OFFLINE_THRESHOLD = 3 * 60 * 1000; // 12 minutos (2× o ciclo padrão de 5min + folga)
 
   function checkRobotAlive() {
     const lastCycleText = $('last-cycle').textContent;
