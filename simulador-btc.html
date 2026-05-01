@@ -137,6 +137,26 @@
     .ind-signal.neutral { color: var(--text-muted); }
     .ind-signal.warn    { color: #f59e0b; }
 
+    /* ── Candle do dia ── */
+    .daily-candle { margin-top: 16px; padding: 16px 18px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: var(--radius-sm); }
+    .daily-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; }
+    .daily-title  { font-family:'JetBrains Mono',monospace; font-size:0.78rem; font-weight:700; letter-spacing:0.06em; text-transform:uppercase; color:var(--text-secondary); }
+    .daily-utc    { font-weight:400; color:var(--text-muted); font-size:0.7rem; }
+    .daily-change { font-family:'JetBrains Mono',monospace; font-size:0.85rem; font-weight:700; }
+    .daily-change.pos { color:#10b981; } .daily-change.neg { color:#ef4444; }
+    .daily-grid   { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-bottom:14px; }
+    .daily-item   { text-align:center; }
+    .daily-label  { font-size:0.68rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-muted); margin-bottom:4px; }
+    .daily-val    { font-family:'JetBrains Mono',monospace; font-size:0.9rem; font-weight:700; color:var(--text-primary); }
+    .daily-val.positive { color:#10b981; } .daily-val.negative { color:#ef4444; }
+    /* Barra de range */
+    .daily-range-bar-wrap { margin-top: 4px; }
+    .daily-range-track  { position:relative; height:6px; background:rgba(255,255,255,0.07); border-radius:999px; margin-bottom:6px; overflow:visible; }
+    .daily-range-fill   { position:absolute; left:0; top:0; height:100%; background:linear-gradient(90deg,#10b981,#f59e0b,#ef4444); border-radius:999px; width:100%; opacity:0.3; }
+    .daily-range-cursor { position:absolute; top:50%; width:10px; height:10px; border-radius:50%; background:var(--accent); border:2px solid var(--bg-primary, #0f1117); transform:translate(-50%,-50%); transition:left 0.6s ease; box-shadow:0 0 6px rgba(124,156,255,0.6); }
+    .daily-range-labels { display:flex; justify-content:space-between; font-family:'JetBrains Mono',monospace; font-size:0.7rem; color:var(--text-muted); }
+    .daily-range-desc   { color:var(--text-secondary); font-size:0.72rem; text-align:center; flex:1; }
+
     @media(max-width:768px){ .sim-cards{grid-template-columns:repeat(2,1fr);} .fib-levels{grid-template-columns:repeat(3,1fr);} #btc-price{font-size:1.7rem;} .log-scroll{height:360px;} }
     @media(max-width:480px){ .fib-levels{grid-template-columns:repeat(2,1fr);} }
   </style>
@@ -153,12 +173,12 @@
 
     <div class="sim-hero">
       <h2>⚡ Simulador BTC — Ao Vivo</h2>
-      <p>Grô operando BTC 24/7 com análise técnica real. Você está observando em tempo real.</p>
+      <p>Robô autônomo operando BTC 24/7 com análise técnica real. Você está observando em tempo real.</p>
     </div>
 
     <!-- Badge leitura apenas -->
     <div class="readonly-notice">
-      <span>👁</span> Modo observação — sem interação. A Grô opera de forma autônoma.
+      <span>👁</span> Modo observação — sem interação. O robô opera de forma autônoma.
     </div>
 
     <!-- Preço ao vivo -->
@@ -203,7 +223,7 @@
     <!-- Análise LLM (visível apenas quando llm_enabled) -->
     <div class="ia-panel" id="ia-panel" style="display:none;">
       <div class="ia-panel-header">
-        <div class="ia-panel-title">◈ Análise da Grô</div>
+        <div class="ia-panel-title">◈ Análise do LLM</div>
         <span class="ia-conf" id="ia-conf" style="display:none;"></span>
       </div>
       <div id="ia-text">—</div>
@@ -247,6 +267,43 @@
           <div class="ind-signal neutral" id="ind-fib-sig">—</div>
         </div>
       </div>
+
+      <!-- Candle do dia -->
+      <div class="daily-candle" id="daily-candle" style="display:none;">
+        <div class="daily-header">
+          <span class="daily-title">◈ Candle do Dia <span class="daily-utc">(00:00 UTC · Binance)</span></span>
+          <span class="daily-change" id="daily-change">—</span>
+        </div>
+        <div class="daily-grid">
+          <div class="daily-item">
+            <div class="daily-label">Abertura</div>
+            <div class="daily-val" id="daily-open">—</div>
+          </div>
+          <div class="daily-item">
+            <div class="daily-label">Máxima</div>
+            <div class="daily-val positive" id="daily-high">—</div>
+          </div>
+          <div class="daily-item">
+            <div class="daily-label">Mínima</div>
+            <div class="daily-val negative" id="daily-low">—</div>
+          </div>
+          <div class="daily-item">
+            <div class="daily-label">Pos. no Range</div>
+            <div class="daily-val" id="daily-pos">—</div>
+          </div>
+        </div>
+        <div class="daily-range-bar-wrap">
+          <div class="daily-range-track">
+            <div class="daily-range-fill" id="daily-range-fill"></div>
+            <div class="daily-range-cursor" id="daily-range-cursor"></div>
+          </div>
+          <div class="daily-range-labels">
+            <span id="daily-low-label">—</span>
+            <span class="daily-range-desc" id="daily-range-desc">—</span>
+            <span id="daily-high-label">—</span>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Fibonacci -->
@@ -274,7 +331,7 @@
     </div>
 
     <div class="risk">
-      <strong>⚠️ Simulação educacional.</strong> A Grô opera com capital fictício. Os preços são reais (CoinGecko), as operações não. Nenhuma decisão financeira deve ser baseada nesta ferramenta.
+      <strong>⚠️ Simulação educacional.</strong> Este robô opera com capital fictício. Os preços são reais (CoinGecko), as operações não. Nenhuma decisão financeira deve ser baseada nesta ferramenta.
     </div>
 
   </main>
@@ -394,7 +451,7 @@
     // Atualiza status bar
     const updated = new Date(s.updated_at);
     $('last-cycle').textContent  = 'último ciclo: '+updated.toLocaleTimeString('pt-BR');
-    $('status-left').textContent = s.is_running ? '● Grô em operação' : '○ Robô pausado';
+    $('status-left').textContent = s.is_running ? '● Robô em operação' : '○ Robô pausado';
     $('status-right').textContent = `${s.strategy || 'combined'} · ${s.llm_enabled ? 'LLM ativo' : 'modo local'}`;
 
     // Painel LLM
@@ -480,6 +537,38 @@
     $('ia-dec-time').textContent = new Date(op.created_at).toLocaleTimeString('pt-BR');
   }
 
+  // ── Aplica candle diário ──
+  function applyDailyCandle(daily) {
+    if (!daily) return;
+    const wrap = $('daily-candle');
+    wrap.style.display = 'block';
+
+    const fmtP = v => '$' + parseFloat(v).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    const ch   = parseFloat(daily.day_change_pct || 0);
+
+    // Change badge
+    const chEl = $('daily-change');
+    chEl.textContent = (ch >= 0 ? '+' : '') + ch.toFixed(2) + '% no dia';
+    chEl.className   = 'daily-change ' + (ch >= 0 ? 'pos' : 'neg');
+
+    // Valores OHLC
+    $('daily-open').textContent = fmtP(daily.open);
+    $('daily-high').textContent = fmtP(daily.high);
+    $('daily-low').textContent  = fmtP(daily.low);
+
+    // Posição no range
+    const pos = parseFloat(daily.pos_in_range || 50);
+    const posEl = $('daily-pos');
+    posEl.textContent = pos.toFixed(1) + '%';
+    posEl.className   = 'daily-val ' + (pos >= 75 ? 'negative' : pos <= 25 ? 'positive' : '');
+
+    // Barra visual de range
+    $('daily-range-cursor').style.left = pos + '%';
+    $('daily-low-label').textContent   = '$' + Math.round(daily.low).toLocaleString('en-US');
+    $('daily-high-label').textContent  = '$' + Math.round(daily.high).toLocaleString('en-US');
+    $('daily-range-desc').textContent  = daily.range_label || '';
+  }
+
   // ── Aplica indicadores do estado ──
   function applyIndicators(ind, updatedAt) {
     if (!ind) return;
@@ -527,8 +616,11 @@
       $('ind-updated').textContent = 'atualizado ' + new Date(updatedAt).toLocaleTimeString('pt-BR');
     }
 
-    // Também atualiza Fibonacci completo
+    // Fibonacci completo
     if (ind.fib) updateFibUI(null, ind.fib);
+
+    // Candle diário
+    if (ind.daily) applyDailyCandle(ind.daily);
   }
 
   // ── Fibonacci (recalcula localmente com preços do BD) ──
@@ -565,7 +657,7 @@
       if (error) throw error;
       if (data) {
         applyState(data);
-        $('status-left').textContent = '● Conectado — Grô em operação';
+        $('status-left').textContent = '● Conectado — robô em operação';
       } else {
         $('status-left').textContent = '○ Aguardando primeiro ciclo do robô...';
       }
@@ -737,7 +829,7 @@
           // Robô online
           badge.className = 'live-badge';
           badge.innerHTML = '<div class="live-dot"></div>ao vivo';
-          statusLeft.textContent = data.is_running ? '● Grô em operação' : '○ Robô pausado';
+          statusLeft.textContent = data.is_running ? '● Robô em operação' : '○ Robô pausado';
         }
       })
       .catch(() => {
