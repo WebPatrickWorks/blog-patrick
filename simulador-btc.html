@@ -101,6 +101,9 @@
     .log-patr  { font-size:0.76rem; color:var(--text-muted); }
     .log-time  { font-size:0.72rem; color:var(--text-muted); margin-left:auto; flex-shrink:0; }
     .log-comment { padding:8px 13px 10px; font-size:0.81rem; line-height:1.6; color:var(--text-muted); border-top:1px solid var(--border-color); background:rgba(124,156,255,0.03); font-style:italic; word-break:break-word; }
+    .veto-badge { font-family:'JetBrains Mono',monospace; font-size:0.7rem; font-weight:700; padding:2px 7px; border-radius:4px; letter-spacing:0.04em; flex-shrink:0; }
+    .veto-badge.approved { background:rgba(16,185,129,0.15); color:#10b981; border:1px solid rgba(16,185,129,0.25); }
+    .veto-badge.blocked  { background:rgba(239,68,68,0.12);  color:#ef4444; border:1px solid rgba(239,68,68,0.22); }
     .log-empty { text-align:center; color:var(--text-muted); font-size:0.9rem; padding:60px 0; }
 
     /* ── Fib ── */
@@ -407,22 +410,34 @@
     const entry = document.createElement('div');
     entry.className = 'log-entry ' + op.action;
 
-    const at  = op.action==='buy'?'BUY':op.action==='sell'?'SELL':'HOLD';
+    const at   = op.action==='buy'?'BUY':op.action==='sell'?'SELL':'HOLD';
     const time = new Date(op.created_at).toLocaleTimeString('pt-BR');
     const pnl  = op.pnl_brl !== null && op.pnl_brl !== undefined
       ? `<span class="log-pnl ${parseFloat(op.pnl_brl)>=0?'pos':'neg'}">${parseFloat(op.pnl_brl)>=0?'+':''}R$ ${Math.abs(parseFloat(op.pnl_brl)).toFixed(2)}</span>`
       : '';
     const patr = `<span class="log-patr">patr: R$ ${parseFloat(op.patrimony).toFixed(2)}</span>`;
 
-    // Extrai trecho curto da análise LLM (2 frases)
+    // Badge de veto da IA
+    let vetoBadge = '';
+    if (op.veto_approved === true) {
+      vetoBadge = '<span class="veto-badge approved">IA ✓</span>';
+    } else if (op.veto_approved === false) {
+      vetoBadge = '<span class="veto-badge blocked">IA ✗ bloqueou</span>';
+    }
+
+    // Raciocínio da IA — limpa prefixos e linha de VETO
     const short = op.llm_analysis
-      ? op.llm_analysis.replace(/DECISÃO:.*$/gim,'').trim().split('.').slice(0,2).join('.').trim()+'.'
-      : (op.reason || '');
+      ? op.llm_analysis
+          .replace(/VETO:\s*(SIM|NÃO|NAO).*$/gim, '')
+          .replace(/DECISÃO:.*$/gim, '')
+          .trim().split('.').slice(0,2).join('.').trim() + '.'
+      : (op.reason ? op.reason.replace(/^\[IA: (SIM|NÃO)\]\s*/i,'') : '');
 
     entry.innerHTML = `
       <div class="log-top">
         <span class="log-action">${at}</span>
         <span class="log-price">$${Math.round(parseFloat(op.price_usd)).toLocaleString('en-US')}</span>
+        ${vetoBadge}
         ${pnl}
         ${patr}
         <span class="log-time">${time}</span>
@@ -653,7 +668,7 @@
   //  WATCHDOG — detecta se o robô está offline
   //  Considera offline se updated_at > OFFLINE_THRESHOLD ms
   // ══════════════════════════════════════════════════════════
-  const OFFLINE_THRESHOLD = 5 * 60 * 1000; // 12 minutos (2× o ciclo padrão de 5min + folga)
+  const OFFLINE_THRESHOLD = 12 * 60 * 1000; // 12 minutos (2× o ciclo padrão de 5min + folga)
 
   function checkRobotAlive() {
     const lastCycleText = $('last-cycle').textContent;
