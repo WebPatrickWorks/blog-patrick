@@ -649,6 +649,51 @@
   //  INIT
   // ══════════════════════════════════════════════════════════
   initChart(500);
+  // ══════════════════════════════════════════════════════════
+  //  WATCHDOG — detecta se o robô está offline
+  //  Considera offline se updated_at > OFFLINE_THRESHOLD ms
+  // ══════════════════════════════════════════════════════════
+  const OFFLINE_THRESHOLD = 12 * 60 * 1000; // 12 minutos (2× o ciclo padrão de 5min + folga)
+
+  function checkRobotAlive() {
+    const lastCycleText = $('last-cycle').textContent;
+    // Só verifica se já recebeu ao menos um ciclo
+    if (lastCycleText === '—') return;
+
+    // Busca updated_at diretamente do Supabase (uma leitura leve)
+    sb.from('btc_simulator_state')
+      .select('updated_at, is_running')
+      .eq('id', 1)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (!data) return;
+
+        const updatedAt  = new Date(data.updated_at);
+        const elapsed    = Date.now() - updatedAt.getTime();
+        const badge      = $('live-badge');
+        const statusLeft = $('status-left');
+
+        if (elapsed > OFFLINE_THRESHOLD || !data.is_running) {
+          // Robô offline ou parado
+          badge.className = 'live-badge offline';
+          badge.innerHTML = '<div class="live-dot"></div>offline';
+          const mins = Math.round(elapsed / 60000);
+          statusLeft.textContent = `○ Robô inativo — último ciclo há ${mins} min`;
+        } else {
+          // Robô online
+          badge.className = 'live-badge';
+          badge.innerHTML = '<div class="live-dot"></div>ao vivo';
+          statusLeft.textContent = data.is_running ? '● Robô em operação' : '○ Robô pausado';
+        }
+      })
+      .catch(() => {
+        // Falha na verificação — não altera badge
+      });
+  }
+
+  // Verifica a cada 60 segundos
+  setInterval(checkRobotAlive, 60 * 1000);
+
   loadInitial().then(() => setupRealtime());
   </script>
 
