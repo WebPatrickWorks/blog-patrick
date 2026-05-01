@@ -108,7 +108,11 @@
 
     /* ── Fib ── */
     .fib-panel { background:linear-gradient(180deg,rgba(167,139,250,0.06),rgba(167,139,250,0.02)); border:1px solid rgba(167,139,250,0.18); border-radius:var(--radius-lg); padding:20px 22px; margin-bottom:28px; }
-    .fib-title { font-family:'JetBrains Mono',monospace; font-size:0.8rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--accent-secondary); margin-bottom:14px; }
+    .fib-title { font-family:'JetBrains Mono',monospace; font-size:0.8rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--accent-secondary); margin-bottom:4px; }
+    .fib-header { margin-bottom: 12px; }
+    .fib-sub { font-size:0.68rem; font-weight:400; color:var(--text-muted); letter-spacing:0.04em; text-transform:none; margin-left:6px; }
+    .fib-signal-line { font-size:0.78rem; color:var(--accent-secondary); margin-top:3px; font-style:italic; }
+    .fib-divider { height:1px; background:rgba(167,139,250,0.15); margin:18px 0; }
     .fib-levels { display:grid; grid-template-columns:repeat(auto-fit,minmax(105px,1fr)); gap:9px; }
     .fib-level { background:rgba(167,139,250,0.06); border:1px solid rgba(167,139,250,0.14); border-radius:var(--radius-sm); padding:9px 11px; text-align:center; }
     .fib-pct  { font-size:0.7rem; color:var(--accent-secondary); font-weight:700; letter-spacing:0.06em; margin-bottom:3px; }
@@ -306,9 +310,14 @@
       </div>
     </div>
 
-    <!-- Fibonacci -->
+    <!-- Fibonacci curto prazo + diário -->
     <div class="fib-panel">
-      <div class="fib-title">◈ Níveis de Fibonacci (último ciclo)</div>
+      <div class="fib-header">
+        <div>
+          <div class="fib-title">◈ Fibonacci Curto Prazo <span class="fib-sub">últimas ~4h</span></div>
+          <div class="fib-signal-line" id="fib-signal-line">—</div>
+        </div>
+      </div>
       <div class="fib-levels">
         <div class="fib-level"><div class="fib-pct">0%</div><div class="fib-price" id="fib-0">—</div></div>
         <div class="fib-level"><div class="fib-pct">23.6%</div><div class="fib-price" id="fib-236">—</div></div>
@@ -316,6 +325,23 @@
         <div class="fib-level"><div class="fib-pct">50%</div><div class="fib-price" id="fib-50">—</div></div>
         <div class="fib-level"><div class="fib-pct">61.8%</div><div class="fib-price" id="fib-618">—</div></div>
         <div class="fib-level"><div class="fib-pct">100%</div><div class="fib-price" id="fib-100">—</div></div>
+      </div>
+
+      <div class="fib-divider"></div>
+
+      <div class="fib-header">
+        <div>
+          <div class="fib-title">◈ Fibonacci Diário <span class="fib-sub">H/L do dia · Binance</span></div>
+          <div class="fib-signal-line" id="fib-daily-signal-line">—</div>
+        </div>
+      </div>
+      <div class="fib-levels">
+        <div class="fib-level"><div class="fib-pct">0%</div><div class="fib-price" id="fib-d-0">—</div></div>
+        <div class="fib-level"><div class="fib-pct">23.6%</div><div class="fib-price" id="fib-d-236">—</div></div>
+        <div class="fib-level"><div class="fib-pct">38.2%</div><div class="fib-price" id="fib-d-382">—</div></div>
+        <div class="fib-level"><div class="fib-pct">50%</div><div class="fib-price" id="fib-d-50">—</div></div>
+        <div class="fib-level"><div class="fib-pct">61.8%</div><div class="fib-price" id="fib-d-618">—</div></div>
+        <div class="fib-level"><div class="fib-pct">100%</div><div class="fib-price" id="fib-d-100">—</div></div>
       </div>
     </div>
 
@@ -616,8 +642,14 @@
       $('ind-updated').textContent = 'atualizado ' + new Date(updatedAt).toLocaleTimeString('pt-BR');
     }
 
-    // Fibonacci completo
-    if (ind.fib) updateFibUI(null, ind.fib);
+    // Fibonacci curto prazo
+    if (ind.fib) {
+      updateFibUI(null, ind.fib);
+      const sigEl = $('fib-signal-line');
+      if (sigEl) sigEl.textContent = ind.fib_signal || '—';
+    }
+    // Fibonacci diário
+    if (ind.fib_daily) updateFibDailyUI(ind.fib_daily, ind.fib_daily_signal);
 
     // Candle diário
     if (ind.daily) applyDailyCandle(ind.daily);
@@ -630,17 +662,27 @@
     return { level0:h, level236:h-d*0.236, level382:h-d*0.382, level50:h-d*0.5, level618:h-d*0.618, level100:l };
   }
 
+  function _fillFibLevels(prefix, fib) {
+    const f = v => '$' + Math.round(v).toLocaleString('en-US');
+    $(prefix + '0').textContent   = f(fib.level0);
+    $(prefix + '236').textContent = f(fib.level236);
+    $(prefix + '382').textContent = f(fib.level382);
+    $(prefix + '50').textContent  = f(fib.level50);
+    $(prefix + '618').textContent = f(fib.level618);
+    $(prefix + '100').textContent = f(fib.level100);
+  }
+
   function updateFibUI(prices, fibDirect) {
-    // Aceita array de preços (calcula) ou objeto fib direto (do Supabase)
+    // Curto prazo: aceita array de preços ou objeto direto
     const fib = fibDirect || (prices ? calcFib(prices) : null);
-    if (!fib) return;
-    const f = v => '$'+Math.round(v).toLocaleString('en-US');
-    $('fib-0').textContent   = f(fib.level0);
-    $('fib-236').textContent = f(fib.level236);
-    $('fib-382').textContent = f(fib.level382);
-    $('fib-50').textContent  = f(fib.level50);
-    $('fib-618').textContent = f(fib.level618);
-    $('fib-100').textContent = f(fib.level100);
+    if (fib) _fillFibLevels('fib-', fib);
+  }
+
+  function updateFibDailyUI(fibDaily, signal) {
+    if (!fibDaily) return;
+    _fillFibLevels('fib-d-', fibDaily);
+    const sigEl = $('fib-daily-signal-line');
+    if (sigEl) sigEl.textContent = signal || '—';
   }
 
   // ══════════════════════════════════════════════════════════
