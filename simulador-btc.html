@@ -208,6 +208,11 @@
       <div class="sim-card"><div class="sim-card-label">Resultado</div><div class="sim-card-value" id="c-pnl">—</div><div class="sim-card-sub" id="c-pnl-pct">—</div></div>
       <div class="sim-card"><div class="sim-card-label">Operações</div><div class="sim-card-value" id="c-ops">—</div><div class="sim-card-sub" id="c-wins">—</div></div>
       <div class="sim-card"><div class="sim-card-label">Melhor Trade</div><div class="sim-card-value pos" id="c-best">—</div><div class="sim-card-sub" id="c-worst">pior: —</div></div>
+      <div class="sim-card" id="card-trailing" style="border-color:rgba(167,139,250,0.2);">
+        <div class="sim-card-label">Trailing Stop</div>
+        <div class="sim-card-value" id="c-trailing-stop">—</div>
+        <div class="sim-card-sub" id="c-trailing-peak">pico: —</div>
+      </div>
     </div>
 
     <!-- Gráfico de patrimônio -->
@@ -486,6 +491,9 @@
     // Indicadores
     if (s.indicators) applyIndicators(s.indicators, s.updated_at);
 
+    // Trailing stop
+    applyTrailingStop(s, price);
+
     // Gráfico
     if (!patriChart) initChart(cap);
     pushChartPoint(total);
@@ -561,6 +569,55 @@
       confEl.style.display='inline-block';
     }
     $('ia-dec-time').textContent = new Date(op.created_at).toLocaleTimeString('pt-BR');
+  }
+
+  // ── Aplica trailing stop ──
+  function applyTrailingStop(s, price) {
+    const btc      = parseFloat(s.btc_held || 0);
+    const buyPrice = parseFloat(s.btc_buy_price || 0);
+    const peak     = parseFloat(s.btc_peak_price || 0);
+    const card     = $('card-trailing');
+    const stopEl   = $('c-trailing-stop');
+    const peakEl   = $('c-trailing-peak');
+
+    if (btc < 0.000001 || buyPrice === 0) {
+      stopEl.textContent = '—';
+      stopEl.className   = 'sim-card-value';
+      peakEl.textContent = 'sem posição aberta';
+      if (card) card.style.borderColor = 'rgba(167,139,250,0.2)';
+      return;
+    }
+
+    const TRAILING_STOP_PCT = 2.0;  // espelha o padrão do .env
+    const TRAILING_STOP_MIN = 1.0;
+
+    const stopLevel   = peak * (1 - TRAILING_STOP_PCT / 100);
+    const peakPnlPct  = peak > 0 ? (peak - buyPrice) / buyPrice * 100 : 0;
+    const currPnlPct  = price > 0 ? (price - buyPrice) / buyPrice * 100 : 0;
+    const isActive    = peakPnlPct >= TRAILING_STOP_MIN;
+    const distPct     = price > 0 ? (price - stopLevel) / price * 100 : 0;
+
+    stopEl.textContent = peak > 0
+      ? '$' + Math.round(stopLevel).toLocaleString('en-US')
+      : '—';
+    stopEl.className = 'sim-card-value ' + (isActive ? (distPct < 1 ? 'negative' : 'positive') : '');
+
+    peakEl.textContent = peak > 0
+      ? `pico $${Math.round(peak).toLocaleString('en-US')} (${peakPnlPct >= 0 ? '+' : ''}${peakPnlPct.toFixed(2)}%)`
+      : 'aguardando pico...';
+
+    // Borda do card muda conforme proximidade do stop
+    if (card) {
+      if (!isActive) {
+        card.style.borderColor = 'rgba(167,139,250,0.2)';
+      } else if (distPct < 0.5) {
+        card.style.borderColor = 'rgba(239,68,68,0.6)';  // perigoso
+      } else if (distPct < 1.5) {
+        card.style.borderColor = 'rgba(245,158,11,0.5)';  // atenção
+      } else {
+        card.style.borderColor = 'rgba(16,185,129,0.4)';  // seguro
+      }
+    }
   }
 
   // ── Aplica candle diário ──
