@@ -233,6 +233,11 @@
     }
     .feed-card.training { border-color: rgba(251,146,60,0.3); }
     .feed-card.resting  { border-color: rgba(124,156,255,0.3); }
+    .feed-card.done {
+      border-color: rgba(52,211,153,0.3);
+      background: linear-gradient(160deg, rgba(52,211,153,0.05), var(--bg3));
+      opacity: 0.75;
+    }
     .feed-nick {
       font-family: 'JetBrains Mono', monospace; font-size: 0.9rem;
       font-weight: 700; color: var(--txt); margin-bottom: 4px;
@@ -1290,7 +1295,7 @@ function runTodayPlan() {
 
 function startFromQueue() {
   if (trainQueueIdx >= trainQueue.length) {
-    closeTrainOverlay();
+    closeTrainOverlay(true);
     toast('Treino do dia concluído! 🎉','ok');
     return;
   }
@@ -1310,12 +1315,30 @@ function openTrainOverlay() {
   publishActiveSession('training', trainCurrentWeight);
 }
 
-function closeTrainOverlay() {
+function closeTrainOverlay(completed = false) {
   clearInterval(restTimer);
   $('train-overlay').classList.remove('active');
   trainQueue = []; trainQueueIdx = 0;
-  // Remove from feed
-  if (currentUser) {
+  if (!currentUser) return;
+  if (completed) {
+    // Publica status 'done' — card fica visível por 2 minutos e some
+    SB.from('kinetic_active_sessions').upsert({
+      user_id: currentUser.id,
+      nick: currentProfile.nick,
+      exercise_name: trainCurrentEx?.name || '—',
+      status: 'done',
+      current_set: trainTotalSets,
+      total_sets: trainTotalSets,
+      weight_kg: trainCurrentWeight,
+      updated_at: new Date().toISOString()
+    }).then(() => {
+      // Deleta após 2 minutos
+      setTimeout(async () => {
+        await SB.from('kinetic_active_sessions').delete().eq('user_id', currentUser.id);
+      }, 2 * 60 * 1000);
+    });
+  } else {
+    // Cancelado — remove imediatamente
     SB.from('kinetic_active_sessions').delete().eq('user_id', currentUser.id);
   }
 }
@@ -1397,14 +1420,14 @@ function doneSet() {
       } else {
         // Última da fila — descansa e fecha
         showRestTimer(() => {
-          closeTrainOverlay();
+          closeTrainOverlay(true);
           toast('Treino do dia concluído! 🎉','ok');
         });
       }
     } else {
       // Modo avulso — fecha overlay ao terminar o descanso
       showRestTimer(() => {
-        closeTrainOverlay();
+        closeTrainOverlay(true);
         toast('Exercício concluído! ✓','ok');
       });
     }
@@ -1554,28 +1577,31 @@ function renderAppFeed(sessions) {
   el.innerHTML = sessions.map(s => {
     const sent = pumpsSent.has(s.user_id);
     const total = pumpTotals[s.user_id] || 0;
+    const isDone = s.status === 'done';
     return `
     <div class="feed-card ${s.status}">
       <div class="feed-nick">@${s.nick}</div>
       <div class="feed-exercise">${s.exercise_name}</div>
       <span class="feed-status ${s.status}">
-        ${s.status === 'training' ? '🔥 Treinando' : '⏱ Descansando'}
+        ${isDone ? '🎉 Treino Concluído' : s.status === 'training' ? '🔥 Treinando' : '⏱ Descansando'}
       </span>
+      ${!isDone ? `
       <div class="feed-series">
         Série ${s.current_set} de ${s.total_sets}
         ${s.weight_kg > 0 ? `<span class="feed-weight">· ${s.weight_kg} kg</span>` : ''}
-      </div>
+      </div>` : ''}
       <div class="feed-footer">
         <div class="pump-total">
           <span>💪</span>
           <strong id="pump-count-app-${s.user_id}">${total}</strong>
           <span>pumps</span>
         </div>
+        ${!isDone ? `
         <button class="btn-pump ${sent ? 'sent' : ''}"
           onclick="sendPump('${s.user_id}', '${s.nick}', this)">
           <span class="pump-icon">💪</span>
           ${sent ? 'Enviado!' : 'Pump!'}
-        </button>
+        </button>` : '<span style="font-size:0.78rem;color:var(--green);font-weight:700;">Mandou bem! 💪</span>'}
       </div>
     </div>
   `}).join('');
@@ -1595,28 +1621,31 @@ function renderFeed(sessions) {
   el.innerHTML = sessions.map(s => {
     const sent = pumpsSent.has(s.user_id);
     const total = pumpTotals[s.user_id] || 0;
+    const isDone = s.status === 'done';
     return `
     <div class="feed-card ${s.status}">
       <div class="feed-nick">@${s.nick}</div>
       <div class="feed-exercise">${s.exercise_name}</div>
       <span class="feed-status ${s.status}">
-        ${s.status === 'training' ? '🔥 Treinando' : '⏱ Descansando'}
+        ${isDone ? '🎉 Treino Concluído' : s.status === 'training' ? '🔥 Treinando' : '⏱ Descansando'}
       </span>
+      ${!isDone ? `
       <div class="feed-series">
         Série ${s.current_set} de ${s.total_sets}
         ${s.weight_kg > 0 ? `<span class="feed-weight">· ${s.weight_kg} kg</span>` : ''}
-      </div>
+      </div>` : ''}
       <div class="feed-footer">
         <div class="pump-total">
           <span>💪</span>
           <strong id="pump-count-${s.user_id}">${total}</strong>
           <span>pumps</span>
         </div>
+        ${!isDone ? `
         <button class="btn-pump ${sent ? 'sent' : ''}"
           onclick="sendPump('${s.user_id}', '${s.nick}', this)">
           <span class="pump-icon">💪</span>
           ${sent ? 'Enviado!' : 'Pump!'}
-        </button>
+        </button>` : '<span style="font-size:0.78rem;color:var(--green);font-weight:700;">Mandou bem! 💪</span>'}
       </div>
     </div>
   `}).join('');
@@ -1647,14 +1676,14 @@ async function loadPumpTotals(userIds) {
 }
 
 async function loadPublicFeedWithPumps() {
-  const { data } = await SB.from('kinetic_active_sessions').select('*').neq('status','done');
+  const { data } = await SB.from('kinetic_active_sessions').select('*');
   const sessions = data || [];
   if (sessions.length) await loadPumpTotals(sessions.map(s => s.user_id));
   renderFeed(sessions);
 }
 
 async function loadAppFeedWithPumps() {
-  const { data } = await SB.from('kinetic_active_sessions').select('*').neq('status','done');
+  const { data } = await SB.from('kinetic_active_sessions').select('*');
   const sessions = data || [];
   if (sessions.length) await loadPumpTotals(sessions.map(s => s.user_id));
   renderAppFeed(sessions);
@@ -1731,7 +1760,7 @@ $('btn-skip-rest').addEventListener('click', skipRest);
 $('btn-cancel-train').addEventListener('click', () => {
   if (confirm('Cancelar o treino?')) {
     clearInterval(restTimer);
-    closeTrainOverlay();
+    closeTrainOverlay(false);
   }
 });
 
