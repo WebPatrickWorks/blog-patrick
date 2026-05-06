@@ -246,6 +246,7 @@
     .feed-status.training { background: var(--orange-soft); color: var(--orange); }
     .feed-status.resting  { background: var(--accent-soft); color: var(--accent); }
     .feed-series { font-size: 0.82rem; color: var(--muted); margin-top: 8px; }
+    .feed-weight { color: var(--orange); font-weight: 700; }
 
     .feed-empty {
       text-align: center; padding: 60px 20px; color: var(--muted);
@@ -652,6 +653,7 @@
   <!-- Nav -->
   <nav class="app-nav">
     <button class="nav-btn active" data-section="train" onclick="switchSection('train')">🏋️ Treinar</button>
+    <button class="nav-btn" data-section="live" onclick="switchSection('live')">🔴 Ao Vivo</button>
     <button class="nav-btn" data-section="exercises" onclick="switchSection('exercises')">⚡ Exercícios</button>
     <button class="nav-btn" data-section="plan" onclick="switchSection('plan')">📅 Plano</button>
     <button class="nav-btn" data-section="measures" onclick="switchSection('measures')">📏 Medidas</button>
@@ -676,6 +678,17 @@
     </div>
     <div class="train-start-grid" id="train-ex-grid">
       <p style="color:var(--muted); font-size:0.88rem;">Nenhum exercício cadastrado. Vá em ⚡ Exercícios para adicionar.</p>
+    </div>
+  </section>
+
+  <!-- ── SECTION: AO VIVO ── -->
+  <section class="app-section" id="section-live">
+    <div class="section-header">
+      <h3>Quem está treinando agora</h3>
+      <div class="live-badge" style="margin:0"><span class="live-dot"></span> Ao Vivo</div>
+    </div>
+    <div class="feed-grid" id="app-feed-grid">
+      <div class="feed-empty"><div class="icon">🏋️</div><p>Nenhum usuário treinando agora.</p></div>
     </div>
   </section>
 
@@ -1321,6 +1334,11 @@ function skipRest() {
 
 async function publishActiveSession(status) {
   if (!currentUser || !currentProfile || !trainCurrentEx) return;
+  // Tenta obter a carga do plano do dia atual
+  const today = new Date().getDay();
+  const planItems = weeklyPlan[today] || [];
+  const planItem  = planItems.find(i => i.exercise_id === trainCurrentEx.id);
+  const weight    = planItem ? parseFloat(planItem.weight_kg) || 0 : 0;
   await SB.from('kinetic_active_sessions').upsert({
     user_id: currentUser.id,
     nick: currentProfile.nick,
@@ -1328,6 +1346,7 @@ async function publishActiveSession(status) {
     status,
     current_set: trainCurrentSet,
     total_sets: trainTotalSets,
+    weight_kg: weight,
     updated_at: new Date().toISOString()
   });
 }
@@ -1416,7 +1435,36 @@ function switchSection(name) {
   $('section-'+name).classList.add('active');
   document.querySelector(`[data-section="${name}"]`).classList.add('active');
   if (name === 'measures') loadMeasures();
+  if (name === 'live') loadAppFeed();
   if (name === 'plan') { activePlanDay = new Date().getDay(); renderDaysTabs(); renderPlanList(); }
+}
+
+// ── APP FEED (logado) ──
+async function loadAppFeed() {
+  const { data } = await SB.from('kinetic_active_sessions').select('*').neq('status','done');
+  renderAppFeed(data || []);
+}
+
+function renderAppFeed(sessions) {
+  const el = $('app-feed-grid');
+  if (!el) return;
+  if (!sessions.length) {
+    el.innerHTML = '<div class="feed-empty"><div class="icon">🏋️</div><p>Nenhum usuário treinando agora.<br>Seja o primeiro!</p></div>';
+    return;
+  }
+  el.innerHTML = sessions.map(s => `
+    <div class="feed-card ${s.status}">
+      <div class="feed-nick">@${s.nick}</div>
+      <div class="feed-exercise">${s.exercise_name}</div>
+      <span class="feed-status ${s.status}">
+        ${s.status === 'training' ? '🔥 Treinando' : '⏱ Descansando'}
+      </span>
+      <div class="feed-series">
+        Série ${s.current_set} de ${s.total_sets}
+        ${s.weight_kg > 0 ? `<span class="feed-weight">· ${s.weight_kg} kg</span>` : ''}
+      </div>
+    </div>
+  `).join('');
 }
 
 // ── PUBLIC FEED ──
@@ -1438,7 +1486,10 @@ function renderFeed(sessions) {
       <span class="feed-status ${s.status}">
         ${s.status === 'training' ? '🔥 Treinando' : '⏱ Descansando'}
       </span>
-      <div class="feed-series">Série ${s.current_set} de ${s.total_sets}</div>
+      <div class="feed-series">
+        Série ${s.current_set} de ${s.total_sets}
+        ${s.weight_kg > 0 ? `<span class="feed-weight">· ${s.weight_kg} kg</span>` : ''}
+      </div>
     </div>
   `).join('');
 }
@@ -1448,6 +1499,8 @@ function subscribeToFeed() {
   SB.channel('active_sessions_feed')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'kinetic_active_sessions' }, () => {
       loadPublicFeed();
+      // Se aba "Ao Vivo" estiver ativa no painel, atualiza também
+      if ($('section-live') && $('section-live').classList.contains('active')) loadAppFeed();
     })
     .subscribe();
 }
