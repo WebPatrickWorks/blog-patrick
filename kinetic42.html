@@ -1,0 +1,1441 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <title>Kinetic42 | Centro Oculto</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Barlow+Condensed:wght@400;700;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    /* ─── RESET & VARS ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0b0f17;
+      --bg2: #0f1623;
+      --bg3: #121826;
+      --txt: #e6edf3;
+      --txt2: #9aa4b2;
+      --muted: #6b7280;
+      --accent: #7c9cff;
+      --accent-soft: rgba(124,156,255,0.12);
+      --border: rgba(255,255,255,0.08);
+      --border2: rgba(255,255,255,0.14);
+      --green: #34d399;
+      --green-soft: rgba(52,211,153,0.12);
+      --red: #f87171;
+      --orange: #fb923c;
+      --orange-soft: rgba(251,146,60,0.12);
+      --r-sm: 8px; --r-md: 12px; --r-lg: 16px; --r-xl: 24px;
+      --shadow: 0 20px 60px rgba(0,0,0,0.55);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0 auto;
+      max-width: 1280px;
+      padding: 40px 32px;
+      font-family: 'Barlow', 'Inter', sans-serif;
+      line-height: 1.7;
+      color: var(--txt);
+      background: radial-gradient(circle at top, #101726 0%, var(--bg) 60%);
+      min-height: 100vh;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button { cursor: pointer; font-family: inherit; }
+    input, textarea, select { font-family: inherit; }
+
+    /* ─── VIDEO BG ─── */
+    .video-background {
+      position: fixed; inset: 0; z-index: -1; overflow: hidden; background: var(--bg);
+    }
+    .video-background video {
+      position: absolute; top: 50%; left: 50%;
+      min-width: 100%; min-height: 100%;
+      object-fit: cover; transform: translate(-50%,-50%);
+      opacity: 0.18; filter: brightness(0.5) saturate(0.8);
+    }
+
+    /* ─── HEADER ─── */
+    .k-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 40px; flex-wrap: wrap; gap: 16px;
+    }
+    .k-brand { display: flex; align-items: center; gap: 14px; }
+    .k-logo {
+      width: 44px; height: 44px; border-radius: var(--r-md);
+      background: linear-gradient(135deg, var(--orange) 0%, #f87171 100%);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.1rem; font-weight: 900; color: #fff; letter-spacing: -0.02em;
+      box-shadow: 0 0 24px rgba(251,146,60,0.3);
+    }
+    .k-brand-text h1 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.8rem; font-weight: 900; letter-spacing: -0.02em;
+      color: var(--txt); line-height: 1;
+    }
+    .k-brand-text span {
+      font-size: 0.75rem; color: var(--muted); letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .k-back {
+      font-size: 0.82rem; color: var(--muted);
+      padding: 8px 16px; border: 1px solid var(--border);
+      border-radius: var(--r-sm); background: transparent;
+      transition: all 0.2s;
+    }
+    .k-back:hover { color: var(--txt); border-color: var(--border2); }
+
+    /* ─── TOAST ─── */
+    .toast {
+      position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+      padding: 12px 20px; border-radius: var(--r-md);
+      background: var(--bg3); border: 1px solid var(--border2);
+      font-size: 0.88rem; color: var(--txt);
+      box-shadow: var(--shadow); opacity: 0;
+      transform: translateY(12px);
+      transition: all 0.3s ease; pointer-events: none;
+      max-width: 320px;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.ok { border-color: rgba(52,211,153,0.4); color: var(--green); }
+    .toast.err { border-color: rgba(248,113,113,0.4); color: var(--red); }
+
+    /* ─── MODAL BASE ─── */
+    .modal-overlay {
+      position: fixed; inset: 0; z-index: 8000;
+      background: rgba(3,7,18,0.75); backdrop-filter: blur(6px);
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px; opacity: 0; pointer-events: none;
+      transition: opacity 0.25s;
+    }
+    .modal-overlay.active { opacity: 1; pointer-events: auto; }
+    .modal {
+      background: var(--bg2); border: 1px solid var(--border2);
+      border-radius: var(--r-xl); padding: 32px; width: 100%;
+      max-width: 440px; box-shadow: var(--shadow);
+      transform: translateY(16px); transition: transform 0.25s;
+    }
+    .modal-overlay.active .modal { transform: translateY(0); }
+    .modal h3 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.4rem; font-weight: 700; margin-bottom: 8px;
+    }
+    .modal p.modal-sub { font-size: 0.84rem; color: var(--txt2); margin-bottom: 24px; line-height: 1.5; }
+    .modal-close {
+      position: absolute; top: 16px; right: 16px;
+      background: none; border: none; color: var(--muted);
+      font-size: 1.4rem; line-height: 1; padding: 4px;
+      transition: color 0.2s;
+    }
+    .modal-close:hover { color: var(--txt); }
+    .modal { position: relative; }
+
+    /* ─── FORM ELEMENTS ─── */
+    .field { margin-bottom: 16px; }
+    .field label { display: block; font-size: 0.8rem; color: var(--muted); margin-bottom: 6px; letter-spacing: 0.06em; text-transform: uppercase; }
+    .field input, .field select, .field textarea {
+      width: 100%; padding: 11px 14px;
+      background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+      border-radius: var(--r-sm); color: var(--txt); font-size: 0.95rem;
+      transition: border-color 0.2s, box-shadow 0.2s; outline: none;
+    }
+    .field input:focus, .field select:focus, .field textarea:focus {
+      border-color: rgba(124,156,255,0.4);
+      box-shadow: 0 0 0 3px rgba(124,156,255,0.1);
+    }
+    .field select option { background: var(--bg2); }
+    .field textarea { resize: vertical; min-height: 80px; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .field-row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+    /* ─── BUTTONS ─── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 11px 22px; border-radius: var(--r-md);
+      font-size: 0.9rem; font-weight: 600; letter-spacing: 0.02em;
+      border: none; transition: all 0.2s; white-space: nowrap;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--orange) 0%, #f87171 100%);
+      color: #fff; box-shadow: 0 4px 16px rgba(251,146,60,0.3);
+    }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 22px rgba(251,146,60,0.45); }
+    .btn-ghost {
+      background: rgba(255,255,255,0.04); color: var(--txt2);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover { background: rgba(255,255,255,0.08); color: var(--txt); }
+    .btn-danger { background: rgba(248,113,113,0.12); color: var(--red); border: 1px solid rgba(248,113,113,0.24); }
+    .btn-danger:hover { background: rgba(248,113,113,0.2); }
+    .btn-green { background: rgba(52,211,153,0.12); color: var(--green); border: 1px solid rgba(52,211,153,0.24); }
+    .btn-green:hover { background: rgba(52,211,153,0.2); }
+    .btn-sm { padding: 7px 14px; font-size: 0.82rem; }
+    .btn-full { width: 100%; justify-content: center; }
+    .btn:disabled { opacity: 0.45; pointer-events: none; }
+
+    /* ─── CARD ─── */
+    .card {
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: var(--r-lg); padding: 24px;
+    }
+    .card-sm { padding: 16px 20px; }
+
+    /* ─── PUBLIC FEED (not logged) ─── */
+    #public-view { display: block; }
+    #auth-view { display: none; }
+    #app-view { display: none; }
+
+    .feed-header {
+      text-align: center; margin-bottom: 40px;
+    }
+    .feed-header h2 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 2.6rem; font-weight: 900; letter-spacing: -0.02em;
+      background: linear-gradient(135deg, var(--orange), #f87171);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; margin-bottom: 8px;
+    }
+    .feed-header p { color: var(--txt2); font-size: 0.95rem; }
+
+    .live-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 14px; border-radius: 999px;
+      background: rgba(52,211,153,0.1); border: 1px solid rgba(52,211,153,0.24);
+      font-size: 0.75rem; font-weight: 700; color: var(--green);
+      letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 20px;
+    }
+    .live-dot {
+      width: 7px; height: 7px; border-radius: 50%; background: var(--green);
+      animation: pulse 1.8s infinite;
+    }
+    @keyframes pulse {
+      0%   { box-shadow: 0 0 0 0 rgba(52,211,153,0.6); }
+      60%  { box-shadow: 0 0 0 7px rgba(52,211,153,0); }
+      100% { box-shadow: 0 0 0 0 rgba(52,211,153,0); }
+    }
+
+    .feed-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px; margin-bottom: 40px;
+    }
+    .feed-card {
+      background: var(--bg3); border: 1px solid var(--border);
+      border-radius: var(--r-lg); padding: 20px;
+      transition: border-color 0.2s;
+    }
+    .feed-card.training { border-color: rgba(251,146,60,0.3); }
+    .feed-card.resting  { border-color: rgba(124,156,255,0.3); }
+    .feed-nick {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.9rem;
+      font-weight: 700; color: var(--txt); margin-bottom: 4px;
+    }
+    .feed-exercise { font-size: 1rem; color: var(--txt2); margin-bottom: 8px; }
+    .feed-status {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 0.78rem; font-weight: 700; letter-spacing: 0.06em;
+      text-transform: uppercase; padding: 3px 10px; border-radius: 999px;
+    }
+    .feed-status.training { background: var(--orange-soft); color: var(--orange); }
+    .feed-status.resting  { background: var(--accent-soft); color: var(--accent); }
+    .feed-series { font-size: 0.82rem; color: var(--muted); margin-top: 8px; }
+
+    .feed-empty {
+      text-align: center; padding: 60px 20px; color: var(--muted);
+    }
+    .feed-empty .icon { font-size: 3rem; margin-bottom: 12px; }
+
+    .auth-cta {
+      max-width: 400px; margin: 0 auto; text-align: center;
+    }
+    .auth-cta .card { padding: 36px; }
+    .auth-cta h3 { font-family: 'Barlow Condensed',sans-serif; font-size: 1.5rem; font-weight: 800; margin-bottom: 8px; }
+    .auth-cta p { font-size: 0.88rem; color: var(--txt2); margin-bottom: 24px; }
+    .auth-cta .btn-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+    /* ─── AUTH FORMS ─── */
+    #auth-view { max-width: 420px; margin: 0 auto; }
+    .auth-box { padding: 40px; }
+    .auth-box h2 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.8rem; font-weight: 900; margin-bottom: 6px;
+    }
+    .auth-box .sub { font-size: 0.85rem; color: var(--txt2); margin-bottom: 28px; line-height: 1.6; }
+    .auth-switch { text-align: center; margin-top: 20px; font-size: 0.84rem; color: var(--muted); }
+    .auth-switch a { color: var(--accent); text-decoration: underline; cursor: pointer; }
+    .warn-box {
+      background: rgba(251,146,60,0.08); border: 1px solid rgba(251,146,60,0.2);
+      border-radius: var(--r-sm); padding: 12px 16px;
+      font-size: 0.82rem; color: var(--orange); margin-bottom: 20px; line-height: 1.6;
+    }
+
+    /* ─── APP LAYOUT ─── */
+    #app-view { display: none; }
+    .app-nav {
+      display: flex; gap: 4px; margin-bottom: 32px;
+      background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+      border-radius: var(--r-lg); padding: 6px; flex-wrap: wrap;
+    }
+    .nav-btn {
+      flex: 1; min-width: 100px; padding: 10px 14px;
+      border-radius: var(--r-md); border: none;
+      background: transparent; color: var(--txt2);
+      font-size: 0.85rem; font-weight: 600; letter-spacing: 0.02em;
+      transition: all 0.2s; display: flex; align-items: center;
+      justify-content: center; gap: 6px; white-space: nowrap;
+    }
+    .nav-btn.active {
+      background: linear-gradient(135deg, rgba(251,146,60,0.2), rgba(248,113,113,0.15));
+      color: var(--orange);
+      box-shadow: inset 0 0 0 1px rgba(251,146,60,0.3);
+    }
+    .nav-btn:hover:not(.active) { background: rgba(255,255,255,0.06); color: var(--txt); }
+
+    .app-section { display: none; }
+    .app-section.active { display: block; }
+
+    .section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 24px; flex-wrap: wrap; gap: 12px;
+    }
+    .section-header h3 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.5rem; font-weight: 800;
+    }
+
+    /* ─── EXERCISES LIST ─── */
+    .exercise-list { display: flex; flex-direction: column; gap: 10px; }
+    .exercise-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 18px; background: var(--bg3);
+      border: 1px solid var(--border); border-radius: var(--r-md);
+      transition: border-color 0.2s;
+    }
+    .exercise-item:hover { border-color: var(--border2); }
+    .exercise-name { flex: 1; font-weight: 600; font-size: 0.95rem; }
+    .exercise-rest { font-size: 0.8rem; color: var(--muted); }
+    .exercise-actions { display: flex; gap: 6px; }
+
+    /* ─── WEEKLY PLAN ─── */
+    .days-tabs {
+      display: flex; gap: 4px; margin-bottom: 20px; flex-wrap: wrap;
+    }
+    .day-tab {
+      padding: 8px 14px; border-radius: var(--r-sm);
+      border: 1px solid var(--border); background: transparent;
+      color: var(--txt2); font-size: 0.82rem; font-weight: 600;
+      letter-spacing: 0.04em; transition: all 0.2s;
+    }
+    .day-tab.active { background: var(--accent-soft); color: var(--accent); border-color: rgba(124,156,255,0.3); }
+    .day-tab.has-items { border-color: rgba(251,146,60,0.3); color: var(--orange); }
+    .day-tab.active.has-items { background: var(--orange-soft); border-color: rgba(251,146,60,0.4); }
+
+    .plan-list { display: flex; flex-direction: column; gap: 10px; }
+    .plan-item {
+      display: grid; grid-template-columns: 1fr auto auto auto auto;
+      align-items: center; gap: 10px; padding: 12px 16px;
+      background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r-md);
+    }
+    .plan-item-name { font-weight: 600; font-size: 0.9rem; }
+    .plan-mini-input {
+      width: 60px; padding: 5px 8px; background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border); border-radius: 6px;
+      color: var(--txt); font-size: 0.85rem; text-align: center;
+    }
+    .plan-mini-label { font-size: 0.72rem; color: var(--muted); text-align: center; display: block; }
+    .plan-mini-group { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+
+    /* ─── TRAIN SECTION ─── */
+    .train-start-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 12px; margin-bottom: 24px;
+    }
+    .train-ex-card {
+      padding: 18px; background: var(--bg3); border: 1px solid var(--border);
+      border-radius: var(--r-md); cursor: pointer; transition: all 0.2s;
+    }
+    .train-ex-card:hover { border-color: rgba(251,146,60,0.4); background: rgba(251,146,60,0.05); }
+    .train-ex-card h4 { font-size: 1rem; font-weight: 700; margin-bottom: 4px; }
+    .train-ex-card p { font-size: 0.82rem; color: var(--muted); margin: 0; }
+
+    /* ─── ACTIVE TRAINING OVERLAY ─── */
+    #train-overlay {
+      position: fixed; inset: 0; z-index: 9000;
+      background: #070b13;
+      display: none; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 32px 20px;
+    }
+    #train-overlay.active { display: flex; }
+
+    .train-exercise-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.2rem; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--muted);
+      margin-bottom: 8px; text-align: center;
+    }
+    .train-series-info {
+      font-size: 0.9rem; color: var(--txt2); margin-bottom: 48px; text-align: center;
+    }
+
+    /* Pulsating TREINO text */
+    .train-word {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(5rem, 22vw, 10rem);
+      font-weight: 900; letter-spacing: -0.04em;
+      line-height: 1; text-align: center;
+      background: linear-gradient(135deg, var(--orange) 0%, #f87171 60%, #fb7185 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: trainPulse 1.4s ease-in-out infinite;
+      user-select: none;
+    }
+    @keyframes trainPulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.75; transform: scale(0.97); }
+    }
+
+    /* REST TIMER */
+    .rest-display { display: none; flex-direction: column; align-items: center; gap: 8px; }
+    .rest-display.active { display: flex; }
+    .rest-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem; letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 12px;
+    }
+    .rest-circle {
+      position: relative; width: 200px; height: 200px;
+    }
+    .rest-circle svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+    .rest-circle-bg { fill: none; stroke: rgba(124,156,255,0.1); stroke-width: 6; }
+    .rest-circle-fill {
+      fill: none; stroke: var(--accent); stroke-width: 6;
+      stroke-linecap: round; stroke-dasharray: 565; stroke-dashoffset: 0;
+      transition: stroke-dashoffset 1s linear;
+    }
+    .rest-time {
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      font-family: 'JetBrains Mono', monospace; font-size: 3rem; font-weight: 700;
+      color: var(--txt);
+    }
+
+    .train-actions {
+      display: flex; gap: 16px; margin-top: 56px; flex-wrap: wrap; justify-content: center;
+    }
+    .train-actions .btn { min-width: 160px; justify-content: center; padding: 16px 28px; font-size: 1rem; }
+    .btn-cancel-train { background: rgba(255,255,255,0.05); color: var(--muted); border: 1px solid var(--border); }
+    .btn-cancel-train:hover { color: var(--red); border-color: rgba(248,113,113,0.3); }
+    .btn-done-set {
+      background: linear-gradient(135deg, var(--orange), #f87171);
+      color: #fff; font-size: 1rem; font-weight: 700;
+      box-shadow: 0 6px 24px rgba(251,146,60,0.4);
+    }
+    .btn-done-set:hover { transform: translateY(-2px); box-shadow: 0 10px 32px rgba(251,146,60,0.55); }
+    .btn-skip-rest { background: var(--accent-soft); color: var(--accent); border: 1px solid rgba(124,156,255,0.24); }
+
+    /* ─── BODY MEASURES ─── */
+    .measure-history { display: flex; flex-direction: column; gap: 12px; margin-top: 24px; }
+    .measure-card {
+      padding: 18px 20px; background: var(--bg3); border: 1px solid var(--border);
+      border-radius: var(--r-md);
+    }
+    .measure-date {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.78rem;
+      color: var(--muted); margin-bottom: 12px; letter-spacing: 0.06em;
+    }
+    .measure-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px;
+    }
+    .measure-val { }
+    .measure-val .label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; }
+    .measure-val .val { font-size: 1.1rem; font-weight: 700; color: var(--txt); }
+    .measure-val .unit { font-size: 0.75rem; color: var(--muted); }
+
+    /* ─── PLAN TODAY ─── */
+    .today-header {
+      background: linear-gradient(135deg, rgba(251,146,60,0.1), rgba(248,113,113,0.08));
+      border: 1px solid rgba(251,146,60,0.2);
+      border-radius: var(--r-lg); padding: 20px 24px;
+      margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px;
+    }
+    .today-header h3 {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 1.3rem; font-weight: 800; color: var(--orange);
+    }
+    .today-header p { font-size: 0.85rem; color: var(--txt2); margin: 0; }
+
+    /* ─── USER HEADER ─── */
+    .user-bar {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 18px; background: var(--bg3); border: 1px solid var(--border);
+      border-radius: var(--r-md); margin-bottom: 28px;
+    }
+    .user-avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--orange), #f87171);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 0.9rem; color: #fff; flex-shrink: 0;
+    }
+    .user-nick { font-weight: 700; font-size: 0.95rem; }
+    .user-since { font-size: 0.78rem; color: var(--muted); }
+    .user-bar .btn-ghost { margin-left: auto; }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 600px) {
+      body { padding: 20px 14px; }
+      .app-nav { gap: 3px; }
+      .nav-btn { font-size: 0.78rem; padding: 9px 10px; min-width: 70px; }
+      .plan-item { grid-template-columns: 1fr; gap: 6px; }
+      .plan-item-name { grid-column: 1; }
+      .plan-mini-group { flex-direction: row; align-items: center; gap: 8px; }
+      .plan-mini-label { display: inline; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="video-background">
+  <video autoplay muted loop playsinline>
+    <source src="videos/fundo-blog-patrick.mp4" type="video/mp4">
+  </video>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- ══════════════════════════════════════════
+     ACTIVE TRAINING OVERLAY (fullscreen)
+══════════════════════════════════════════ -->
+<div id="train-overlay">
+  <div class="train-exercise-name" id="to-exercise-name">—</div>
+  <div class="train-series-info" id="to-series-info">Série 1 de 3</div>
+
+  <!-- TREINO word -->
+  <div id="train-word-wrap">
+    <div class="train-word">TREINO</div>
+  </div>
+
+  <!-- REST TIMER -->
+  <div class="rest-display" id="rest-display">
+    <div class="rest-label">⟳ Descanso</div>
+    <div class="rest-circle">
+      <svg viewBox="0 0 180 180">
+        <circle class="rest-circle-bg" cx="90" cy="90" r="80"/>
+        <circle class="rest-circle-fill" id="rest-arc" cx="90" cy="90" r="80"/>
+      </svg>
+      <div class="rest-time" id="rest-time-display">—</div>
+    </div>
+  </div>
+
+  <div class="train-actions">
+    <button class="btn btn-cancel-train" id="btn-cancel-train">✕ Cancelar</button>
+    <button class="btn btn-done-set" id="btn-done-set">Terminei a Série ✓</button>
+    <button class="btn btn-skip-rest" id="btn-skip-rest" style="display:none">Pular descanso →</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     HEADER
+══════════════════════════════════════════ -->
+<header class="k-header">
+  <div class="k-brand">
+    <div class="k-logo">K42</div>
+    <div class="k-brand-text">
+      <h1>Kinetic42</h1>
+      <span>Sistema de Treino · Centro Oculto</span>
+    </div>
+  </div>
+  <a href="index.html" class="btn btn-ghost btn-sm k-back">← Voltar ao blog</a>
+</header>
+
+<!-- ══════════════════════════════════════════
+     PUBLIC VIEW (not logged in)
+══════════════════════════════════════════ -->
+<div id="public-view">
+  <div class="feed-header">
+    <div class="live-badge"><span class="live-dot"></span> Ao Vivo</div>
+    <h2>Quem está treinando agora</h2>
+    <p>Acompanhe os usuários ativos em tempo real</p>
+  </div>
+
+  <div class="feed-grid" id="feed-grid">
+    <div class="feed-empty">
+      <div class="icon">🏋️</div>
+      <p>Nenhum usuário treinando agora.<br>Seja o primeiro!</p>
+    </div>
+  </div>
+
+  <div class="auth-cta">
+    <div class="card">
+      <h3>Comece a treinar</h3>
+      <p>Crie sua conta gratuita e monte seu plano de treino personalizado.</p>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="showAuth('register')">Criar conta</button>
+        <button class="btn btn-ghost" onclick="showAuth('login')">Entrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     AUTH VIEW
+══════════════════════════════════════════ -->
+<div id="auth-view">
+  <!-- LOGIN -->
+  <div id="login-form" class="card auth-box">
+    <h2>Entrar</h2>
+    <p class="sub">Acesse sua conta Kinetic42.</p>
+    <div class="field">
+      <label>Nick</label>
+      <input type="text" id="login-nick" placeholder="seu_nick" autocomplete="username"/>
+    </div>
+    <div class="field">
+      <label>Senha</label>
+      <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password"/>
+    </div>
+    <button class="btn btn-primary btn-full" onclick="doLogin()">Entrar</button>
+    <div class="auth-switch">Não tem conta? <a onclick="toggleAuthForm('register')">Criar conta</a></div>
+    <div class="auth-switch" style="margin-top:8px"><a onclick="showPublic()">← Voltar</a></div>
+  </div>
+
+  <!-- REGISTER -->
+  <div id="register-form" class="card auth-box" style="display:none">
+    <h2>Criar conta</h2>
+    <p class="sub">Escolha um nick e senha para começar.</p>
+    <div class="warn-box">
+      ⚠️ <strong>Atenção:</strong> suas credenciais <strong>não podem ser recuperadas</strong> em caso de perda. Guarde-as bem. Contas sem acesso por <strong>6 meses</strong> são excluídas automaticamente.
+    </div>
+    <div class="field">
+      <label>Nick (apelido público)</label>
+      <input type="text" id="reg-nick" placeholder="seu_nick" maxlength="24" autocomplete="username"/>
+    </div>
+    <div class="field">
+      <label>Senha</label>
+      <input type="password" id="reg-pass" placeholder="mínimo 6 caracteres" autocomplete="new-password"/>
+    </div>
+    <div class="field">
+      <label>Confirmar senha</label>
+      <input type="password" id="reg-pass2" placeholder="repita a senha" autocomplete="new-password"/>
+    </div>
+    <button class="btn btn-primary btn-full" onclick="doRegister()">Criar conta</button>
+    <div class="auth-switch">Já tem conta? <a onclick="toggleAuthForm('login')">Entrar</a></div>
+    <div class="auth-switch" style="margin-top:8px"><a onclick="showPublic()">← Voltar</a></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     APP VIEW (logged in)
+══════════════════════════════════════════ -->
+<div id="app-view">
+
+  <!-- User bar -->
+  <div class="user-bar">
+    <div class="user-avatar" id="app-avatar">?</div>
+    <div>
+      <div class="user-nick" id="app-nick">—</div>
+      <div class="user-since" id="app-since">membro desde —</div>
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="doLogout()">Sair</button>
+  </div>
+
+  <!-- Nav -->
+  <nav class="app-nav">
+    <button class="nav-btn active" data-section="train" onclick="switchSection('train')">🏋️ Treinar</button>
+    <button class="nav-btn" data-section="exercises" onclick="switchSection('exercises')">⚡ Exercícios</button>
+    <button class="nav-btn" data-section="plan" onclick="switchSection('plan')">📅 Plano</button>
+    <button class="nav-btn" data-section="measures" onclick="switchSection('measures')">📏 Medidas</button>
+  </nav>
+
+  <!-- ── SECTION: TREINAR ── -->
+  <section class="app-section active" id="section-train">
+
+    <!-- Plano do dia -->
+    <div class="today-header" id="today-header">
+      <div>
+        <h3 id="today-title">Plano de hoje</h3>
+        <p id="today-subtitle">Carregando...</p>
+      </div>
+      <button class="btn btn-primary btn-sm" id="btn-run-today" onclick="runTodayPlan()" style="display:none">
+        ▶ Executar Plano do Dia
+      </button>
+    </div>
+
+    <div class="section-header">
+      <h3>Escolher exercício</h3>
+    </div>
+    <div class="train-start-grid" id="train-ex-grid">
+      <p style="color:var(--muted); font-size:0.88rem;">Nenhum exercício cadastrado. Vá em ⚡ Exercícios para adicionar.</p>
+    </div>
+  </section>
+
+  <!-- ── SECTION: EXERCÍCIOS ── -->
+  <section class="app-section" id="section-exercises">
+    <div class="section-header">
+      <h3>Meus Exercícios</h3>
+      <button class="btn btn-primary btn-sm" onclick="openExerciseModal()">+ Adicionar</button>
+    </div>
+    <div class="exercise-list" id="exercise-list">
+      <p style="color:var(--muted);font-size:0.88rem;">Nenhum exercício cadastrado ainda.</p>
+    </div>
+  </section>
+
+  <!-- ── SECTION: PLANO SEMANAL ── -->
+  <section class="app-section" id="section-plan">
+    <div class="section-header">
+      <h3>Plano Semanal</h3>
+    </div>
+    <div class="days-tabs" id="days-tabs"></div>
+    <div style="margin-bottom:16px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+      <select id="plan-add-exercise" style="flex:1; padding:9px 12px; background:rgba(255,255,255,0.04); border:1px solid var(--border); border-radius:var(--r-sm); color:var(--txt);">
+        <option value="">Escolher exercício...</option>
+      </select>
+      <button class="btn btn-primary btn-sm" onclick="addToPlan()">+ Adicionar ao dia</button>
+    </div>
+    <div class="plan-list" id="plan-list">
+      <p style="color:var(--muted);font-size:0.88rem;">Nenhum exercício neste dia.</p>
+    </div>
+  </section>
+
+  <!-- ── SECTION: MEDIDAS ── -->
+  <section class="app-section" id="section-measures">
+    <div class="section-header">
+      <h3>Medidas Corporais</h3>
+      <button class="btn btn-primary btn-sm" onclick="openMeasureModal()">+ Registrar</button>
+    </div>
+    <div class="measure-history" id="measure-list">
+      <p style="color:var(--muted);font-size:0.88rem;">Nenhuma medida registrada ainda.</p>
+    </div>
+  </section>
+
+</div><!-- /app-view -->
+
+<!-- ══════════════════════════════════════════
+     MODALS
+══════════════════════════════════════════ -->
+
+<!-- Exercise Modal -->
+<div class="modal-overlay" id="modal-exercise">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-exercise')">×</button>
+    <h3 id="ex-modal-title">Novo Exercício</h3>
+    <p class="modal-sub">Cadastre um exercício e o tempo de intervalo entre as séries.</p>
+    <input type="hidden" id="ex-edit-id"/>
+    <div class="field">
+      <label>Nome do exercício</label>
+      <input type="text" id="ex-name" placeholder="ex: Supino Reto, Remada Alta..."/>
+    </div>
+    <div class="field">
+      <label>Intervalo entre séries (segundos)</label>
+      <input type="number" id="ex-rest" value="60" min="10" max="600"/>
+    </div>
+    <div style="display:flex; gap:10px; margin-top:8px;">
+      <button class="btn btn-ghost" style="flex:1" onclick="closeModal('modal-exercise')">Cancelar</button>
+      <button class="btn btn-primary" style="flex:1" onclick="saveExercise()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Measure Modal -->
+<div class="modal-overlay" id="modal-measure">
+  <div class="modal" style="max-width:520px">
+    <button class="modal-close" onclick="closeModal('modal-measure')">×</button>
+    <h3>Registrar Medidas</h3>
+    <p class="modal-sub">Registre suas medidas corporais para acompanhar a evolução.</p>
+    <div class="field">
+      <label>Data</label>
+      <input type="date" id="m-date"/>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Peso (kg)</label><input type="number" id="m-weight" step="0.1" placeholder="75.5"/></div>
+      <div class="field"><label>Altura (cm)</label><input type="number" id="m-height" step="0.1" placeholder="175"/></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Peito (cm)</label><input type="number" id="m-chest" step="0.1"/></div>
+      <div class="field"><label>Cintura (cm)</label><input type="number" id="m-waist" step="0.1"/></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Quadril (cm)</label><input type="number" id="m-hip" step="0.1"/></div>
+      <div class="field"><label>% Gordura</label><input type="number" id="m-fat" step="0.1"/></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Braço Esq. (cm)</label><input type="number" id="m-larm" step="0.1"/></div>
+      <div class="field"><label>Braço Dir. (cm)</label><input type="number" id="m-rarm" step="0.1"/></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Coxa Esq. (cm)</label><input type="number" id="m-lthigh" step="0.1"/></div>
+      <div class="field"><label>Coxa Dir. (cm)</label><input type="number" id="m-rthigh" step="0.1"/></div>
+    </div>
+    <div class="field">
+      <label>Observações</label>
+      <textarea id="m-notes" placeholder="ex: início de bulking, pós-férias..."></textarea>
+    </div>
+    <div style="display:flex; gap:10px; margin-top:8px;">
+      <button class="btn btn-ghost" style="flex:1" onclick="closeModal('modal-measure')">Cancelar</button>
+      <button class="btn btn-primary" style="flex:1" onclick="saveMeasure()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════ -->
+<script>
+// ── SUPABASE INIT ──
+const { createClient } = supabase;
+const SB = createClient(
+  'https://yegczfbshkctxedzkdpu.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InllZ2N6ZmJzaGtjdHhlZHprZHB1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYyMzc1OTUsImV4cCI6MjA4MTgxMzU5NX0.GU7KfJ4J1gAGK_q_uyYNPsPWqYbXjU2qdVhZq8SsIdM'
+);
+
+// ── STATE ──
+let currentUser = null;
+let currentProfile = null;
+let exercises = [];
+let weeklyPlan = {};
+let activePlanDay = new Date().getDay(); // 0=Dom
+
+// Train state
+let trainQueue = [];
+let trainQueueIdx = 0;
+let trainCurrentEx = null;
+let trainCurrentSet = 1;
+let trainTotalSets = 3;
+let restTimer = null;
+let restTotal = 60;
+
+const DAY_NAMES = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const DAY_FULL  = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+
+// ── UTILS ──
+function toast(msg, type='') {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.className = 'toast show ' + type;
+  setTimeout(() => el.className = 'toast', 3000);
+}
+
+function $(id) { return document.getElementById(id); }
+
+function openModal(id) { $(id).classList.add('active'); }
+function closeModal(id) { $(id).classList.remove('active'); }
+
+function fmtDate(d) {
+  return new Date(d).toLocaleDateString('pt-BR', {day:'2-digit',month:'short',year:'numeric'});
+}
+
+// ── VIEWS ──
+function showPublic() {
+  $('public-view').style.display = 'block';
+  $('auth-view').style.display   = 'none';
+  $('app-view').style.display    = 'none';
+}
+function showAuth(mode) {
+  $('public-view').style.display = 'none';
+  $('auth-view').style.display   = 'block';
+  $('app-view').style.display    = 'none';
+  toggleAuthForm(mode);
+}
+function showApp() {
+  $('public-view').style.display = 'none';
+  $('auth-view').style.display   = 'none';
+  $('app-view').style.display    = 'block';
+}
+function toggleAuthForm(mode) {
+  $('login-form').style.display    = mode === 'login'    ? 'block' : 'none';
+  $('register-form').style.display = mode === 'register' ? 'block' : 'none';
+}
+
+// ── AUTH ──
+async function doRegister() {
+  const nick = $('reg-nick').value.trim();
+  const pass  = $('reg-pass').value;
+  const pass2 = $('reg-pass2').value;
+  if (!nick || nick.length < 3) return toast('Nick muito curto (mín. 3 caracteres).','err');
+  if (!/^[a-z0-9_]+$/i.test(nick)) return toast('Nick: use apenas letras, números e _','err');
+  if (pass.length < 6) return toast('Senha muito curta (mín. 6 caracteres).','err');
+  if (pass !== pass2) return toast('Senhas não coincidem.','err');
+
+  // Check nick availability
+  const { data: existing } = await SB.from('kinetic_profiles').select('nick').eq('nick', nick).maybeSingle();
+  if (existing) return toast('Nick já em uso. Escolha outro.','err');
+
+  // Supabase Auth uses email format — create a fake email from nick
+  const fakeEmail = `${nick.toLowerCase()}@kinetic42.local`;
+  const { data, error } = await SB.auth.signUp({ email: fakeEmail, password: pass });
+  if (error) return toast('Erro: ' + error.message,'err');
+
+  // Create profile
+  await SB.from('kinetic_profiles').insert({ id: data.user.id, nick });
+  toast('Conta criada! Bem-vindo ao Kinetic42 🔥','ok');
+  await loadSession();
+}
+
+async function doLogin() {
+  const nick = $('login-nick').value.trim();
+  const pass  = $('login-pass').value;
+  if (!nick || !pass) return toast('Preencha nick e senha.','err');
+
+  // Find email from nick
+  const { data: profile } = await SB.from('kinetic_profiles').select('id,nick').eq('nick', nick).maybeSingle();
+  if (!profile) return toast('Nick não encontrado.','err');
+
+  const fakeEmail = `${nick.toLowerCase()}@kinetic42.local`;
+  const { data, error } = await SB.auth.signInWithPassword({ email: fakeEmail, password: pass });
+  if (error) return toast('Senha incorreta.','err');
+
+  // Update last_seen
+  await SB.from('kinetic_profiles').update({ last_seen: new Date().toISOString() }).eq('id', data.user.id);
+  toast('Bem-vindo, ' + nick + '! 💪','ok');
+  await loadSession();
+}
+
+async function doLogout() {
+  // Remove active session
+  if (currentUser) {
+    await SB.from('kinetic_active_sessions').delete().eq('user_id', currentUser.id);
+  }
+  await SB.auth.signOut();
+  currentUser = null; currentProfile = null;
+  exercises = []; weeklyPlan = {};
+  showPublic();
+}
+
+async function loadSession() {
+  const { data: { session } } = await SB.auth.getSession();
+  if (!session) { showPublic(); return; }
+  currentUser = session.user;
+
+  const { data: profile } = await SB.from('kinetic_profiles').select('*').eq('id', currentUser.id).single();
+  currentProfile = profile;
+
+  // Update UI
+  const initials = profile.nick.slice(0,2).toUpperCase();
+  $('app-avatar').textContent = initials;
+  $('app-nick').textContent   = profile.nick;
+  $('app-since').textContent  = 'membro desde ' + fmtDate(profile.created_at);
+
+  await loadExercises();
+  await loadWeeklyPlan();
+  renderTodayHeader();
+  showApp();
+}
+
+// ── EXERCISES ──
+async function loadExercises() {
+  const { data } = await SB.from('kinetic_exercises').select('*').eq('user_id', currentUser.id).order('created_at');
+  exercises = data || [];
+  renderExerciseList();
+  renderTrainGrid();
+  renderPlanExerciseSelect();
+}
+
+function renderExerciseList() {
+  const el = $('exercise-list');
+  if (!exercises.length) {
+    el.innerHTML = '<p style="color:var(--muted);font-size:0.88rem;">Nenhum exercício cadastrado ainda.</p>';
+    return;
+  }
+  el.innerHTML = exercises.map(ex => `
+    <div class="exercise-item">
+      <div class="exercise-name">${ex.name}</div>
+      <div class="exercise-rest">⏱ ${ex.rest_seconds}s</div>
+      <div class="exercise-actions">
+        <button class="btn btn-ghost btn-sm" onclick="openExerciseModal('${ex.id}')">✏️</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteExercise('${ex.id}')">🗑</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function renderTrainGrid() {
+  const el = $('train-ex-grid');
+  if (!exercises.length) {
+    el.innerHTML = '<p style="color:var(--muted);font-size:0.88rem;">Nenhum exercício cadastrado. Vá em ⚡ Exercícios para adicionar.</p>';
+    return;
+  }
+  el.innerHTML = exercises.map(ex => `
+    <div class="train-ex-card" onclick="startExercise('${ex.id}', 3)">
+      <h4>${ex.name}</h4>
+      <p>⏱ ${ex.rest_seconds}s de descanso</p>
+    </div>
+  `).join('');
+}
+
+function renderPlanExerciseSelect() {
+  const sel = $('plan-add-exercise');
+  sel.innerHTML = '<option value="">Escolher exercício...</option>' +
+    exercises.map(ex => `<option value="${ex.id}">${ex.name}</option>`).join('');
+}
+
+function openExerciseModal(id) {
+  $('ex-edit-id').value = '';
+  $('ex-name').value = '';
+  $('ex-rest').value = 60;
+  $('ex-modal-title').textContent = 'Novo Exercício';
+  if (id) {
+    const ex = exercises.find(e => e.id === id);
+    if (ex) {
+      $('ex-edit-id').value = ex.id;
+      $('ex-name').value = ex.name;
+      $('ex-rest').value = ex.rest_seconds;
+      $('ex-modal-title').textContent = 'Editar Exercício';
+    }
+  }
+  openModal('modal-exercise');
+}
+
+async function saveExercise() {
+  const id   = $('ex-edit-id').value;
+  const name = $('ex-name').value.trim();
+  const rest = parseInt($('ex-rest').value) || 60;
+  if (!name) return toast('Nome do exercício é obrigatório.','err');
+
+  if (id) {
+    const { error } = await SB.from('kinetic_exercises').update({ name, rest_seconds: rest }).eq('id', id);
+    if (error) return toast('Erro ao salvar.','err');
+  } else {
+    const { error } = await SB.from('kinetic_exercises').insert({ user_id: currentUser.id, name, rest_seconds: rest });
+    if (error) return toast('Erro ao salvar.','err');
+  }
+  closeModal('modal-exercise');
+  toast('Exercício salvo!','ok');
+  await loadExercises();
+}
+
+async function deleteExercise(id) {
+  if (!confirm('Remover este exercício? Ele será removido do plano também.')) return;
+  await SB.from('kinetic_exercises').delete().eq('id', id);
+  toast('Exercício removido.','ok');
+  await loadExercises();
+  await loadWeeklyPlan();
+}
+
+// ── WEEKLY PLAN ──
+async function loadWeeklyPlan() {
+  const { data } = await SB.from('kinetic_weekly_plan')
+    .select('*, exercises(name, rest_seconds)')
+    .eq('user_id', currentUser.id)
+    .order('sort_order');
+  weeklyPlan = {};
+  (data || []).forEach(item => {
+    if (!weeklyPlan[item.day_of_week]) weeklyPlan[item.day_of_week] = [];
+    weeklyPlan[item.day_of_week].push(item);
+  });
+  renderDaysTabs();
+  renderPlanList();
+  renderTodayHeader();
+}
+
+function renderDaysTabs() {
+  const el = $('days-tabs');
+  el.innerHTML = DAY_NAMES.map((d, i) => {
+    const hasItems = weeklyPlan[i] && weeklyPlan[i].length > 0;
+    const isActive = i === activePlanDay;
+    return `<button class="day-tab ${isActive ? 'active' : ''} ${hasItems ? 'has-items' : ''}"
+      onclick="selectPlanDay(${i})">${d}</button>`;
+  }).join('');
+}
+
+function selectPlanDay(day) {
+  activePlanDay = day;
+  renderDaysTabs();
+  renderPlanList();
+}
+
+function renderPlanList() {
+  const el = $('plan-list');
+  const items = weeklyPlan[activePlanDay] || [];
+  if (!items.length) {
+    el.innerHTML = '<p style="color:var(--muted);font-size:0.88rem;">Nenhum exercício neste dia.</p>';
+    return;
+  }
+  el.innerHTML = items.map(item => `
+    <div class="plan-item">
+      <div class="plan-item-name">${item.exercises?.name || '—'}</div>
+      <div class="plan-mini-group">
+        <input class="plan-mini-input" type="number" value="${item.sets}" min="1" max="20"
+          onchange="updatePlanItem('${item.id}', 'sets', this.value)"/>
+        <span class="plan-mini-label">séries</span>
+      </div>
+      <div class="plan-mini-group">
+        <input class="plan-mini-input" type="number" value="${item.reps}" min="1" max="200"
+          onchange="updatePlanItem('${item.id}', 'reps', this.value)"/>
+        <span class="plan-mini-label">reps</span>
+      </div>
+      <div class="plan-mini-group">
+        <input class="plan-mini-input" type="number" value="${item.weight_kg}" min="0" step="0.5"
+          onchange="updatePlanItem('${item.id}', 'weight_kg', this.value)"/>
+        <span class="plan-mini-label">kg</span>
+      </div>
+      <button class="btn btn-danger btn-sm" onclick="removePlanItem('${item.id}')">✕</button>
+    </div>
+  `).join('');
+}
+
+async function addToPlan() {
+  const exId = $('plan-add-exercise').value;
+  if (!exId) return toast('Selecione um exercício.','err');
+  const items = weeklyPlan[activePlanDay] || [];
+  if (items.find(i => i.exercise_id === exId)) return toast('Exercício já está neste dia.','err');
+  const { error } = await SB.from('kinetic_weekly_plan').insert({
+    user_id: currentUser.id,
+    day_of_week: activePlanDay,
+    exercise_id: exId,
+    sets: 3, reps: 12, weight_kg: 0,
+    sort_order: items.length
+  });
+  if (error) return toast('Erro ao adicionar.','err');
+  toast('Adicionado!','ok');
+  await loadWeeklyPlan();
+}
+
+async function updatePlanItem(id, field, value) {
+  const update = {};
+  update[field] = parseFloat(value) || 0;
+  await SB.from('kinetic_weekly_plan').update(update).eq('id', id);
+}
+
+async function removePlanItem(id) {
+  await SB.from('kinetic_weekly_plan').delete().eq('id', id);
+  toast('Removido.','ok');
+  await loadWeeklyPlan();
+}
+
+function renderTodayHeader() {
+  const today = new Date().getDay();
+  const items = weeklyPlan[today] || [];
+  $('today-title').textContent = DAY_FULL[today];
+  if (items.length) {
+    $('today-subtitle').textContent = `${items.length} exercício${items.length > 1 ? 's' : ''} no plano de hoje`;
+    $('btn-run-today').style.display = 'inline-flex';
+  } else {
+    $('today-subtitle').textContent = 'Nenhum exercício no plano de hoje.';
+    $('btn-run-today').style.display = 'none';
+  }
+}
+
+// ── TRAINING ──
+function startExercise(exId, sets) {
+  const ex = exercises.find(e => e.id === exId);
+  if (!ex) return;
+  trainCurrentEx = ex;
+  trainCurrentSet = 1;
+  trainTotalSets = sets;
+  openTrainOverlay();
+}
+
+function runTodayPlan() {
+  const today = new Date().getDay();
+  const items = weeklyPlan[today] || [];
+  if (!items.length) return toast('Nenhum exercício no plano de hoje.','err');
+  // Build queue
+  trainQueue = items.map(item => ({
+    ex: exercises.find(e => e.id === item.exercise_id),
+    sets: item.sets,
+    reps: item.reps,
+    weight: item.weight_kg
+  })).filter(i => i.ex);
+  trainQueueIdx = 0;
+  startFromQueue();
+}
+
+function startFromQueue() {
+  if (trainQueueIdx >= trainQueue.length) {
+    closeTrainOverlay();
+    toast('Treino do dia concluído! 🎉','ok');
+    return;
+  }
+  const { ex, sets } = trainQueue[trainQueueIdx];
+  trainCurrentEx = ex;
+  trainCurrentSet = 1;
+  trainTotalSets = sets;
+  openTrainOverlay();
+}
+
+function openTrainOverlay() {
+  const overlay = $('train-overlay');
+  overlay.classList.add('active');
+  updateTrainUI();
+  showTrainWord();
+  // Publish to realtime feed
+  publishActiveSession('training');
+}
+
+function closeTrainOverlay() {
+  clearInterval(restTimer);
+  $('train-overlay').classList.remove('active');
+  trainQueue = []; trainQueueIdx = 0;
+  // Remove from feed
+  if (currentUser) {
+    SB.from('kinetic_active_sessions').delete().eq('user_id', currentUser.id);
+  }
+}
+
+function updateTrainUI() {
+  $('to-exercise-name').textContent = trainCurrentEx?.name || '—';
+  $('to-series-info').textContent   = `Série ${trainCurrentSet} de ${trainTotalSets}`;
+}
+
+function showTrainWord() {
+  $('train-word-wrap').style.display = 'block';
+  $('rest-display').classList.remove('active');
+  $('btn-done-set').style.display = 'inline-flex';
+  $('btn-skip-rest').style.display = 'none';
+}
+
+function showRestTimer() {
+  clearInterval(restTimer);
+  const total = trainCurrentEx?.rest_seconds || 60;
+  restTotal = total;
+  let remaining = total;
+  const arc = $('rest-arc');
+  const circumference = 2 * Math.PI * 80; // r=80 → ~502
+
+  $('train-word-wrap').style.display = 'none';
+  $('rest-display').classList.add('active');
+  $('btn-done-set').style.display = 'none';
+  $('btn-skip-rest').style.display = 'inline-flex';
+
+  function tick() {
+    $('rest-time-display').textContent = remaining;
+    const offset = circumference * (1 - remaining / total);
+    arc.style.strokeDasharray  = circumference;
+    arc.style.strokeDashoffset = offset;
+    if (remaining <= 0) {
+      clearInterval(restTimer);
+      // Back to training
+      showTrainWord();
+      publishActiveSession('training');
+    }
+    remaining--;
+  }
+  tick();
+  restTimer = setInterval(tick, 1000);
+  publishActiveSession('resting');
+}
+
+// Called when user taps "Terminei a Série"
+function doneSet() {
+  if (trainCurrentSet >= trainTotalSets) {
+    // All sets done for this exercise
+    trainQueueIdx++;
+    if (trainQueue.length > 0 && trainQueueIdx < trainQueue.length) {
+      // Move to next exercise after rest
+      showRestTimer();
+      // After rest, go to next
+      const origTimer = restTimer;
+      const checkNext = setInterval(() => {
+        if (!$('rest-display').classList.contains('active')) {
+          clearInterval(checkNext);
+          const { ex, sets } = trainQueue[trainQueueIdx] || {};
+          if (ex) {
+            trainCurrentEx = ex;
+            trainCurrentSet = 1;
+            trainTotalSets = sets;
+            updateTrainUI();
+          } else {
+            closeTrainOverlay();
+            toast('Treino concluído! 🎉','ok');
+          }
+        }
+      }, 500);
+    } else {
+      showRestTimer();
+      setTimeout(() => {
+        // After last rest, close
+        const waitDone = setInterval(() => {
+          if (!$('rest-display').classList.contains('active')) {
+            clearInterval(waitDone);
+            closeTrainOverlay();
+            toast('Treino concluído! 🎉','ok');
+          }
+        }, 500);
+      }, 100);
+    }
+    return;
+  }
+  trainCurrentSet++;
+  updateTrainUI();
+  showRestTimer();
+}
+
+function skipRest() {
+  clearInterval(restTimer);
+  // Check if we need to move to next exercise
+  if (trainQueue.length > 0 && trainCurrentSet > trainTotalSets) {
+    const { ex, sets } = trainQueue[trainQueueIdx] || {};
+    if (ex) {
+      trainCurrentEx = ex; trainCurrentSet = 1; trainTotalSets = sets;
+      updateTrainUI();
+    } else {
+      closeTrainOverlay();
+      toast('Treino concluído! 🎉','ok');
+      return;
+    }
+  }
+  showTrainWord();
+  publishActiveSession('training');
+}
+
+async function publishActiveSession(status) {
+  if (!currentUser || !currentProfile || !trainCurrentEx) return;
+  await SB.from('kinetic_active_sessions').upsert({
+    user_id: currentUser.id,
+    nick: currentProfile.nick,
+    exercise_name: trainCurrentEx.name,
+    status,
+    current_set: trainCurrentSet,
+    total_sets: trainTotalSets,
+    updated_at: new Date().toISOString()
+  });
+}
+
+// ── BODY MEASURES ──
+async function loadMeasures() {
+  const { data } = await SB.from('kinetic_body_measures')
+    .select('*').eq('user_id', currentUser.id)
+    .order('measured_at', { ascending: false });
+  renderMeasures(data || []);
+}
+
+function renderMeasures(list) {
+  const el = $('measure-list');
+  if (!list.length) {
+    el.innerHTML = '<p style="color:var(--muted);font-size:0.88rem;">Nenhuma medida registrada ainda.</p>';
+    return;
+  }
+  el.innerHTML = list.map(m => {
+    const fields = [
+      { label:'Peso', val: m.weight_kg, unit:'kg' },
+      { label:'Altura', val: m.height_cm, unit:'cm' },
+      { label:'Peito', val: m.chest_cm, unit:'cm' },
+      { label:'Cintura', val: m.waist_cm, unit:'cm' },
+      { label:'Quadril', val: m.hip_cm, unit:'cm' },
+      { label:'% Gordura', val: m.body_fat_pct, unit:'%' },
+      { label:'Braço E', val: m.left_arm_cm, unit:'cm' },
+      { label:'Braço D', val: m.right_arm_cm, unit:'cm' },
+      { label:'Coxa E', val: m.left_thigh_cm, unit:'cm' },
+      { label:'Coxa D', val: m.right_thigh_cm, unit:'cm' },
+    ].filter(f => f.val !== null && f.val !== undefined);
+    return `
+      <div class="measure-card">
+        <div class="measure-date">${fmtDate(m.measured_at)}</div>
+        <div class="measure-grid">
+          ${fields.map(f => `
+            <div class="measure-val">
+              <div class="label">${f.label}</div>
+              <div class="val">${f.val} <span class="unit">${f.unit}</span></div>
+            </div>
+          `).join('')}
+        </div>
+        ${m.notes ? `<div style="margin-top:10px;font-size:0.82rem;color:var(--muted)">${m.notes}</div>` : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+function openMeasureModal() {
+  $('m-date').value = new Date().toISOString().split('T')[0];
+  openModal('modal-measure');
+}
+
+async function saveMeasure() {
+  const row = {
+    user_id: currentUser.id,
+    measured_at: $('m-date').value || new Date().toISOString().split('T')[0],
+    weight_kg:       parseFloatOrNull($('m-weight').value),
+    height_cm:       parseFloatOrNull($('m-height').value),
+    chest_cm:        parseFloatOrNull($('m-chest').value),
+    waist_cm:        parseFloatOrNull($('m-waist').value),
+    hip_cm:          parseFloatOrNull($('m-hip').value),
+    body_fat_pct:    parseFloatOrNull($('m-fat').value),
+    left_arm_cm:     parseFloatOrNull($('m-larm').value),
+    right_arm_cm:    parseFloatOrNull($('m-rarm').value),
+    left_thigh_cm:   parseFloatOrNull($('m-lthigh').value),
+    right_thigh_cm:  parseFloatOrNull($('m-rthigh').value),
+    notes:           $('m-notes').value.trim() || null,
+  };
+  const { error } = await SB.from('kinetic_body_measures').insert(row);
+  if (error) return toast('Erro ao salvar medidas.','err');
+  closeModal('modal-measure');
+  toast('Medidas registradas!','ok');
+  await loadMeasures();
+}
+
+function parseFloatOrNull(v) {
+  const n = parseFloat(v);
+  return isNaN(n) ? null : n;
+}
+
+// ── NAV ──
+function switchSection(name) {
+  document.querySelectorAll('.app-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  $('section-'+name).classList.add('active');
+  document.querySelector(`[data-section="${name}"]`).classList.add('active');
+  if (name === 'measures') loadMeasures();
+  if (name === 'plan') { activePlanDay = new Date().getDay(); renderDaysTabs(); renderPlanList(); }
+}
+
+// ── PUBLIC FEED ──
+async function loadPublicFeed() {
+  const { data } = await SB.from('kinetic_active_sessions').select('*').neq('status','done');
+  renderFeed(data || []);
+}
+
+function renderFeed(sessions) {
+  const el = $('feed-grid');
+  if (!sessions.length) {
+    el.innerHTML = `<div class="feed-empty"><div class="icon">🏋️</div><p>Nenhum usuário treinando agora.<br>Seja o primeiro!</p></div>`;
+    return;
+  }
+  el.innerHTML = sessions.map(s => `
+    <div class="feed-card ${s.status}">
+      <div class="feed-nick">@${s.nick}</div>
+      <div class="feed-exercise">${s.exercise_name}</div>
+      <span class="feed-status ${s.status}">
+        ${s.status === 'training' ? '🔥 Treinando' : '⏱ Descansando'}
+      </span>
+      <div class="feed-series">Série ${s.current_set} de ${s.total_sets}</div>
+    </div>
+  `).join('');
+}
+
+// Realtime subscription
+function subscribeToFeed() {
+  SB.channel('active_sessions_feed')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'kinetic_active_sessions' }, () => {
+      loadPublicFeed();
+    })
+    .subscribe();
+}
+
+// ── EVENT LISTENERS ──
+$('btn-done-set').addEventListener('click', doneSet);
+$('btn-skip-rest').addEventListener('click', skipRest);
+$('btn-cancel-train').addEventListener('click', () => {
+  if (confirm('Cancelar o treino?')) {
+    clearInterval(restTimer);
+    closeTrainOverlay();
+  }
+});
+
+// ── INIT ──
+(async function init() {
+  await loadSession();
+  loadPublicFeed();
+  subscribeToFeed();
+  // Refresh feed every 30s fallback
+  setInterval(loadPublicFeed, 30000);
+})();
+</script>
+
+</body>
+</html>
