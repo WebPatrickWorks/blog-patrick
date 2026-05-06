@@ -974,7 +974,14 @@ function renderTrainGrid() {
     el.innerHTML = '<p style="color:var(--muted);font-size:0.88rem;">Nenhum exercício cadastrado. Vá em ⚡ Exercícios para adicionar.</p>';
     return;
   }
-  el.innerHTML = exercises.map(ex => {
+  // Ordem alfabética, concluídos no final
+  const sorted = [...exercises].sort((a, b) => {
+    const aDone = completedExercises.has(a.id);
+    const bDone = completedExercises.has(b.id);
+    if (aDone !== bDone) return aDone ? 1 : -1;
+    return a.name.localeCompare(b.name, 'pt-BR');
+  });
+  el.innerHTML = sorted.map(ex => {
     const done = completedExercises.has(ex.id);
     const sets = ex.default_sets || 3;
     return `
@@ -1198,7 +1205,7 @@ function openTrainOverlay() {
 function closeTrainOverlay() {
   clearInterval(restTimer);
   $('train-overlay').classList.remove('active');
-  trainQueue = []; trainQueueIdx = 0; completedExercises = new Set();
+  trainQueue = []; trainQueueIdx = 0;
   // Remove from feed
   if (currentUser) {
     SB.from('kinetic_active_sessions').delete().eq('user_id', currentUser.id);
@@ -1217,18 +1224,21 @@ function showTrainWord() {
   $('btn-skip-rest').style.display = 'none';
 }
 
-function showRestTimer() {
+function showRestTimer(onDone) {
   clearInterval(restTimer);
   const total = trainCurrentEx?.rest_seconds || 60;
   restTotal = total;
   let remaining = total;
   const arc = $('rest-arc');
-  const circumference = 2 * Math.PI * 80; // r=80 → ~502
+  const circumference = 2 * Math.PI * 80;
 
   $('train-word-wrap').style.display = 'none';
   $('rest-display').classList.add('active');
   $('btn-done-set').style.display = 'none';
   $('btn-skip-rest').style.display = 'inline-flex';
+
+  // Guarda callback para o skipRest também poder usar
+  showRestTimer._onDone = onDone || null;
 
   function tick() {
     $('rest-time-display').textContent = remaining;
@@ -1237,9 +1247,14 @@ function showRestTimer() {
     arc.style.strokeDashoffset = offset;
     if (remaining <= 0) {
       clearInterval(restTimer);
-      // Back to training
-      showTrainWord();
-      publishActiveSession('training');
+      $('rest-display').classList.remove('active');
+      if (showRestTimer._onDone) {
+        showRestTimer._onDone();
+        showRestTimer._onDone = null;
+      } else {
+        showTrainWord();
+        publishActiveSession('training');
+      }
     }
     remaining--;
   }
@@ -1251,66 +1266,57 @@ function showRestTimer() {
 // Called when user taps "Terminei a Série"
 function doneSet() {
   if (trainCurrentSet >= trainTotalSets) {
-    // All sets done for this exercise — mark as completed
-    if (trainCurrentEx) completedExercises.add(trainCurrentEx.id);
-    renderTrainGrid();
-    trainQueueIdx++;
-    if (trainQueue.length > 0 && trainQueueIdx < trainQueue.length) {
-      // Move to next exercise after rest
-      showRestTimer();
-      // After rest, go to next
-      const origTimer = restTimer;
-      const checkNext = setInterval(() => {
-        if (!$('rest-display').classList.contains('active')) {
-          clearInterval(checkNext);
-          const { ex, sets } = trainQueue[trainQueueIdx] || {};
-          if (ex) {
-            trainCurrentEx = ex;
-            trainCurrentSet = 1;
-            trainTotalSets = sets;
-            updateTrainUI();
-          } else {
-            closeTrainOverlay();
-            toast('Treino concluído! 🎉','ok');
-          }
-        }
-      }, 500);
+    // Marca exercício como concluído — persiste entre overlays
+    if (trainCurrentEx) {
+      completedExercises.add(trainCurrentEx.id);
+      renderTrainGrid();
+    }
+
+    if (trainQueue.length > 0) {
+      // Modo fila (plano do dia) — avança para o próximo após descanso
+      trainQueueIdx++;
+      const nextItem = trainQueue[trainQueueIdx];
+      if (nextItem) {
+        showRestTimer(() => {
+          trainCurrentEx = nextItem.ex;
+          trainCurrentSet = 1;
+          trainTotalSets = nextItem.sets;
+          updateTrainUI();
+          showTrainWord();
+          publishActiveSession('training');
+        });
+      } else {
+        // Última da fila — descansa e fecha
+        showRestTimer(() => {
+          closeTrainOverlay();
+          toast('Treino do dia concluído! 🎉','ok');
+        });
+      }
     } else {
-      showRestTimer();
-      setTimeout(() => {
-        // After last rest, close
-        const waitDone = setInterval(() => {
-          if (!$('rest-display').classList.contains('active')) {
-            clearInterval(waitDone);
-            closeTrainOverlay();
-            toast('Treino concluído! 🎉','ok');
-          }
-        }, 500);
-      }, 100);
+      // Modo avulso — fecha overlay ao terminar o descanso
+      showRestTimer(() => {
+        closeTrainOverlay();
+        toast('Exercício concluído! ✓','ok');
+      });
     }
     return;
   }
   trainCurrentSet++;
   updateTrainUI();
-  showRestTimer();
+  showRestTimer(null);
 }
 
 function skipRest() {
   clearInterval(restTimer);
-  // Check if we need to move to next exercise
-  if (trainQueue.length > 0 && trainCurrentSet > trainTotalSets) {
-    const { ex, sets } = trainQueue[trainQueueIdx] || {};
-    if (ex) {
-      trainCurrentEx = ex; trainCurrentSet = 1; trainTotalSets = sets;
-      updateTrainUI();
-    } else {
-      closeTrainOverlay();
-      toast('Treino concluído! 🎉','ok');
-      return;
-    }
+  $('rest-display').classList.remove('active');
+  const cb = showRestTimer._onDone;
+  showRestTimer._onDone = null;
+  if (cb) {
+    cb();
+  } else {
+    showTrainWord();
+    publishActiveSession('training');
   }
-  showTrainWord();
-  publishActiveSession('training');
 }
 
 async function publishActiveSession(status) {
