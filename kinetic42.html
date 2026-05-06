@@ -1082,20 +1082,46 @@ function renderTrainGrid() {
     el.innerHTML = '<p style="color:var(--muted);font-size:0.88rem;">Nenhum exercício cadastrado. Vá em ⚡ Exercícios para adicionar.</p>';
     return;
   }
-  // Ordem alfabética, concluídos no final
-  const sorted = [...exercises].sort((a, b) => {
+
+  // Filtra pelos exercícios do plano do dia atual
+  const today = new Date().getDay();
+  const todayPlan = weeklyPlan[today] || [];
+
+  if (!todayPlan.length) {
+    el.innerHTML = `
+      <div style="grid-column:1/-1; text-align:center; padding:32px 20px; color:var(--muted);">
+        <div style="font-size:2rem; margin-bottom:10px;">📅</div>
+        <p style="margin:0 0 4px; font-size:0.95rem; color:var(--txt2);">Nenhum exercício planejado para hoje.</p>
+        <p style="margin:0; font-size:0.84rem;">Monte o plano em <strong style="color:var(--txt)">📅 Plano</strong> ou adicione um dia de treino.</p>
+      </div>`;
+    return;
+  }
+
+  // Monta lista dos exercícios do dia, preservando ordem do plano
+  const todayExercises = todayPlan
+    .map(item => {
+      const ex = exercises.find(e => e.id === item.exercise_id);
+      if (!ex) return null;
+      return { ...ex, plan_sets: item.sets, plan_reps: item.reps, plan_weight: item.weight_kg };
+    })
+    .filter(Boolean);
+
+  // Ordem: pendentes primeiro (ordem do plano), concluídos no final
+  const sorted = [...todayExercises].sort((a, b) => {
     const aDone = completedExercises.has(a.id);
     const bDone = completedExercises.has(b.id);
-    if (aDone !== bDone) return aDone ? 1 : -1;
-    return a.name.localeCompare(b.name, 'pt-BR');
+    return aDone !== bDone ? (aDone ? 1 : -1) : 0;
   });
+
   el.innerHTML = sorted.map(ex => {
     const done = completedExercises.has(ex.id);
-    const sets = ex.default_sets || 3;
+    const sets = ex.plan_sets || ex.default_sets || 3;
+    const reps = ex.plan_reps || ex.default_reps || 12;
+    const weight = ex.plan_weight > 0 ? ` · ${ex.plan_weight} kg` : '';
     return `
     <div class="train-ex-card${done ? ' done' : ''}" onclick="startExercise('${ex.id}', ${sets})">
       <h4>${ex.name}</h4>
-      <p>⏱ ${ex.rest_seconds}s · ${sets} séries × ${ex.default_reps || 12} reps</p>
+      <p>⏱ ${ex.rest_seconds}s · ${sets} séries × ${reps} reps${weight}</p>
     </div>
   `;}).join('');
 }
