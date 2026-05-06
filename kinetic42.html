@@ -364,6 +364,9 @@
     .train-ex-card:hover { border-color: rgba(251,146,60,0.4); background: rgba(251,146,60,0.05); }
     .train-ex-card h4 { font-size: 1rem; font-weight: 700; margin-bottom: 4px; }
     .train-ex-card p { font-size: 0.82rem; color: var(--muted); margin: 0; }
+    .train-ex-card.done { opacity: 0.45; pointer-events: none; border-color: rgba(52,211,153,0.25); }
+    .train-ex-card.done h4 { text-decoration: line-through; color: var(--green); }
+    .train-ex-card.done::after { content: '✓ Concluído'; display:block; margin-top:6px; font-size:0.75rem; color:var(--green); font-weight:700; letter-spacing:0.06em; }
 
     /* ─── ACTIVE TRAINING OVERLAY ─── */
     #train-overlay {
@@ -726,11 +729,21 @@
   <div class="modal">
     <button class="modal-close" onclick="closeModal('modal-exercise')">×</button>
     <h3 id="ex-modal-title">Novo Exercício</h3>
-    <p class="modal-sub">Cadastre um exercício e o tempo de intervalo entre as séries.</p>
+    <p class="modal-sub">Cadastre um exercício com suas configurações padrão.</p>
     <input type="hidden" id="ex-edit-id"/>
     <div class="field">
       <label>Nome do exercício</label>
       <input type="text" id="ex-name" placeholder="ex: Supino Reto, Remada Alta..."/>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Séries padrão</label>
+        <input type="number" id="ex-sets" value="3" min="1" max="20"/>
+      </div>
+      <div class="field">
+        <label>Repetições padrão</label>
+        <input type="number" id="ex-reps" value="12" min="1" max="200"/>
+      </div>
     </div>
     <div class="field">
       <label>Intervalo entre séries (segundos)</label>
@@ -810,6 +823,7 @@ let trainCurrentSet = 1;
 let trainTotalSets = 3;
 let restTimer = null;
 let restTotal = 60;
+let completedExercises = new Set(); // tracks IDs done this session
 
 const DAY_NAMES = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 const DAY_FULL  = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
@@ -960,12 +974,15 @@ function renderTrainGrid() {
     el.innerHTML = '<p style="color:var(--muted);font-size:0.88rem;">Nenhum exercício cadastrado. Vá em ⚡ Exercícios para adicionar.</p>';
     return;
   }
-  el.innerHTML = exercises.map(ex => `
-    <div class="train-ex-card" onclick="startExercise('${ex.id}', 3)">
+  el.innerHTML = exercises.map(ex => {
+    const done = completedExercises.has(ex.id);
+    const sets = ex.default_sets || 3;
+    return `
+    <div class="train-ex-card${done ? ' done' : ''}" onclick="startExercise('${ex.id}', ${sets})">
       <h4>${ex.name}</h4>
-      <p>⏱ ${ex.rest_seconds}s de descanso</p>
+      <p>⏱ ${ex.rest_seconds}s · ${sets} séries × ${ex.default_reps || 12} reps</p>
     </div>
-  `).join('');
+  `;}).join('');
 }
 
 function renderPlanExerciseSelect() {
@@ -977,6 +994,8 @@ function renderPlanExerciseSelect() {
 function openExerciseModal(id) {
   $('ex-edit-id').value = '';
   $('ex-name').value = '';
+  $('ex-sets').value = 3;
+  $('ex-reps').value = 12;
   $('ex-rest').value = 60;
   $('ex-modal-title').textContent = 'Novo Exercício';
   if (id) {
@@ -984,6 +1003,8 @@ function openExerciseModal(id) {
     if (ex) {
       $('ex-edit-id').value = ex.id;
       $('ex-name').value = ex.name;
+      $('ex-sets').value = ex.default_sets || 3;
+      $('ex-reps').value = ex.default_reps || 12;
       $('ex-rest').value = ex.rest_seconds;
       $('ex-modal-title').textContent = 'Editar Exercício';
     }
@@ -994,14 +1015,16 @@ function openExerciseModal(id) {
 async function saveExercise() {
   const id   = $('ex-edit-id').value;
   const name = $('ex-name').value.trim();
+  const sets = parseInt($('ex-sets').value) || 3;
+  const reps = parseInt($('ex-reps').value) || 12;
   const rest = parseInt($('ex-rest').value) || 60;
   if (!name) return toast('Nome do exercício é obrigatório.','err');
 
   if (id) {
-    const { error } = await SB.from('kinetic_exercises').update({ name, rest_seconds: rest }).eq('id', id);
+    const { error } = await SB.from('kinetic_exercises').update({ name, default_sets: sets, default_reps: reps, rest_seconds: rest }).eq('id', id);
     if (error) return toast('Erro ao salvar.','err');
   } else {
-    const { error } = await SB.from('kinetic_exercises').insert({ user_id: currentUser.id, name, rest_seconds: rest });
+    const { error } = await SB.from('kinetic_exercises').insert({ user_id: currentUser.id, name, default_sets: sets, default_reps: reps, rest_seconds: rest });
     if (error) return toast('Erro ao salvar.','err');
   }
   closeModal('modal-exercise');
@@ -1019,10 +1042,11 @@ async function deleteExercise(id) {
 
 // ── WEEKLY PLAN ──
 async function loadWeeklyPlan() {
-  const { data } = await SB.from('kinetic_weekly_plan')
-    .select('*, exercises(name, rest_seconds)')
+  const { data, error } = await SB.from('kinetic_weekly_plan')
+    .select('*, kinetic_exercises(name, rest_seconds, default_sets, default_reps)')
     .eq('user_id', currentUser.id)
     .order('sort_order');
+  if (error) console.error('loadWeeklyPlan error:', error);
   weeklyPlan = {};
   (data || []).forEach(item => {
     if (!weeklyPlan[item.day_of_week]) weeklyPlan[item.day_of_week] = [];
@@ -1058,7 +1082,7 @@ function renderPlanList() {
   }
   el.innerHTML = items.map(item => `
     <div class="plan-item">
-      <div class="plan-item-name">${item.exercises?.name || '—'}</div>
+      <div class="plan-item-name">${(item.kinetic_exercises && item.kinetic_exercises.name) ? item.kinetic_exercises.name : '—'}</div>
       <div class="plan-mini-group">
         <input class="plan-mini-input" type="number" value="${item.sets}" min="1" max="20"
           onchange="updatePlanItem('${item.id}', 'sets', this.value)"/>
@@ -1084,11 +1108,14 @@ async function addToPlan() {
   if (!exId) return toast('Selecione um exercício.','err');
   const items = weeklyPlan[activePlanDay] || [];
   if (items.find(i => i.exercise_id === exId)) return toast('Exercício já está neste dia.','err');
+  const ex = exercises.find(e => e.id === exId);
   const { error } = await SB.from('kinetic_weekly_plan').insert({
     user_id: currentUser.id,
     day_of_week: activePlanDay,
     exercise_id: exId,
-    sets: 3, reps: 12, weight_kg: 0,
+    sets: ex?.default_sets || 3,
+    reps: ex?.default_reps || 12,
+    weight_kg: 0,
     sort_order: items.length
   });
   if (error) return toast('Erro ao adicionar.','err');
@@ -1171,7 +1198,7 @@ function openTrainOverlay() {
 function closeTrainOverlay() {
   clearInterval(restTimer);
   $('train-overlay').classList.remove('active');
-  trainQueue = []; trainQueueIdx = 0;
+  trainQueue = []; trainQueueIdx = 0; completedExercises = new Set();
   // Remove from feed
   if (currentUser) {
     SB.from('kinetic_active_sessions').delete().eq('user_id', currentUser.id);
@@ -1224,7 +1251,9 @@ function showRestTimer() {
 // Called when user taps "Terminei a Série"
 function doneSet() {
   if (trainCurrentSet >= trainTotalSets) {
-    // All sets done for this exercise
+    // All sets done for this exercise — mark as completed
+    if (trainCurrentEx) completedExercises.add(trainCurrentEx.id);
+    renderTrainGrid();
     trainQueueIdx++;
     if (trainQueue.length > 0 && trainQueueIdx < trainQueue.length) {
       // Move to next exercise after rest
