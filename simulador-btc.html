@@ -213,6 +213,11 @@
         <div class="sim-card-value" id="c-trailing-stop">—</div>
         <div class="sim-card-sub" id="c-trailing-peak">pico: —</div>
       </div>
+      <div class="sim-card" id="card-position" style="border-color:rgba(124,156,255,0.15);">
+        <div class="sim-card-label">Posição Aberta</div>
+        <div class="sim-card-value" id="c-pos-price">—</div>
+        <div class="sim-card-sub" id="c-pos-pnl">sem posição</div>
+      </div>
     </div>
 
     <!-- Gráfico de patrimônio -->
@@ -494,6 +499,9 @@
     // Trailing stop
     applyTrailingStop(s, price);
 
+    // Card de posição aberta
+    applyPositionCard(s, price);
+
     // Gráfico
     if (!patriChart) initChart(cap);
     pushChartPoint(total);
@@ -616,6 +624,54 @@
         card.style.borderColor = 'rgba(245,158,11,0.5)';  // atenção
       } else {
         card.style.borderColor = 'rgba(16,185,129,0.4)';  // seguro
+      }
+    }
+  }
+
+  // ── Aplica card de posição aberta ──
+  function applyPositionCard(s, price) {
+    const btc      = parseFloat(s.btc_held || 0);
+    const buyPrice = parseFloat(s.btc_buy_price || 0);
+    const card     = $('card-position');
+    const priceEl  = $('c-pos-price');
+    const pnlEl    = $('c-pos-pnl');
+
+    if (btc < 0.000001 || buyPrice === 0) {
+      priceEl.textContent = '—';
+      priceEl.className   = 'sim-card-value';
+      pnlEl.textContent   = 'sem posição';
+      if (card) card.style.borderColor = 'rgba(124,156,255,0.15)';
+      return;
+    }
+
+    const pct = price > 0 ? (price - buyPrice) / buyPrice * 100 : 0;
+    // Profit-stop status
+    const PROFIT_STOP_TRIGGER = 0.5;
+    const PROFIT_STOP_DROP    = 0.2;
+    const peak   = parseFloat(s.btc_peak_price || buyPrice);
+    const peakPct = peak > 0 ? (peak - buyPrice) / buyPrice * 100 : 0;
+    const stopPct = peakPct >= PROFIT_STOP_TRIGGER ? peakPct - PROFIT_STOP_DROP : null;
+
+    priceEl.textContent = '$' + buyPrice.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    priceEl.className   = 'sim-card-value';
+
+    let sub = (pct >= 0 ? '+' : '') + pct.toFixed(2) + '% lucro atual';
+    if (stopPct !== null) {
+      sub += ` · stop +${stopPct.toFixed(2)}%`;
+    }
+    pnlEl.textContent = sub;
+    pnlEl.style.color = pct >= 0 ? '#10b981' : '#ef4444';
+
+    // Borda do card muda conforme estado do profit-stop
+    if (card) {
+      if (stopPct !== null && pct <= stopPct) {
+        card.style.borderColor = 'rgba(239,68,68,0.6)';   // stop quase atingido
+      } else if (stopPct !== null) {
+        card.style.borderColor = 'rgba(16,185,129,0.4)';  // stop ativo, seguro
+      } else if (pct >= 0) {
+        card.style.borderColor = 'rgba(124,156,255,0.3)'; // em lucro, stop inativo
+      } else {
+        card.style.borderColor = 'rgba(239,68,68,0.3)';   // em prejuízo
       }
     }
   }
