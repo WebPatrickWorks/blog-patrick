@@ -1045,6 +1045,7 @@ async function loadSession() {
   await loadExercises();
   await loadWeeklyPlan();
   renderTodayHeader();
+  renderTrainGrid(); // chamado aqui: weeklyPlan já populado
   subscribeToPumps();
   showApp();
 }
@@ -1054,8 +1055,8 @@ async function loadExercises() {
   const { data } = await SB.from('kinetic_exercises').select('*').eq('user_id', currentUser.id).order('created_at');
   exercises = data || [];
   renderExerciseList();
-  renderTrainGrid();
   renderPlanExerciseSelect();
+  // renderTrainGrid() chamado após loadWeeklyPlan — depende do weeklyPlan populado
 }
 
 function renderExerciseList() {
@@ -1196,6 +1197,7 @@ async function loadWeeklyPlan() {
   renderDaysTabs();
   renderPlanList();
   renderTodayHeader();
+  renderTrainGrid();
 }
 
 function renderDaysTabs() {
