@@ -836,6 +836,7 @@ let trainCurrentSet = 1;
 let trainTotalSets = 3;
 let restTimer = null;
 let restTotal = 60;
+let trainCurrentWeight = 0;
 let completedExercises = new Set(); // tracks IDs done this session
 
 const DAY_NAMES = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
@@ -1175,6 +1176,11 @@ function startExercise(exId, sets) {
   trainCurrentEx = ex;
   trainCurrentSet = 1;
   trainTotalSets = sets;
+  // Pega a carga do plano do dia para este exercício
+  const today = new Date().getDay();
+  const planItems = weeklyPlan[today] || [];
+  const planItem  = planItems.find(i => i.exercise_id === exId);
+  trainCurrentWeight = planItem ? parseFloat(planItem.weight_kg) || 0 : 0;
   openTrainOverlay();
 }
 
@@ -1187,7 +1193,7 @@ function runTodayPlan() {
     ex: exercises.find(e => e.id === item.exercise_id),
     sets: item.sets,
     reps: item.reps,
-    weight: item.weight_kg
+    weight: parseFloat(item.weight_kg) || 0
   })).filter(i => i.ex);
   trainQueueIdx = 0;
   startFromQueue();
@@ -1199,10 +1205,11 @@ function startFromQueue() {
     toast('Treino do dia concluído! 🎉','ok');
     return;
   }
-  const { ex, sets } = trainQueue[trainQueueIdx];
+  const { ex, sets, weight } = trainQueue[trainQueueIdx];
   trainCurrentEx = ex;
   trainCurrentSet = 1;
   trainTotalSets = sets;
+  trainCurrentWeight = weight || 0;
   openTrainOverlay();
 }
 
@@ -1211,8 +1218,7 @@ function openTrainOverlay() {
   overlay.classList.add('active');
   updateTrainUI();
   showTrainWord();
-  // Publish to realtime feed
-  publishActiveSession('training');
+  publishActiveSession('training', trainCurrentWeight);
 }
 
 function closeTrainOverlay() {
@@ -1266,14 +1272,14 @@ function showRestTimer(onDone) {
         showRestTimer._onDone = null;
       } else {
         showTrainWord();
-        publishActiveSession('training');
+        publishActiveSession('training', trainCurrentWeight);
       }
     }
     remaining--;
   }
   tick();
   restTimer = setInterval(tick, 1000);
-  publishActiveSession('resting');
+  publishActiveSession('resting', trainCurrentWeight);
 }
 
 // Called when user taps "Terminei a Série"
@@ -1294,9 +1300,10 @@ function doneSet() {
           trainCurrentEx = nextItem.ex;
           trainCurrentSet = 1;
           trainTotalSets = nextItem.sets;
+          trainCurrentWeight = nextItem.weight || 0;
           updateTrainUI();
           showTrainWord();
-          publishActiveSession('training');
+          publishActiveSession('training', trainCurrentWeight);
         });
       } else {
         // Última da fila — descansa e fecha
@@ -1328,18 +1335,21 @@ function skipRest() {
     cb();
   } else {
     showTrainWord();
-    publishActiveSession('training');
+    publishActiveSession('training', trainCurrentWeight);
   }
 }
 
-async function publishActiveSession(status) {
+async function publishActiveSession(status, weightOverride) {
   if (!currentUser || !currentProfile || !trainCurrentEx) return;
-  // Tenta obter a carga do plano do dia atual
-  const today = new Date().getDay();
-  const planItems = weeklyPlan[today] || [];
-  const planItem  = planItems.find(i => i.exercise_id === trainCurrentEx.id);
-  const weight    = planItem ? parseFloat(planItem.weight_kg) || 0 : 0;
-  await SB.from('kinetic_active_sessions').upsert({
+  // Busca carga: usa override se fornecido, senão busca no plano do dia
+  let weight = (weightOverride !== undefined) ? weightOverride : null;
+  if (weight === null) {
+    const today = new Date().getDay();
+    const planItems = weeklyPlan[today] || [];
+    const planItem  = planItems.find(i => i.exercise_id === trainCurrentEx.id);
+    weight = planItem ? parseFloat(planItem.weight_kg) || 0 : 0;
+  }
+  const { error } = await SB.from('kinetic_active_sessions').upsert({
     user_id: currentUser.id,
     nick: currentProfile.nick,
     exercise_name: trainCurrentEx.name,
@@ -1349,6 +1359,7 @@ async function publishActiveSession(status) {
     weight_kg: weight,
     updated_at: new Date().toISOString()
   });
+  if (error) console.error('publishActiveSession error:', error);
 }
 
 // ── BODY MEASURES ──
