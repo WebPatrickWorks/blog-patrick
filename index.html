@@ -314,6 +314,29 @@
         </a>
         <!-- ===== /CARD BTC AO VIVO ===== -->
 
+        <!-- ===== CARD KINETIC 42 ===== -->
+        <a href="kinetic42.html" class="sidebar-hero-link" id="kinetic-card-link">
+          <section class="sidebar-card sidebar-card-kinetic">
+            <div class="k42-header">
+              <div class="k42-badge">
+                <span class="k42-pulse"></span>
+                <span>🏋️ Kinetic42</span>
+              </div>
+              <span class="k42-arrow">→</span>
+            </div>
+            <div class="k42-logo-row">
+              <div class="k42-logo-box">K42</div>
+              <div class="k42-title">Sistema de Treino</div>
+            </div>
+            <div class="k42-active-row">
+              <span class="k42-active-count" id="k42-active-count">—</span>
+              <span class="k42-active-label">treinando agora</span>
+            </div>
+            <p class="k42-cta-text">Monte seu plano e treine ao vivo →</p>
+          </section>
+        </a>
+        <!-- ===== /CARD KINETIC 42 ===== -->
+
         <section class="sidebar-card">
           <h3>Últimos Posts</h3>
           <ul id="recent-posts" class="sidebar-list sidebar-list-clean"></ul>
@@ -530,6 +553,26 @@
       setInterval(fetchBTC, 60000);
     })();
   </script>
+
+  <script>
+  // Kinetic42 — contador de usuários ativos no sidebar
+  (async function loadK42Count() {
+    try {
+      const { createClient } = supabase; // assume supabase-js já carregado
+      const sb = createClient(
+        'https://yegczfbshkctxedzkdpu.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InllZ2N6ZmJzaGtjdHhlZHprZHB1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYyMzc1OTUsImV4cCI6MjA4MTgxMzU5NX0.GU7KfJ4J1gAGK_q_uyYNPsPWqYbXjU2qdVhZq8SsIdM'
+      );
+      const { count } = await sb.from('kinetic_active_sessions').select('*', { count: 'exact', head: true });
+      const el = document.getElementById('k42-active-count');
+      if (el) el.textContent = count || 0;
+    } catch(e) {
+      const el = document.getElementById('k42-active-count');
+      if (el) el.textContent = '0';
+    }
+  })();
+  </script>
+
   <script src="js/main.js"></script>
   <script src="js/chat.js"></script>
 </body>
