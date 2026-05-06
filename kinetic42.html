@@ -248,6 +248,83 @@
     .feed-series { font-size: 0.82rem; color: var(--muted); margin-top: 8px; }
     .feed-weight { color: var(--orange); font-weight: 700; }
 
+    /* ─── PUMP ─── */
+    .feed-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 14px; padding-top: 12px;
+      border-top: 1px solid var(--border);
+    }
+    .pump-total {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 0.82rem; color: var(--muted);
+    }
+    .pump-total strong { color: var(--txt); font-family: 'JetBrains Mono', monospace; }
+    .btn-pump {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 16px; border-radius: 999px;
+      background: rgba(251,146,60,0.08);
+      border: 1px solid rgba(251,146,60,0.2);
+      color: var(--orange); font-size: 0.82rem; font-weight: 700;
+      letter-spacing: 0.04em; cursor: pointer;
+      transition: all 0.2s; font-family: inherit;
+    }
+    .btn-pump:hover {
+      background: rgba(251,146,60,0.18);
+      border-color: rgba(251,146,60,0.45);
+      transform: scale(1.05);
+    }
+    .btn-pump.sent {
+      background: rgba(52,211,153,0.1);
+      border-color: rgba(52,211,153,0.3);
+      color: var(--green); pointer-events: none;
+    }
+    .btn-pump .pump-icon { font-size: 1rem; transition: transform 0.15s; }
+    .btn-pump:hover .pump-icon { transform: scale(1.3) rotate(-10deg); }
+
+    /* ─── PUMP NOTIFICATION (tela de treino) ─── */
+    #pump-notify {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      pointer-events: none; z-index: 100;
+    }
+    .pump-blast {
+      display: none;
+      flex-direction: column; align-items: center; gap: 12px;
+      animation: pumpBlast 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards;
+    }
+    .pump-blast.active { display: flex; }
+    @keyframes pumpBlast {
+      0%   { opacity: 0; transform: scale(0.4) translateY(40px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .pump-blast-icon {
+      font-size: clamp(4rem, 18vw, 7rem);
+      filter: drop-shadow(0 0 32px rgba(251,146,60,0.9));
+      animation: pumpIconBounce 0.5s ease infinite alternate;
+    }
+    @keyframes pumpIconBounce {
+      0%   { transform: scale(1) rotate(-8deg); }
+      100% { transform: scale(1.12) rotate(8deg); }
+    }
+    .pump-blast-text {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: clamp(1.6rem, 7vw, 2.8rem);
+      font-weight: 900; letter-spacing: 0.04em;
+      text-align: center; line-height: 1.1;
+      color: var(--orange);
+      text-shadow: 0 0 40px rgba(251,146,60,0.6);
+    }
+    .pump-blast-from {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem; color: var(--txt2); letter-spacing: 0.06em;
+    }
+    .pump-fade-out { animation: pumpFadeOut 0.5s ease forwards; }
+    @keyframes pumpFadeOut {
+      0%   { opacity: 1; transform: scale(1) translateY(0); }
+      100% { opacity: 0; transform: scale(0.85) translateY(-20px); }
+    }
+
     .feed-empty {
       text-align: center; padding: 60px 20px; color: var(--muted);
     }
@@ -519,6 +596,15 @@
      ACTIVE TRAINING OVERLAY (fullscreen)
 ══════════════════════════════════════════ -->
 <div id="train-overlay">
+  <!-- PUMP NOTIFICATION -->
+  <div id="pump-notify">
+    <div class="pump-blast" id="pump-blast">
+      <div class="pump-blast-icon">💪</div>
+      <div class="pump-blast-text" id="pump-blast-text">PUMP!</div>
+      <div class="pump-blast-from" id="pump-blast-from"></div>
+    </div>
+  </div>
+
   <div class="train-exercise-name" id="to-exercise-name">—</div>
   <div class="train-series-info" id="to-series-info">Série 1 de 3</div>
 
@@ -838,6 +924,8 @@ let restTimer = null;
 let restTotal = 60;
 let trainCurrentWeight = 0;
 let completedExercises = new Set(); // tracks IDs done this session
+let pumpsSent   = new Set();  // user_ids que já receberam pump nesta sessão
+let pumpTotals  = {};         // { user_id: totalCount }
 
 const DAY_NAMES = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 const DAY_FULL  = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
@@ -952,6 +1040,7 @@ async function loadSession() {
   await loadExercises();
   await loadWeeklyPlan();
   renderTodayHeader();
+  subscribeToPumps();
   showApp();
 }
 
@@ -1452,8 +1541,7 @@ function switchSection(name) {
 
 // ── APP FEED (logado) ──
 async function loadAppFeed() {
-  const { data } = await SB.from('kinetic_active_sessions').select('*').neq('status','done');
-  renderAppFeed(data || []);
+  await loadAppFeedWithPumps();
 }
 
 function renderAppFeed(sessions) {
@@ -1463,7 +1551,10 @@ function renderAppFeed(sessions) {
     el.innerHTML = '<div class="feed-empty"><div class="icon">🏋️</div><p>Nenhum usuário treinando agora.<br>Seja o primeiro!</p></div>';
     return;
   }
-  el.innerHTML = sessions.map(s => `
+  el.innerHTML = sessions.map(s => {
+    const sent = pumpsSent.has(s.user_id);
+    const total = pumpTotals[s.user_id] || 0;
+    return `
     <div class="feed-card ${s.status}">
       <div class="feed-nick">@${s.nick}</div>
       <div class="feed-exercise">${s.exercise_name}</div>
@@ -1474,14 +1565,25 @@ function renderAppFeed(sessions) {
         Série ${s.current_set} de ${s.total_sets}
         ${s.weight_kg > 0 ? `<span class="feed-weight">· ${s.weight_kg} kg</span>` : ''}
       </div>
+      <div class="feed-footer">
+        <div class="pump-total">
+          <span>💪</span>
+          <strong id="pump-count-app-${s.user_id}">${total}</strong>
+          <span>pumps</span>
+        </div>
+        <button class="btn-pump ${sent ? 'sent' : ''}"
+          onclick="sendPump('${s.user_id}', '${s.nick}', this)">
+          <span class="pump-icon">💪</span>
+          ${sent ? 'Enviado!' : 'Pump!'}
+        </button>
+      </div>
     </div>
-  `).join('');
+  `}).join('');
 }
 
 // ── PUBLIC FEED ──
 async function loadPublicFeed() {
-  const { data } = await SB.from('kinetic_active_sessions').select('*').neq('status','done');
-  renderFeed(data || []);
+  await loadPublicFeedWithPumps();
 }
 
 function renderFeed(sessions) {
@@ -1490,7 +1592,10 @@ function renderFeed(sessions) {
     el.innerHTML = `<div class="feed-empty"><div class="icon">🏋️</div><p>Nenhum usuário treinando agora.<br>Seja o primeiro!</p></div>`;
     return;
   }
-  el.innerHTML = sessions.map(s => `
+  el.innerHTML = sessions.map(s => {
+    const sent = pumpsSent.has(s.user_id);
+    const total = pumpTotals[s.user_id] || 0;
+    return `
     <div class="feed-card ${s.status}">
       <div class="feed-nick">@${s.nick}</div>
       <div class="feed-exercise">${s.exercise_name}</div>
@@ -1501,17 +1606,121 @@ function renderFeed(sessions) {
         Série ${s.current_set} de ${s.total_sets}
         ${s.weight_kg > 0 ? `<span class="feed-weight">· ${s.weight_kg} kg</span>` : ''}
       </div>
+      <div class="feed-footer">
+        <div class="pump-total">
+          <span>💪</span>
+          <strong id="pump-count-${s.user_id}">${total}</strong>
+          <span>pumps</span>
+        </div>
+        <button class="btn-pump ${sent ? 'sent' : ''}"
+          onclick="sendPump('${s.user_id}', '${s.nick}', this)">
+          <span class="pump-icon">💪</span>
+          ${sent ? 'Enviado!' : 'Pump!'}
+        </button>
+      </div>
     </div>
-  `).join('');
+  `}).join('');
 }
 
 // Realtime subscription
 function subscribeToFeed() {
   SB.channel('active_sessions_feed')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'kinetic_active_sessions' }, () => {
-      loadPublicFeed();
-      // Se aba "Ao Vivo" estiver ativa no painel, atualiza também
-      if ($('section-live') && $('section-live').classList.contains('active')) loadAppFeed();
+      loadPublicFeedWithPumps();
+      if ($('section-live') && $('section-live').classList.contains('active')) loadAppFeedWithPumps();
+    })
+    .subscribe();
+}
+
+// ── PUMP SYSTEM ──
+
+async function loadPumpTotals(userIds) {
+  if (!userIds.length) return;
+  const { data } = await SB.from('kinetic_pumps')
+    .select('recipient_user_id')
+    .in('recipient_user_id', userIds);
+  // Conta manualmente (sem group by no client)
+  pumpTotals = {};
+  (data || []).forEach(row => {
+    pumpTotals[row.recipient_user_id] = (pumpTotals[row.recipient_user_id] || 0) + 1;
+  });
+}
+
+async function loadPublicFeedWithPumps() {
+  const { data } = await SB.from('kinetic_active_sessions').select('*').neq('status','done');
+  const sessions = data || [];
+  if (sessions.length) await loadPumpTotals(sessions.map(s => s.user_id));
+  renderFeed(sessions);
+}
+
+async function loadAppFeedWithPumps() {
+  const { data } = await SB.from('kinetic_active_sessions').select('*').neq('status','done');
+  const sessions = data || [];
+  if (sessions.length) await loadPumpTotals(sessions.map(s => s.user_id));
+  renderAppFeed(sessions);
+}
+
+async function sendPump(recipientId, recipientNick, btn) {
+  if (pumpsSent.has(recipientId)) return;
+  // Rate limit local
+  pumpsSent.add(recipientId);
+  btn.classList.add('sent');
+  btn.innerHTML = '<span class="pump-icon">💪</span> Enviado!';
+
+  const senderNick = currentProfile?.nick || 'Anônimo';
+  const { error } = await SB.from('kinetic_pumps').insert({
+    recipient_user_id: recipientId,
+    recipient_nick: recipientNick,
+    sender_nick: senderNick
+  });
+  if (error) { console.error('Pump error:', error); return; }
+
+  // Atualiza contadores locais imediatamente
+  pumpTotals[recipientId] = (pumpTotals[recipientId] || 0) + 1;
+  const count = pumpTotals[recipientId];
+  // Atualiza todos os contadores na tela
+  [`pump-count-${recipientId}`, `pump-count-app-${recipientId}`].forEach(id => {
+    const el = $(id); if (el) el.textContent = count;
+  });
+}
+
+function showPumpNotification(senderNick) {
+  const blast = $('pump-blast');
+  const text  = $('pump-blast-text');
+  const from  = $('pump-blast-from');
+  if (!blast) return;
+
+  text.textContent = 'PUMP!';
+  from.textContent = `de @${senderNick}`;
+  blast.classList.remove('pump-fade-out');
+  blast.classList.add('active');
+
+  // Vibração no mobile
+  if (navigator.vibrate) navigator.vibrate([100, 50, 100, 50, 200]);
+
+  // Fade out após 3s
+  setTimeout(() => {
+    blast.classList.add('pump-fade-out');
+    setTimeout(() => blast.classList.remove('active', 'pump-fade-out'), 500);
+  }, 3000);
+}
+
+function subscribeToPumps() {
+  if (!currentUser) return;
+  SB.channel(`pumps_for_${currentUser.id}`)
+    .on('postgres_changes', {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'kinetic_pumps',
+      filter: `recipient_user_id=eq.${currentUser.id}`
+    }, payload => {
+      const senderNick = payload.new?.sender_nick || 'Anônimo';
+      // Só notifica se estiver treinando
+      if ($('train-overlay') && $('train-overlay').classList.contains('active')) {
+        showPumpNotification(senderNick);
+      } else {
+        toast(`💪 Pump de @${senderNick}!`, 'ok');
+      }
     })
     .subscribe();
 }
@@ -1529,10 +1738,9 @@ $('btn-cancel-train').addEventListener('click', () => {
 // ── INIT ──
 (async function init() {
   await loadSession();
-  loadPublicFeed();
+  loadPublicFeedWithPumps();
   subscribeToFeed();
-  // Refresh feed every 30s fallback
-  setInterval(loadPublicFeed, 30000);
+  setInterval(loadPublicFeedWithPumps, 30000);
 })();
 </script>
 
