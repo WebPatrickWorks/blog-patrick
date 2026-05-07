@@ -1117,7 +1117,6 @@ async function doLogin() {
   const pass  = $('login-pass').value;
   if (!nick || !pass) return toast('Preencha nick e senha.','err');
 
-  // Find email from nick
   const { data: profile } = await SB.from('kinetic_profiles').select('id,nick').eq('nick', nick).maybeSingle();
   if (!profile) return toast('Nick não encontrado.','err');
 
@@ -1125,10 +1124,9 @@ async function doLogin() {
   const { data, error } = await SB.auth.signInWithPassword({ email: fakeEmail, password: pass });
   if (error) return toast('Senha incorreta.','err');
 
-  // Update last_seen
   await SB.from('kinetic_profiles').update({ last_seen: new Date().toISOString() }).eq('id', data.user.id);
   toast('Bem-vindo, ' + nick + '! 💪','ok');
-  await loadSession();
+  await loadSession(data.session); // passa a sessão diretamente — sem depender do getSession()
 }
 
 async function doLogout() {
@@ -1142,8 +1140,8 @@ async function doLogout() {
   showPublic();
 }
 
-async function loadSession() {
-  const { data: { session } } = await SB.auth.getSession();
+async function loadSession(sessionOverride = null) {
+  const session = sessionOverride || (await SB.auth.getSession()).data.session;
   if (!session) { showPublic(); return; }
   currentUser = session.user;
 
