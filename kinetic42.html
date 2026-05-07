@@ -245,6 +245,7 @@
 
     .feed-grid {
       display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      justify-content: center;
       gap: 16px; margin-bottom: 40px;
     }
     .feed-card {
@@ -353,6 +354,7 @@
 
     .feed-empty {
       text-align: center; padding: 60px 20px; color: var(--muted);
+      grid-column: 1 / -1;
     }
     .feed-empty .icon { font-size: 3rem; margin-bottom: 12px; }
 
