@@ -1002,28 +1002,33 @@ function fmtDate(d) {
 // Obtém a data de hoje pelo servidor fazendo um UPDATE inócuo que força
 // o Postgres a gerar um novo updated_at — nunca confia no relógio do cliente.
 async function getServerToday() {
-  // 1. Tenta INSERT — se já existir (23505) ignora, é esperado
-  const { error: insErr } = await SB.from('kinetic_daily_progress')
-    .insert({ user_id: currentUser.id, training_date: '1970-01-01', completed_ids: [] });
-  if (insErr && insErr.code !== '23505') {
-    console.error('[K42] getServerToday INSERT error:', insErr);
-  }
-
-  // 2. SELECT para ler o registro com updated_at gerado pelo servidor
-  const { data: row, error: selErr } = await SB
-    .from('kinetic_daily_progress')
+  // 1. Verifica se já existe registro antes de tentar inserir — evita 409 no console
+  const { data: existing } = await SB.from('kinetic_daily_progress')
     .select('updated_at, training_date, completed_ids')
     .eq('user_id', currentUser.id)
-    .single();
+    .maybeSingle();
 
-  if (selErr) console.error('[K42] getServerToday SELECT error:', selErr);
-  if (!row) return null;
+  if (!existing) {
+    // Registro novo — cria com data sentinela para ser detectada como "novo dia"
+    const { error: insErr } = await SB.from('kinetic_daily_progress')
+      .insert({ user_id: currentUser.id, training_date: '1970-01-01', completed_ids: [] });
+    if (insErr) { console.error('[K42] getServerToday INSERT error:', insErr); return null; }
 
-  // Converte timestamp do servidor para data em São Paulo — nunca usa relógio do cliente
-  serverToday = new Date(row.updated_at)
+    // Lê de volta para pegar o updated_at gerado pelo servidor
+    const { data: fresh } = await SB.from('kinetic_daily_progress')
+      .select('updated_at, training_date, completed_ids')
+      .eq('user_id', currentUser.id)
+      .single();
+    if (!fresh) return null;
+    serverToday = new Date(fresh.updated_at)
+      .toLocaleDateString('sv-SE', { timeZone: 'America/Sao_Paulo' });
+    return fresh;
+  }
+
+  // Registro já existe — usa updated_at do servidor diretamente
+  serverToday = new Date(existing.updated_at)
     .toLocaleDateString('sv-SE', { timeZone: 'America/Sao_Paulo' });
-
-  return row;
+  return existing;
 }
 
 async function loadDailyProgress() {
