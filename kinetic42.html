@@ -999,25 +999,26 @@ function fmtDate(d) {
 
 // ── DAILY PROGRESS ──
 
-// Obtém a data de hoje pelo servidor (via updated_at do upsert),
-// garantindo independência do relógio do dispositivo.
+// Obtém a data de hoje pelo servidor fazendo um UPDATE inócuo que força
+// o Postgres a gerar um novo updated_at — nunca confia no relógio do cliente.
 async function getServerToday() {
-  const { data, error } = await SB
-    .from('kinetic_daily_progress')
-    .upsert(
-      { user_id: currentUser.id },
-      { onConflict: 'user_id', ignoreDuplicates: true }
-    )
-    .select('updated_at, training_date, completed_ids')
-    .single();
+  // 1. Garante que o registro existe (INSERT se não houver)
+  await SB.from('kinetic_daily_progress')
+    .upsert({ user_id: currentUser.id }, { onConflict: 'user_id', ignoreDuplicates: true });
 
-  // Se o upsert com ignoreDuplicates não retornou dados, busca o registro existente
-  const row = data || (await SB
+  // 2. Faz um UPDATE inócuo para forçar o Postgres a gerar updated_at agora
+  //    (só funciona se a coluna tiver DEFAULT now() + trigger on update,
+  //     ou se a política RLS permitir update; caso contrário usamos o select direto)
+  await SB.from('kinetic_daily_progress')
+    .update({ user_id: currentUser.id })   // campo idempotente, só para disparar o update
+    .eq('user_id', currentUser.id);
+
+  // 3. Lê o registro com o updated_at gerado pelo servidor
+  const { data: row } = await SB
     .from('kinetic_daily_progress')
     .select('updated_at, training_date, completed_ids')
     .eq('user_id', currentUser.id)
-    .single()
-  ).data;
+    .single();
 
   if (!row) return null;
 
@@ -1032,14 +1033,13 @@ async function loadDailyProgress() {
   const row = await getServerToday();
   if (!row) return;
 
-  // Se a data salva no banco bate com hoje (pelo relógio do servidor),
-  // restaura os exercícios concluídos. Caso contrário descarta — novo dia.
+  // Se a data salva no banco bate com o hoje do servidor, restaura.
+  // Caso contrário é um novo dia — descarta e prepara registro limpo.
   if (row.training_date === serverToday) {
     const ids = Array.isArray(row.completed_ids) ? row.completed_ids : [];
     completedExercises = new Set(ids);
   } else {
     completedExercises = new Set();
-    // Limpa o registro para o novo dia (será recriado ao concluir o 1º exercício)
     await SB.from('kinetic_daily_progress')
       .update({ training_date: serverToday, completed_ids: [] })
       .eq('user_id', currentUser.id);
@@ -1048,18 +1048,18 @@ async function loadDailyProgress() {
 
 async function saveProgress() {
   if (!currentUser || !serverToday) return;
-  const ids = Array.from(completedExercises);
-  const today = new Date().getDay();
-  const totalCount = (weeklyPlan[today] || []).length;
+  const ids        = Array.from(completedExercises);
+  const todayDay   = new Date().getDay();
+  const totalCount = (weeklyPlan[todayDay] || []).length;
 
-  await SB.from('kinetic_daily_progress').upsert({
-    user_id:       currentUser.id,
-    training_date: serverToday,
-    completed_ids: ids,
-    updated_at:    new Date().toISOString() // apenas para o campo not-null; servidor pode sobrescrever
-  }, { onConflict: 'user_id' });
+  // NÃO inclui updated_at — deixa o Postgres gerar via trigger/default
+  const { error } = await SB.from('kinetic_daily_progress')
+    .update({ training_date: serverToday, completed_ids: ids })
+    .eq('user_id', currentUser.id);
 
-  // Atualiza também o campo de progresso na sessão ativa (para o feed)
+  if (error) { console.error('saveProgress error:', error); return; }
+
+  // Atualiza progresso na sessão ativa (para o feed)
   if (currentProfile) {
     await SB.from('kinetic_active_sessions')
       .update({ completed_count: ids.length, total_count: totalCount })
