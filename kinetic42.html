@@ -1867,7 +1867,11 @@ function renderFeed(sessions) {
 
 // Realtime subscription
 function subscribeToFeed() {
-  SB.channel('active_sessions_feed')
+  const channelName = 'active_sessions_feed';
+  const existing = SB.getChannels().find(c => c.topic === `realtime:${channelName}`);
+  if (existing) SB.removeChannel(existing);
+
+  SB.channel(channelName)
     .on('postgres_changes', { event: '*', schema: 'public', table: 'kinetic_active_sessions' }, () => {
       loadPublicFeedWithPumps();
       if ($('section-live') && $('section-live').classList.contains('active')) loadAppFeedWithPumps();
@@ -1950,7 +1954,12 @@ function showPumpNotification(senderNick) {
 
 function subscribeToPumps() {
   if (!currentUser) return;
-  SB.channel(`pumps_for_${currentUser.id}`)
+  const channelName = `pumps_for_${currentUser.id}`;
+  // Remove canal anterior se existir — evita erro ao fazer login após logout
+  const existing = SB.getChannels().find(c => c.topic === `realtime:${channelName}`);
+  if (existing) SB.removeChannel(existing);
+
+  SB.channel(channelName)
     .on('postgres_changes', {
       event: 'INSERT',
       schema: 'public',
@@ -1958,7 +1967,6 @@ function subscribeToPumps() {
       filter: `recipient_user_id=eq.${currentUser.id}`
     }, payload => {
       const senderNick = payload.new?.sender_nick || 'Anônimo';
-      // Só notifica se estiver treinando
       if ($('train-overlay') && $('train-overlay').classList.contains('active')) {
         showPumpNotification(senderNick);
       } else {
