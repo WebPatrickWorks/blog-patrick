@@ -1002,88 +1002,61 @@ function fmtDate(d) {
 // Obtém a data de hoje pelo servidor fazendo um UPDATE inócuo que força
 // o Postgres a gerar um novo updated_at — nunca confia no relógio do cliente.
 async function getServerToday() {
-  console.log('[K42] getServerToday: iniciando, user_id =', currentUser.id);
-
-  // 1. Tenta INSERT direto (mais simples que upsert para diagnóstico)
+  // 1. Tenta INSERT — se já existir (23505) ignora, é esperado
   const { error: insErr } = await SB.from('kinetic_daily_progress')
     .insert({ user_id: currentUser.id, training_date: '1970-01-01', completed_ids: [] });
-  if (insErr) {
-    // Código 23505 = registro já existe (unique violation) — é esperado, não é erro real
-    if (insErr.code !== '23505') {
-      console.error('[K42] getServerToday: INSERT falhou (não é duplicate):', insErr);
-    } else {
-      console.log('[K42] getServerToday: registro já existe (23505 esperado), seguindo');
-    }
-  } else {
-    console.log('[K42] getServerToday: INSERT ok — registro novo criado');
+  if (insErr && insErr.code !== '23505') {
+    console.error('[K42] getServerToday INSERT error:', insErr);
   }
 
-  // 2. SELECT para ler o registro
+  // 2. SELECT para ler o registro com updated_at gerado pelo servidor
   const { data: row, error: selErr } = await SB
     .from('kinetic_daily_progress')
     .select('updated_at, training_date, completed_ids')
     .eq('user_id', currentUser.id)
     .single();
 
-  console.log('[K42] getServerToday: select =', row, '| error =', selErr);
+  if (selErr) console.error('[K42] getServerToday SELECT error:', selErr);
+  if (!row) return null;
 
-  if (!row) {
-    console.error('[K42] getServerToday: sem row após INSERT + SELECT — verifique RLS da tabela');
-    return null;
-  }
-
+  // Converte timestamp do servidor para data em São Paulo — nunca usa relógio do cliente
   serverToday = new Date(row.updated_at)
     .toLocaleDateString('sv-SE', { timeZone: 'America/Sao_Paulo' });
-  console.log('[K42] getServerToday: serverToday =', serverToday);
 
   return row;
 }
 
 async function loadDailyProgress() {
-  console.log('[K42] loadDailyProgress: iniciando');
   const row = await getServerToday();
-  if (!row) { console.warn('[K42] loadDailyProgress: sem row, abortando'); return; }
-
-  console.log('[K42] loadDailyProgress: row.training_date =', row.training_date, '| serverToday =', serverToday);
+  if (!row) return;
 
   if (row.training_date === serverToday) {
     const ids = Array.isArray(row.completed_ids) ? row.completed_ids : [];
     completedExercises = new Set(ids);
-    console.log('[K42] loadDailyProgress: restaurado', ids.length, 'exercícios:', ids);
   } else {
     completedExercises = new Set();
-    console.log('[K42] loadDailyProgress: novo dia, limpando registro');
-    const { error } = await SB.from('kinetic_daily_progress')
+    await SB.from('kinetic_daily_progress')
       .update({ training_date: serverToday, completed_ids: [] })
       .eq('user_id', currentUser.id);
-    console.log('[K42] loadDailyProgress: limpeza error =', error);
   }
 }
 
 async function saveProgress() {
-  console.log('[K42] saveProgress: iniciando | currentUser =', !!currentUser, '| serverToday =', serverToday);
-  if (!currentUser || !serverToday) {
-    console.warn('[K42] saveProgress: abortado — currentUser ou serverToday ausente');
-    return;
-  }
+  if (!currentUser || !serverToday) return;
   const ids        = Array.from(completedExercises);
   const todayDay   = new Date().getDay();
   const totalCount = (weeklyPlan[todayDay] || []).length;
-  console.log('[K42] saveProgress: salvando ids =', ids, '| training_date =', serverToday);
 
-  const { data, error } = await SB.from('kinetic_daily_progress')
+  const { error } = await SB.from('kinetic_daily_progress')
     .update({ training_date: serverToday, completed_ids: ids })
-    .eq('user_id', currentUser.id)
-    .select();
-  console.log('[K42] saveProgress: result data =', data, '| error =', error);
+    .eq('user_id', currentUser.id);
 
-  if (error) { console.error('[K42] saveProgress ERROR:', error); return; }
+  if (error) { console.error('[K42] saveProgress error:', error); return; }
 
   if (currentProfile) {
-    const sessRes = await SB.from('kinetic_active_sessions')
+    await SB.from('kinetic_active_sessions')
       .update({ completed_count: ids.length, total_count: totalCount })
       .eq('user_id', currentUser.id);
-    console.log('[K42] saveProgress: active_sessions update =', sessRes);
   }
 }
 
