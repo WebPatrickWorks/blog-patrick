@@ -1075,7 +1075,7 @@ async function loadSession() {
 
 // ── EXERCISES ──
 async function loadExercises() {
-  const { data } = await SB.from('kinetic_exercises').select('*').eq('user_id', currentUser.id).order('created_at');
+  const { data } = await SB.from('kinetic_exercises').select('*').eq('user_id', currentUser.id).order('name');
   exercises = data || [];
   renderExerciseList();
   renderPlanExerciseSelect();
@@ -1246,7 +1246,12 @@ function renderPlanList() {
     el.innerHTML = '<p style="color:var(--muted);font-size:0.88rem;">Nenhum exercício neste dia.</p>';
     return;
   }
-  el.innerHTML = items.map(item => `
+  const sorted = [...items].sort((a, b) => {
+    const nameA = (a.kinetic_exercises?.name || '').toLowerCase();
+    const nameB = (b.kinetic_exercises?.name || '').toLowerCase();
+    return nameA.localeCompare(nameB, 'pt-BR');
+  });
+  el.innerHTML = sorted.map(item => `
     <div class="plan-item">
       <div class="plan-item-name">${(item.kinetic_exercises && item.kinetic_exercises.name) ? item.kinetic_exercises.name : '—'}</div>
       <div class="plan-mini-group">
