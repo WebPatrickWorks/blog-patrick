@@ -275,6 +275,28 @@
     .feed-series { font-size: 0.82rem; color: var(--muted); margin-top: 8px; }
     .feed-weight { color: var(--orange); font-weight: 700; }
 
+    /* ─── PROGRESSO NOS CARDS DO FEED ─── */
+    .feed-progress {
+      margin-top: 10px;
+    }
+    .feed-progress-label {
+      font-size: 0.75rem; color: var(--muted); margin-bottom: 5px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .feed-progress-label strong { color: var(--txt); font-family: 'JetBrains Mono', monospace; }
+    .feed-progress-track {
+      width: 100%; height: 3px; background: rgba(255,255,255,0.08);
+      border-radius: 999px; overflow: hidden;
+    }
+    .feed-progress-fill {
+      height: 100%; border-radius: 999px;
+      background: linear-gradient(90deg, var(--orange), #f87171);
+      transition: width 0.4s ease;
+    }
+    .feed-progress-fill.complete {
+      background: linear-gradient(90deg, var(--green), #34d399);
+    }
+
     /* ─── PUMP ─── */
     .feed-footer {
       display: flex; align-items: center; justify-content: space-between;
@@ -952,6 +974,7 @@ let restTimer = null;
 let restTotal = 60;
 let trainCurrentWeight = 0;
 let completedExercises = new Set(); // tracks IDs done this session
+let serverToday        = null;      // 'YYYY-MM-DD' vindo do servidor
 let pumpsSent   = new Set();  // user_ids que já receberam pump nesta sessão
 let pumpTotals  = {};         // { user_id: totalCount }
 
@@ -972,6 +995,76 @@ function closeModal(id) { $(id).classList.remove('active'); }
 
 function fmtDate(d) {
   return new Date(d).toLocaleDateString('pt-BR', {day:'2-digit',month:'short',year:'numeric'});
+}
+
+// ── DAILY PROGRESS ──
+
+// Obtém a data de hoje pelo servidor (via updated_at do upsert),
+// garantindo independência do relógio do dispositivo.
+async function getServerToday() {
+  const { data, error } = await SB
+    .from('kinetic_daily_progress')
+    .upsert(
+      { user_id: currentUser.id },
+      { onConflict: 'user_id', ignoreDuplicates: true }
+    )
+    .select('updated_at, training_date, completed_ids')
+    .single();
+
+  // Se o upsert com ignoreDuplicates não retornou dados, busca o registro existente
+  const row = data || (await SB
+    .from('kinetic_daily_progress')
+    .select('updated_at, training_date, completed_ids')
+    .eq('user_id', currentUser.id)
+    .single()
+  ).data;
+
+  if (!row) return null;
+
+  // Converte o timestamp do servidor para data em São Paulo
+  serverToday = new Date(row.updated_at)
+    .toLocaleDateString('sv-SE', { timeZone: 'America/Sao_Paulo' }); // 'YYYY-MM-DD'
+
+  return row;
+}
+
+async function loadDailyProgress() {
+  const row = await getServerToday();
+  if (!row) return;
+
+  // Se a data salva no banco bate com hoje (pelo relógio do servidor),
+  // restaura os exercícios concluídos. Caso contrário descarta — novo dia.
+  if (row.training_date === serverToday) {
+    const ids = Array.isArray(row.completed_ids) ? row.completed_ids : [];
+    completedExercises = new Set(ids);
+  } else {
+    completedExercises = new Set();
+    // Limpa o registro para o novo dia (será recriado ao concluir o 1º exercício)
+    await SB.from('kinetic_daily_progress')
+      .update({ training_date: serverToday, completed_ids: [] })
+      .eq('user_id', currentUser.id);
+  }
+}
+
+async function saveProgress() {
+  if (!currentUser || !serverToday) return;
+  const ids = Array.from(completedExercises);
+  const today = new Date().getDay();
+  const totalCount = (weeklyPlan[today] || []).length;
+
+  await SB.from('kinetic_daily_progress').upsert({
+    user_id:       currentUser.id,
+    training_date: serverToday,
+    completed_ids: ids,
+    updated_at:    new Date().toISOString() // apenas para o campo not-null; servidor pode sobrescrever
+  }, { onConflict: 'user_id' });
+
+  // Atualiza também o campo de progresso na sessão ativa (para o feed)
+  if (currentProfile) {
+    await SB.from('kinetic_active_sessions')
+      .update({ completed_count: ids.length, total_count: totalCount })
+      .eq('user_id', currentUser.id);
+  }
 }
 
 // ── VIEWS ──
@@ -1067,6 +1160,7 @@ async function loadSession() {
 
   await loadExercises();
   await loadWeeklyPlan();
+  await loadDailyProgress();
   renderTodayHeader();
   renderTrainGrid(); // chamado aqui: weeklyPlan já populado
   subscribeToPumps();
@@ -1310,12 +1404,45 @@ function renderTodayHeader() {
   const today = new Date().getDay();
   const items = weeklyPlan[today] || [];
   $('today-title').textContent = DAY_FULL[today];
+
   if (items.length) {
-    $('today-subtitle').textContent = `${items.length} exercício${items.length > 1 ? 's' : ''} no plano de hoje`;
-    $('btn-run-today').style.display = 'inline-flex';
+    // Conta quantos do plano de hoje já foram concluídos
+    const doneCount = items.filter(i => completedExercises.has(i.exercise_id)).length;
+    const total     = items.length;
+    const pct       = Math.round((doneCount / total) * 100);
+    const allDone   = doneCount === total;
+
+    $('today-subtitle').innerHTML = allDone
+      ? `<span style="color:var(--green);font-weight:700;">✓ Treino concluído! ${total}/${total} exercícios</span>`
+      : doneCount > 0
+        ? `<span style="color:var(--orange)">${doneCount}/${total} exercícios concluídos (${pct}%)</span>`
+        : `${total} exercício${total > 1 ? 's' : ''} no plano de hoje`;
+
+    // Barra de progresso
+    const existing = $('today-progress-bar');
+    if (!existing) {
+      const bar = document.createElement('div');
+      bar.id = 'today-progress-bar';
+      bar.style.cssText = `
+        width:100%; height:4px; background:rgba(255,255,255,0.08);
+        border-radius:999px; margin-top:10px; overflow:hidden;
+      `;
+      bar.innerHTML = `<div id="today-progress-fill" style="
+        height:100%; border-radius:999px; transition:width 0.5s ease;
+        background: linear-gradient(90deg, var(--orange), #f87171);
+        width:${pct}%;
+      "></div>`;
+      $('today-header').appendChild(bar);
+    } else {
+      $('today-progress-fill').style.width = pct + '%';
+    }
+
+    $('btn-run-today').style.display = allDone ? 'none' : 'inline-flex';
   } else {
     $('today-subtitle').textContent = 'Nenhum exercício no plano de hoje.';
     $('btn-run-today').style.display = 'none';
+    const bar = $('today-progress-bar');
+    if (bar) bar.remove();
   }
 }
 
@@ -1457,6 +1584,8 @@ function doneSet() {
     if (trainCurrentEx) {
       completedExercises.add(trainCurrentEx.id);
       renderTrainGrid();
+      renderTodayHeader();
+      saveProgress(); // persiste no Supabase
     }
 
     if (trainQueue.length > 0) {
@@ -1509,7 +1638,6 @@ function skipRest() {
 
 async function publishActiveSession(status, weightOverride) {
   if (!currentUser || !currentProfile || !trainCurrentEx) return;
-  // Busca carga: usa override se fornecido, senão busca no plano do dia
   let weight = (weightOverride !== undefined) ? weightOverride : null;
   if (weight === null) {
     const today = new Date().getDay();
@@ -1517,15 +1645,22 @@ async function publishActiveSession(status, weightOverride) {
     const planItem  = planItems.find(i => i.exercise_id === trainCurrentEx.id);
     weight = planItem ? parseFloat(planItem.weight_kg) || 0 : 0;
   }
+  const today      = new Date().getDay();
+  const todayItems = weeklyPlan[today] || [];
+  const totalCount = todayItems.length;
+  const doneCount  = todayItems.filter(i => completedExercises.has(i.exercise_id)).length;
+
   const { error } = await SB.from('kinetic_active_sessions').upsert({
-    user_id: currentUser.id,
-    nick: currentProfile.nick,
-    exercise_name: trainCurrentEx.name,
+    user_id:         currentUser.id,
+    nick:            currentProfile.nick,
+    exercise_name:   trainCurrentEx.name,
     status,
-    current_set: trainCurrentSet,
-    total_sets: trainTotalSets,
-    weight_kg: weight,
-    updated_at: new Date().toISOString()
+    current_set:     trainCurrentSet,
+    total_sets:      trainTotalSets,
+    weight_kg:       weight,
+    completed_count: doneCount,
+    total_count:     totalCount,
+    updated_at:      new Date().toISOString()
   });
   if (error) console.error('publishActiveSession error:', error);
 }
@@ -1623,6 +1758,24 @@ async function loadAppFeed() {
   await loadAppFeedWithPumps();
 }
 
+function buildProgressBar(s) {
+  const total = s.total_count || 0;
+  if (!total) return '';
+  const done = s.completed_count || 0;
+  const pct  = Math.round((done / total) * 100);
+  const complete = done >= total;
+  return `
+    <div class="feed-progress">
+      <div class="feed-progress-label">
+        <span>Progresso do treino</span>
+        <strong>${done}/${total} (${pct}%)</strong>
+      </div>
+      <div class="feed-progress-track">
+        <div class="feed-progress-fill${complete ? ' complete' : ''}" style="width:${pct}%"></div>
+      </div>
+    </div>`;
+}
+
 function renderAppFeed(sessions) {
   const el = $('app-feed-grid');
   if (!el) return;
@@ -1646,6 +1799,7 @@ function renderAppFeed(sessions) {
         Série ${s.current_set} de ${s.total_sets}
         ${s.weight_kg > 0 ? `<span class="feed-weight">· ${s.weight_kg} kg</span>` : ''}
       </div>` : ''}
+      ${buildProgressBar(s)}
       <div class="feed-footer">
         <div class="pump-total">
           <span>💪</span>
@@ -1690,6 +1844,7 @@ function renderFeed(sessions) {
         Série ${s.current_set} de ${s.total_sets}
         ${s.weight_kg > 0 ? `<span class="feed-weight">· ${s.weight_kg} kg</span>` : ''}
       </div>` : ''}
+      ${buildProgressBar(s)}
       <div class="feed-footer">
         <div class="pump-total">
           <span>💪</span>
