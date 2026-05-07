@@ -1004,26 +1004,33 @@ function fmtDate(d) {
 async function getServerToday() {
   console.log('[K42] getServerToday: iniciando, user_id =', currentUser.id);
 
-  // 1. Garante que o registro existe
-  const upsertRes = await SB.from('kinetic_daily_progress')
-    .upsert({ user_id: currentUser.id }, { onConflict: 'user_id', ignoreDuplicates: true });
-  console.log('[K42] getServerToday: upsert result =', upsertRes);
+  // 1. Tenta INSERT direto (mais simples que upsert para diagnóstico)
+  const { error: insErr } = await SB.from('kinetic_daily_progress')
+    .insert({ user_id: currentUser.id, training_date: '1970-01-01', completed_ids: [] });
+  if (insErr) {
+    // Código 23505 = registro já existe (unique violation) — é esperado, não é erro real
+    if (insErr.code !== '23505') {
+      console.error('[K42] getServerToday: INSERT falhou (não é duplicate):', insErr);
+    } else {
+      console.log('[K42] getServerToday: registro já existe (23505 esperado), seguindo');
+    }
+  } else {
+    console.log('[K42] getServerToday: INSERT ok — registro novo criado');
+  }
 
-  // 2. UPDATE inócuo para forçar Postgres a gerar updated_at
-  const updateRes = await SB.from('kinetic_daily_progress')
-    .update({ user_id: currentUser.id })
-    .eq('user_id', currentUser.id);
-  console.log('[K42] getServerToday: update inócuo result =', updateRes);
-
-  // 3. SELECT para ler o registro
+  // 2. SELECT para ler o registro
   const { data: row, error: selErr } = await SB
     .from('kinetic_daily_progress')
     .select('updated_at, training_date, completed_ids')
     .eq('user_id', currentUser.id)
     .single();
-  console.log('[K42] getServerToday: select row =', row, 'error =', selErr);
 
-  if (!row) return null;
+  console.log('[K42] getServerToday: select =', row, '| error =', selErr);
+
+  if (!row) {
+    console.error('[K42] getServerToday: sem row após INSERT + SELECT — verifique RLS da tabela');
+    return null;
+  }
 
   serverToday = new Date(row.updated_at)
     .toLocaleDateString('sv-SE', { timeZone: 'America/Sao_Paulo' });
