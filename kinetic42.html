@@ -1130,13 +1130,19 @@ async function doLogin() {
 }
 
 async function doLogout() {
-  // Remove active session
   if (currentUser) {
     await SB.from('kinetic_active_sessions').delete().eq('user_id', currentUser.id);
   }
   await SB.auth.signOut();
-  currentUser = null; currentProfile = null;
-  exercises = []; weeklyPlan = {};
+  // Reset completo de todo o estado da aplicação
+  currentUser        = null;
+  currentProfile     = null;
+  exercises          = [];
+  weeklyPlan         = {};
+  completedExercises = new Set();
+  serverToday        = null;
+  pumpsSent          = new Set();
+  pumpTotals         = {};
   showPublic();
 }
 
@@ -1145,7 +1151,8 @@ async function loadSession(sessionOverride = null) {
   if (!session) { showPublic(); return; }
   currentUser = session.user;
 
-  const { data: profile } = await SB.from('kinetic_profiles').select('*').eq('id', currentUser.id).single();
+  const { data: profile, error: profErr } = await SB.from('kinetic_profiles').select('*').eq('id', currentUser.id).single();
+  if (profErr || !profile) { console.error('[K42] loadSession: perfil não encontrado', profErr); showPublic(); return; }
   currentProfile = profile;
 
   // Update UI
@@ -1156,9 +1163,9 @@ async function loadSession(sessionOverride = null) {
 
   await loadExercises();
   await loadWeeklyPlan();
-  await loadDailyProgress();
+  try { await loadDailyProgress(); } catch(e) { console.error('[K42] loadDailyProgress error:', e); }
   renderTodayHeader();
-  renderTrainGrid(); // chamado aqui: weeklyPlan já populado
+  renderTrainGrid();
   subscribeToPumps();
   showApp();
 }
