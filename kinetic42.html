@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <meta name="theme-color" content="#0b0f17">
   <title>Kinetic42 | Centro Oculto</title>
   <link rel="stylesheet" href="css/main.css">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
@@ -34,7 +35,10 @@
       --shadow: 0 20px 60px rgba(0,0,0,0.55);
     }
 
-    html { scroll-behavior: smooth; }
+    html { 
+      scroll-behavior: smooth;
+      background-color: var(--bg); /* já tem --bg: #0b0f17 definido */
+    }
 
     body {
       margin: 0 auto;
