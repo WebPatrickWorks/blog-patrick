@@ -808,8 +808,8 @@
         <h3 id="today-title">Plano de hoje</h3>
         <p id="today-subtitle">Carregando...</p>
       </div>
-      <button class="btn btn-primary btn-sm" id="btn-run-today" onclick="runTodayPlan()" style="display:none">
-        ▶ Executar Plano do Dia
+      <button class="btn btn-primary btn-sm" id="btn-run-today" onclick="resetAndStartWorkout()" style="display:none">
+        ▶ Iniciar Treino
       </button>
     </div>
 
@@ -1466,6 +1466,28 @@ function startExercise(exId, sets) {
   const planItem  = planItems.find(i => i.exercise_id === exId);
   trainCurrentWeight = planItem ? parseFloat(planItem.weight_kg) || 0 : 0;
   openTrainOverlay();
+}
+
+async function resetAndStartWorkout() {
+  const today = new Date().getDay();
+  const items = weeklyPlan[today] || [];
+  if (!items.length) return toast('Nenhum exercício no plano de hoje.', 'err');
+
+  // Zera o progresso localmente
+  completedExercises = new Set();
+
+  // Persiste o reset no Supabase
+  if (currentUser && serverToday) {
+    await SB.from('kinetic_daily_progress')
+      .update({ training_date: serverToday, completed_ids: [] })
+      .eq('user_id', currentUser.id);
+  }
+
+  // Atualiza a UI
+  renderTrainGrid();
+  renderTodayHeader();
+
+  toast('Treino reiniciado! Bora! 💪', 'ok');
 }
 
 function runTodayPlan() {
