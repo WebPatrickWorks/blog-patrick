@@ -1476,14 +1476,30 @@ async function resetAndStartWorkout() {
   // Zera o progresso localmente
   completedExercises = new Set();
 
-  // Persiste o reset no Supabase
+  // Persiste o reset no Supabase (daily_progress)
   if (currentUser && serverToday) {
     await SB.from('kinetic_daily_progress')
       .update({ training_date: serverToday, completed_ids: [] })
       .eq('user_id', currentUser.id);
   }
 
-  // Atualiza a UI
+  // Reseta o contador no feed "Ao Vivo"
+  if (currentUser && currentProfile) {
+    await SB.from('kinetic_active_sessions').upsert({
+      user_id:         currentUser.id,
+      nick:            currentProfile.nick,
+      exercise_name:   '—',
+      status:          'training',
+      current_set:     0,
+      total_sets:      0,
+      weight_kg:       0,
+      completed_count: 0,
+      total_count:     items.length,
+      updated_at:      new Date().toISOString()
+    });
+  }
+
+  // Atualiza a UI local
   renderTrainGrid();
   renderTodayHeader();
 
